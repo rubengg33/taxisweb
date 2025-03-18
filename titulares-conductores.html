@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Titulares y Conductores</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="flex items-center justify-center min-h-screen bg-gray-100">
+    <div class="w-full max-w-6xl min-h-[500px] bg-white p-6 rounded-lg shadow-lg">
+        <h2 class="text-2xl font-bold text-center mb-4">Gestión de Conductores y Titulares</h2>
+        
+        <div class="flex justify-center gap-4 mb-4">
+            <button onclick="mostrarTabla('licencias')" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700">Ver Titulares</button>
+            <button onclick="mostrarTabla('conductores')" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700">Ver Conductores</button>
+        </div>
+        
+        <div id="licencias" class="hidden">
+            <h3 class="text-xl font-semibold mb-2 text-center">Titulares</h3>
+            <button onclick="abrirFormulario('licencias')" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-800 mb-2">Agregar Titular</button>
+            <table class="w-full table-auto border border-gray-300">
+                <thead>
+                    <tr class="bg-gray-300 text-lg">
+                        <th class="border border-gray-400 p-2">LICENCIA</th>
+                        <th class="border border-gray-400 p-2">DNI</th>
+                        <th class="border border-gray-400 p-2">NOMBRE Y APELLIDOS</th>
+                        <th class="border border-gray-400 p-2">MATRÍCULA</th>
+                        <th class="border border-gray-400 p-2">MARCA Y MODELO</th>
+                        <th class="border border-gray-400 p-2">EMAIL</th>
+                        <th class="border border-gray-400 p-2">Nº PATRONAL</th>
+                        <th class="border border-gray-400 p-2">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="dataTableTitulares"></tbody>
+            </table>
+        </div>
+        
+        <div id="conductores" class="hidden">
+            <h3 class="text-xl font-semibold mb-2 text-center">Conductores</h3>
+            <button onclick="abrirFormulario('conductores')" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-800 mb-2">Agregar Conductor</button>
+            <table class="w-full table-auto border border-gray-300">
+                <thead>
+                    <tr class="bg-gray-300 text-lg">
+                        <th class="border border-gray-400 p-2">ID</th>
+                        <th class="border border-gray-400 p-2">NOMBRE Y APELLIDOS</th>
+                        <th class="border border-gray-400 p-2">DNI</th>
+                        <th class="border border-gray-400 p-2">DIRECCIÓN</th>
+                        <th class="border border-gray-400 p-2">CÓDIGO POSTAL</th>
+                        <th class="border border-gray-400 p-2">EMAIL</th>
+                        <th class="border border-gray-400 p-2">Nº SEGURIDAD SOCIAL</th>
+                        <th class="border border-gray-400 p-2">LICENCIA</th>
+                        <th class="border border-gray-400 p-2">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="dataTableConductores"></tbody>
+            </table>
+        </div>
+    </div>
+    <div id="formularioContainer" class="fixed inset-0 flex items-center justify-center hidden bg-gray-900 bg-opacity-50">
+        <div class="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
+            <h3 id="formTitle" class="text-xl font-semibold mb-4 text-center"></h3>
+            <input type="hidden" id="formId">
+            <div class="space-y-2">
+                <input id="formNombre" type="text" placeholder="Nombre" class="w-full p-2 border border-gray-300 rounded">
+                <input id="formDNI" type="text" placeholder="DNI" class="w-full p-2 border border-gray-300 rounded">
+                <input id="formDireccion" type="text" placeholder="Dirección" class="w-full p-2 border border-gray-300 rounded">
+                <input id="formCP" type="text" placeholder="Código Postal" class="w-full p-2 border border-gray-300 rounded">
+                <input id="formEmail" type="email" placeholder="Email" class="w-full p-2 border border-gray-300 rounded">
+                <input id="formSS" type="text" placeholder="Seguridad Social" class="w-full p-2 border border-gray-300 rounded">
+                <input id="formLicencia" type="text" placeholder="Licencia" class="w-full p-2 border border-gray-300 rounded">
+            </div>
+            <div class="flex justify-end mt-4 space-x-2">
+                <button onclick="cerrarFormulario()" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-700">Cancelar</button>
+                <button onclick="guardarDatos()" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700">Guardar</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+let tipoFormulario = '';
+
+function abrirFormulario(tipo, datos = null) {
+    tipoFormulario = tipo; // Guardamos el tipo seleccionado
+    document.getElementById('formularioContainer').classList.remove('hidden');
+    document.getElementById('formTitle').innerText = datos ? `Editar ${tipo}` : `Agregar ${tipo}`;
+    
+    document.getElementById('formId').value = datos ? datos.id || datos.LICENCIA : "";
+    document.getElementById('formNombre').value = datos ? datos.nombre_apellidos || '' : '';
+    document.getElementById('formDNI').value = datos ? datos.dni || '' : '';
+    document.getElementById('formDireccion').value = datos ? datos.direccion || '' : '';
+    document.getElementById('formCP').value = datos ? datos.codigo_postal || '' : '';
+    document.getElementById('formEmail').value = datos ? datos.email || '' : '';
+    document.getElementById('formSS').value = datos ? datos.numero_seguridad_social || '' : '';
+    document.getElementById('formLicencia').value = datos ? datos.licencia || '' : '';
+}
+
+function cerrarFormulario() {
+    document.getElementById('formularioContainer').classList.add('hidden');
+}
+
+async function guardarDatos() {
+    const id = document.getElementById('formId').value;
+    const nombre_apellidos = document.getElementById('formNombre').value;
+    const dni = document.getElementById('formDNI').value;
+    const direccion = document.getElementById('formDireccion').value;
+    const codigo_postal = document.getElementById('formCP').value;
+    const email = document.getElementById('formEmail').value;
+    const numero_seguridad_social = document.getElementById('formSS').value;
+    const licencia = document.getElementById('formLicencia').value;
+    
+    const datos = { nombre_apellidos, dni, direccion, codigo_postal, email, numero_seguridad_social, licencia };
+    let apiTipo = tipoFormulario === 'titulares' ? 'licencias' : 'conductores';
+
+    try {
+        const response = await fetch(`http://localhost:3000/api/${apiTipo}${id ? `/${id}` : ''}`, {
+            method: id ? "PUT" : "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(datos)
+        });
+        const resultado = await response.json();
+        alert(resultado.message || "Datos guardados correctamente");
+        cerrarFormulario();
+        cargarDatos(`http://localhost:3000/api/${apiTipo}`, `dataTable${tipoFormulario.charAt(0).toUpperCase() + tipoFormulario.slice(1)}`, tipoFormulario);
+    } catch (error) {
+        console.error("Error guardando:", error);
+    }
+}
+
+        function mostrarTabla(tabla) {
+            document.getElementById('licencias').classList.add('hidden');
+            document.getElementById('conductores').classList.add('hidden');
+            document.getElementById(tabla).classList.remove('hidden');
+        }
+        
+        async function cargarDatos(url, tablaId, tipo) {
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                const tableBody = document.getElementById(tablaId);
+                tableBody.innerHTML = "";
+                
+                data.forEach(item => {
+                    const row = document.createElement("tr");
+                    row.innerHTML = Object.values(item).map(valor => `<td class='border border-gray-400 p-2 text-center'>${valor || '-'}</td>`).join('') +
+                        `<td class='border border-gray-400 p-2 text-center'>
+                            <button onclick="editar('${tipo}', '${item[tipo === 'licencias' ? 'LICENCIA' : 'id']}')" class='bg-yellow-500 text-white px-2 py-1 rounded hover:bg-yellow-700'>Editar</button>
+                            <button onclick="eliminar('${tipo}', '${item[tipo === 'licencias' ? 'LICENCIA' : 'id']}')" class='bg-red-500 text-white px-2 py-1 rounded hover:bg-red-700'>Eliminar</button>
+                        </td>`;
+                    tableBody.appendChild(row);
+                });
+            } catch (error) {
+                console.error("Error cargando datos:", error);
+            }
+        }
+        
+        async function editar(tipo, id) {
+    try {
+        const apiTipo = tipo === 'licencias' ? 'licencias' : 'conductores';
+        const response = await fetch(`http://localhost:3000/api/${apiTipo}/${id}`);
+        const datos = await response.json();
+        abrirFormulario(tipo, datos);
+    } catch (error) {
+        console.error("Error obteniendo datos:", error);
+    }
+}
+
+async function eliminar(tipo, id) {
+    if (!confirm("¿Seguro que deseas eliminar este registro?")) return;
+
+    try {
+        const apiTipo = tipo === 'licencias' ? 'licencias' : 'conductores';
+        const response = await fetch(`http://localhost:3000/api/${apiTipo}/${id}`, {
+            method: "DELETE"
+        });
+        const resultado = await response.json();
+        alert(resultado.message || "Eliminado correctamente");
+        cargarDatos(`http://localhost:3000/api/${apiTipo}`, `dataTable${tipo.charAt(0).toUpperCase() + tipo.slice(1)}`, tipo);
+    } catch (error) {
+        console.error("Error eliminando:", error);
+    }
+}
+
+
+        
+        cargarDatos("http://localhost:3000/api/licencias", "dataTableTitulares", "licencias");
+        cargarDatos("http://localhost:3000/api/conductores", "dataTableConductores", "conductores");
+    </script>
+</body>
+</html>
