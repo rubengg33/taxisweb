@@ -22,7 +22,7 @@
             <i class="material-icons alert-close cursor-pointer" onclick="cerrarAlerta()">close</i>
         </div>
 
-        <form id="loginForm" class="space-y-4">
+        <form id="loginForm" class="space-y-4"> 
             <div>
                 <label for="email" class="block text-sm font-medium text-gray-700">Correo Electrónico</label>
                 <input type="email" id="email" class="mt-1 block w-full p-2 border border-gray-300 rounded-md" required>
@@ -36,6 +36,18 @@
     </div>
 
     <script>
+        document.addEventListener("DOMContentLoaded", function() {
+    const userEmail = localStorage.getItem("userEmail");
+    const isAdmin = localStorage.getItem("isAdmin");
+
+    if (userEmail) {
+        if (isAdmin === "true") {
+            window.location.href = "titulares-conductores.html"; // Admin
+        } else {
+            window.location.href = "registro.html"; // Usuario normal
+        }
+    }
+});
 document.getElementById("loginForm").addEventListener("submit", async function(event) {
     event.preventDefault();
     const email = document.getElementById("email").value;
@@ -51,6 +63,10 @@ document.getElementById("loginForm").addEventListener("submit", async function(e
         const data = await response.json();
 
         if (data.exists) {
+            // Guardar sesión en localStorage
+            localStorage.setItem("userEmail", email);
+            localStorage.setItem("isAdmin", data.admin);
+
             if (data.admin) {
                 window.location.href = "titulares-conductores.html"; // Admin
             } else {

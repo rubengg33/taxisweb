@@ -1,61 +1,70 @@
-    <!DOCTYPE html>
-    <html lang="es">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Gestión de Titulares y Conductores</title>
-        <script src="https://cdn.tailwindcss.com"></script>
-    </head>
-    <body class="flex items-center justify-center min-h-screen bg-gray-100">
-        <div class="w-full max-w-6xl min-h-[500px] bg-white p-6 rounded-lg shadow-lg">
-            <h2 class="text-2xl font-bold text-center mb-4">Gestión de Conductores y Titulares</h2>
-            
-            <div class="flex justify-center gap-4 mb-4">
-                <button onclick="mostrarTabla('licencias')" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700">Ver Titulares</button>
-                <button onclick="mostrarTabla('conductores')" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700">Ver Conductores</button>
-            </div>
-            
-            <div id="licencias" class="hidden">
-                <h3 class="text-xl font-semibold mb-2 text-center">Titulares</h3>
-                <button onclick="abrirFormulario('licencias')" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-800 mb-2">Agregar Titular</button>
-                <table class="w-full table-auto border border-gray-300">
-                    <thead>
-                        <tr class="bg-blue-500 text-white">
-                            <th class="border border-gray-400 p-2">LICENCIA</th>
-                            <th class="border border-gray-400 p-2">DNI</th>
-                            <th class="border border-gray-400 p-2">NOMBRE Y APELLIDOS</th>
-                            <th class="border border-gray-400 p-2">MATRÍCULA</th>
-                            <th class="border border-gray-400 p-2">MARCA Y MODELO</th>
-                            <th class="border border-gray-400 p-2">EMAIL</th>
-                            <th class="border border-gray-400 p-2">Nº PATRONAL</th>
-                            <th class="border border-gray-400 p-2">Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody id="dataTableLicencias"></tbody>
-                </table>
-            </div>
-            
-            <div id="conductores" class="hidden">
-                <h3 class="text-xl font-semibold mb-2 text-center">Conductores</h3>
-                <button onclick="abrirFormulario('conductores')" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-800 mb-2">Agregar Conductor</button>
-                <table class="w-full table-auto border border-gray-300">
-                    <thead>
-                        <tr class="bg-green-500 text-white">
-                            <th class="border border-gray-400 p-2">ID</th>
-                            <th class="border border-gray-400 p-2">NOMBRE Y APELLIDOS</th>
-                            <th class="border border-gray-400 p-2">DNI</th>
-                            <th class="border border-gray-400 p-2">DIRECCIÓN</th>
-                            <th class="border border-gray-400 p-2">CÓDIGO POSTAL</th>
-                            <th class="border border-gray-400 p-2">EMAIL</th>
-                            <th class="border border-gray-400 p-2">Nº SEGURIDAD SOCIAL</th>
-                            <th class="border border-gray-400 p-2">LICENCIA</th>
-                            <th class="border border-gray-400 p-2">Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody id="dataTableConductores"></tbody>
-                </table>
-            </div>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Titulares y Conductores</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="flex flex-col items-center justify-center min-h-screen bg-gray-100 relative">
+    
+    <!-- Botón de cerrar sesión en la parte superior derecha -->
+    <button class="absolute top-4 right-4 bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700 transition" id="logoutButton">
+        Cerrar sesión
+    </button>
+
+    <!-- Contenedor principal -->
+    <h1 class="text-center text-2xl mb-4">Bienvenido</h1>
+
+    <div class="w-full max-w-6xl min-h-[500px] bg-white p-6 rounded-lg shadow-lg">
+        <h2 class="text-2xl font-bold text-center mb-4">Gestión de Conductores y Titulares</h2>
+
+        <div class="flex justify-center gap-4 mb-4">
+            <button onclick="mostrarTabla('licencias')" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700 mt-4">Ver Titulares</button>
+            <button onclick="mostrarTabla('conductores')" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700 mt-4">Ver Conductores</button>
         </div>
+
+        <div id="licencias" class="hidden">
+            <h3 class="text-xl font-semibold mb-2 text-center">Titulares</h3>
+            <button onclick="abrirFormulario('licencias')" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-800 mb-2">Agregar Titular</button>
+            <table class="w-full table-auto border border-gray-300">
+                <thead>
+                    <tr class="bg-blue-500 text-white">
+                        <th class="border border-gray-400 p-2">LICENCIA</th>
+                        <th class="border border-gray-400 p-2">DNI</th>
+                        <th class="border border-gray-400 p-2">NOMBRE Y APELLIDOS</th>
+                        <th class="border border-gray-400 p-2">MATRÍCULA</th>
+                        <th class="border border-gray-400 p-2">MARCA Y MODELO</th>
+                        <th class="border border-gray-400 p-2">EMAIL</th>
+                        <th class="border border-gray-400 p-2">Nº PATRONAL</th>
+                        <th class="border border-gray-400 p-2">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="dataTableLicencias"></tbody>
+            </table>
+        </div>
+
+        <div id="conductores" class="hidden">
+            <h3 class="text-xl font-semibold mb-2 text-center">Conductores</h3>
+            <button onclick="abrirFormulario('conductores')" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-800 mb-2">Agregar Conductor</button>
+            <table class="w-full table-auto border border-gray-300">
+                <thead>
+                    <tr class="bg-green-500 text-white">
+                        <th class="border border-gray-400 p-2">ID</th>
+                        <th class="border border-gray-400 p-2">NOMBRE Y APELLIDOS</th>
+                        <th class="border border-gray-400 p-2">DNI</th>
+                        <th class="border border-gray-400 p-2">DIRECCIÓN</th>
+                        <th class="border border-gray-400 p-2">CÓDIGO POSTAL</th>
+                        <th class="border border-gray-400 p-2">EMAIL</th>
+                        <th class="border border-gray-400 p-2">Nº SEGURIDAD SOCIAL</th>
+                        <th class="border border-gray-400 p-2">LICENCIA</th>
+                        <th class="border border-gray-400 p-2">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="dataTableConductores"></tbody>
+            </table>
+        </div>
+    </div>
         <div id="formularioTitulares" class="fixed inset-0 flex items-center justify-center hidden bg-gray-900 bg-opacity-50">
             <div class="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
                 <h3 id="formTitle2" class="text-xl font-semibold mb-4 text-center"></h3>
@@ -88,7 +97,7 @@
                     <input id="formSS" type="text" placeholder="Seguridad Social" class="w-full p-2 border border-gray-300 rounded">
                     <input id="formLicencia" type="text" placeholder="Licencia" class="w-full p-2 border border-gray-300 rounded">
                 </div>
-                <div class="flex justify-end mt-4 space-x-2">
+                <div class="flex     justify-end mt-4 space-x-2">
                     <button onclick="cerrarFormulario('conductores')" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-700">Cancelar</button>
                     <button onclick="guardarDatos('conductores')" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700">Guardar</button>
                 </div>
@@ -97,7 +106,37 @@
         
         <script>
     let tipoFormulario = '';
-                
+    document.addEventListener("DOMContentLoaded", function () {
+    // Verifica si el usuario ha iniciado sesión
+    const usuarioLogueado = localStorage.getItem("usuario");
+
+    if (!usuarioLogueado) {
+      // Si no hay sesión, redirige al index.html
+      window.location.href = "index.html";
+    }
+  });
+    document.getElementById("logoutButton").addEventListener("click", async () => {
+    try {
+        const response = await fetch("http://localhost:3000/api/logout", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" }
+        });
+
+        if (response.ok) {
+            // 🔹 Borra la sesión del cliente
+            localStorage.removeItem("userEmail");
+            localStorage.removeItem("isAdmin");
+
+            alert("Sesión cerrada correctamente");
+            window.location.href = "index.html"; // Redirige al login
+        } else {
+            alert("Error al cerrar sesión");
+        }
+    } catch (error) {
+        console.error("Error al cerrar sesión:", error);
+        alert("Hubo un problema con la conexión al servidor");
+    }
+});           
     function abrirFormulario(tipo, datos = null) {
         tipoFormulario = tipo; // Guardamos el tipo seleccionado
         if(tipo === 'conductores'){

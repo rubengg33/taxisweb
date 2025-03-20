@@ -21,7 +21,7 @@ db.connect(err => {
     }
     console.log("Conectado a MySQL 🚀");
 });
-        
+
 const admins = {
     "admin@empresa.com": "1234",
     "otroadmin@empresa.com": "1234"
@@ -173,7 +173,10 @@ app.delete("/api/conductores/:id", (req, res) => {
         res.json({ message: "Conductor eliminado correctamente" });
     });
 });
-
+// Endpoint para cerrar sesión
+app.post("/api/logout", (req, res) => {
+    res.json({ message: "Sesión cerrada correctamente" });
+});
 app.listen(3000, () => {
     console.log("Servidor ejecutándose en http://localhost:3000 🚀");
 });
