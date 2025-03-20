@@ -36,34 +36,36 @@
     </div>
 
     <script>
-        document.getElementById("loginForm").addEventListener("submit", async function(event) {
-            event.preventDefault();
-            const email = document.getElementById("email").value;
-            const password = document.getElementById("password").value; // Ahora es el DNI
+document.getElementById("loginForm").addEventListener("submit", async function(event) {
+    event.preventDefault();
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
 
-            try {
-                const response = await fetch("http://localhost:3000/api/login", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ email, dni: password }) 
-                });
-
-                const data = await response.json();
-
-                if (data.exists) {
-                    window.location.href = "registro.html"; // Redirigir a la página de registro
-                } else {
-                    document.getElementById("alertaError").classList.remove("hidden");
-                }
-            } catch (error) {
-                console.error("Error en el login:", error);
-                document.getElementById("alertaError").classList.remove("hidden");
-            }
+    try {
+        const response = await fetch("http://localhost:3000/api/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, dni: password })
         });
 
-        function cerrarAlerta() {
-            document.getElementById("alertaError").classList.add("hidden");
+        const data = await response.json();
+
+        if (data.exists) {
+            if (data.admin) {
+                window.location.href = "titulares-conductores.html"; // Admin
+            } else {
+                window.location.href = "registro.html"; // Usuario normal
+            }
+        } else {
+            document.getElementById("alertaError").classList.remove("hidden");
         }
+    } catch (error) {
+        console.error("Error en el login:", error);
+        document.getElementById("alertaError").classList.remove("hidden");
+    }
+});
+
+
     </script>
 </body>
 </html>

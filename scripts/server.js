@@ -21,17 +21,32 @@ db.connect(err => {
     }
     console.log("Conectado a MySQL 🚀");
 });
-
+        
+const admins = {
+    "admin@empresa.com": "1234",
+    "otroadmin@empresa.com": "1234"
+};
 // Endpoint para iniciar sesión
 app.post("/api/login", (req, res) => {
     const { email, dni } = req.body;
+
+    // Verificar si es un admin (SIN base de datos)
+    if (admins[email] && admins[email] === dni) {
+        return res.json({ exists: true, admin: true });
+    }
+
+    // Si no es admin, verificar en la base de datos
     const query = "SELECT * FROM conductores WHERE EMAIL = ? AND DNI = ?";
     db.query(query, [email, dni], (err, result) => {
         if (err) return res.status(500).json({ error: "Error en el servidor" });
-        res.json({ exists: result.length > 0 });
+        
+        if (result.length > 0) {
+            return res.json({ exists: true, admin: false }); // Usuario normal
+        } else {
+            return res.json({ exists: false });
+        }
     });
 });
-
 // Obtener todos los titulares (licencias)
 app.get("/api/licencias", (req, res) => {
     db.query("SELECT * FROM licencias", (err, result) => {
