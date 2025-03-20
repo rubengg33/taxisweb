@@ -180,3 +180,40 @@ app.post("/api/logout", (req, res) => {
 app.listen(3000, () => {
     console.log("Servidor ejecutándose en http://localhost:3000 🚀");
 });
+
+// Búsqueda en todos los campos de licencias
+app.get("/api/licencias/buscar/:termino", (req, res) => {
+    const termino = req.params.termino;
+    const query = `SELECT * FROM licencias WHERE 
+        LICENCIA LIKE ? OR 
+        DNI LIKE ? OR 
+        NOMBRE_APELLIDOS LIKE ? OR 
+        MATRICULA LIKE ? OR 
+        MARCA_MODELO LIKE ? OR 
+        EMAIL LIKE ? OR 
+        NUMERO_PATRONAL LIKE ?`;
+    const searchTerm = `%${termino}%`;
+    db.query(query, Array(7).fill(searchTerm), (err, result) => {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json(result);
+    });
+});
+
+// Búsqueda en todos los campos de conductores
+app.get("/api/conductores/buscar/:termino", (req, res) => {
+    const termino = req.params.termino;
+    const query = `SELECT * FROM conductores WHERE 
+        id LIKE ? OR 
+        nombre_apellidos LIKE ? OR 
+        dni LIKE ? OR 
+        direccion LIKE ? OR 
+        codigo_postal LIKE ? OR 
+        email LIKE ? OR 
+        numero_seguridad_social LIKE ? OR 
+        licencia LIKE ?`;
+    const searchTerm = `%${termino}%`;
+    db.query(query, Array(8).fill(searchTerm), (err, result) => {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json(result);
+    });
+});

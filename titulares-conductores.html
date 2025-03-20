@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestión de Titulares y Conductores</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Agregar Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
 <body class="flex flex-col items-center justify-center min-h-screen bg-gray-100 relative">
     
@@ -24,9 +26,24 @@
             <button onclick="mostrarTabla('conductores')" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700 mt-4">Ver Conductores</button>
         </div>
 
+        <!-- In the licencias div, after the "Agregar Titular" button -->
         <div id="licencias" class="hidden">
             <h3 class="text-xl font-semibold mb-2 text-center">Titulares</h3>
-            <button onclick="abrirFormulario('licencias')" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-800 mb-2">Agregar Titular</button>
+            <div class="flex gap-2 mb-2">
+                <button onclick="abrirFormulario('licencias')" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-800">
+                    <span class="material-icons text-sm mr-1">add</span>
+                    Agregar Titular
+                </button>
+                <!-- Actualizar los inputs de búsqueda -->
+                <div class="flex-1 flex gap-2">
+                    <input type="text" id="buscarLicencia" placeholder="Buscar en cualquier campo..." 
+                        class="flex-1 p-2 border border-gray-300 rounded">
+                </div>
+
+                <button onclick="buscar('licencias')" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700">
+                    <span class="material-icons text-sm">search</span>
+                </button>
+            </div>
             <table class="w-full table-auto border border-gray-300">
                 <thead>
                     <tr class="bg-blue-500 text-white">
@@ -44,9 +61,22 @@
             </table>
         </div>
 
+        <!-- In the conductores div, after the "Agregar Conductor" button -->
         <div id="conductores" class="hidden">
             <h3 class="text-xl font-semibold mb-2 text-center">Conductores</h3>
-            <button onclick="abrirFormulario('conductores')" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-800 mb-2">Agregar Conductor</button>
+            <div class="flex gap-2 mb-2">
+                <button onclick="abrirFormulario('conductores')" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-800">
+                    <span class="material-icons text-sm mr-1">add</span>
+                    Agregar Conductor
+                </button>
+                <div class="flex-1 flex gap-2">
+                    <input type="text" id="buscarConductor" placeholder="Buscar en cualquier campo..." 
+                        class="flex-1 p-2 border border-gray-300 rounded">
+                </div>
+                <button onclick="buscar('conductores')" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700">
+                    <span class="material-icons text-sm">search</span>
+                </button>
+            </div>
             <table class="w-full table-auto border border-gray-300">
                 <thead>
                     <tr class="bg-green-500 text-white">
@@ -106,6 +136,16 @@
         
         <script>
     let tipoFormulario = '';
+    // Reemplaza los event listeners actuales con estos:
+document.getElementById('buscarLicencia').addEventListener('input', function(e) {
+    buscar('licencias');
+});
+
+document.getElementById('buscarConductor').addEventListener('input', function(e) {
+    buscar('conductores');
+});
+
+// La función buscar se mantiene igual, ya que ya tenemos la lógica de búsqueda implementada
     document.addEventListener("DOMContentLoaded", function () {
         const userEmail = localStorage.getItem("userEmail");
         const isAdmin = localStorage.getItem("isAdmin");
@@ -135,7 +175,55 @@
         console.error("Error al cerrar sesión:", error);
         alert("Hubo un problema con la conexión al servidor");
     }
-});           
+});
+async function buscar(tipo) {
+    const termino = document.getElementById(tipo === 'licencias' ? 'buscarLicencia' : 'buscarConductor').value.trim();
+    if (!termino) {
+        // Si no hay término de búsqueda, cargar todos los datos
+        await cargarDatos(`http://localhost:3000/api/${tipo}`, `dataTable${tipo.charAt(0).toUpperCase() + tipo.slice(1)}`, tipo);
+        return;
+    }
+
+    try {
+        const response = await fetch(`http://localhost:3000/api/${tipo}/buscar/${termino}`);
+        if (!response.ok) throw new Error('Error en la búsqueda');
+        
+        const data = await response.json();
+        const tableBody = document.getElementById(`dataTable${tipo.charAt(0).toUpperCase() + tipo.slice(1)}`);
+        
+        tableBody.innerHTML = "";
+        
+        data.forEach(item => {
+            const row = document.createElement("tr");
+            row.innerHTML = Object.values(item).map(valor => `<td class='border border-gray-400 p-2 text-center'>${valor || '-'}</td>`).join('') +
+                `<td class='border border-gray-400 p-2 text-center'>
+                    <button onclick="editar('${tipo}', '${item[tipo === 'licencias' ? 'LICENCIA' : 'id']}')" 
+                        class='bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-700 flex items-center gap-1 inline-flex'>
+                        <span class="material-icons text-sm">edit</span>
+                        <span>Editar</span>
+                    </button>
+                    <button onclick="eliminar('${tipo}', '${item[tipo === 'licencias' ? 'LICENCIA' : 'id']}')" 
+                        class='bg-red-500 text-white px-3 py-1 rounded hover:bg-red-700 flex items-center gap-1 inline-flex mt-1'>
+                        <span class="material-icons text-sm">delete</span>
+                        <span>Eliminar</span>
+                    </button>
+                </td>`;
+            tableBody.appendChild(row);
+        });
+    } catch (error) {
+        console.error("Error en la búsqueda:", error);
+        alert("Error al realizar la búsqueda");
+    }
+}
+
+// Add event listeners for Enter key in search inputs
+document.getElementById('buscarLicencia').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') buscar('licencias');
+});
+
+document.getElementById('buscarConductor').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') buscar('conductores');
+});      
     function abrirFormulario(tipo, datos = null) {
         tipoFormulario = tipo; // Guardamos el tipo seleccionado
         if(tipo === 'conductores'){
@@ -273,8 +361,16 @@
             const row = document.createElement("tr");
             row.innerHTML = Object.values(item).map(valor => `<td class='border border-gray-400 p-2 text-center'>${valor || '-'}</td>`).join('') +
                 `<td class='border border-gray-400 p-2 text-center'>
-                    <button onclick="editar('${tipo}', '${item[tipo === 'licencias' ? 'LICENCIA' : 'id']}')" class='bg-yellow-500 text-white px-2 py-1 rounded hover:bg-yellow-700'>Editar</button>
-                    <button onclick="eliminar('${tipo}', '${item[tipo === 'licencias' ? 'LICENCIA' : 'id']}')" class='bg-red-500 text-white px-2 py-1 rounded hover:bg-red-700'>Eliminar</button>
+                    <button onclick="editar('${tipo}', '${item[tipo === 'licencias' ? 'LICENCIA' : 'id']}')" 
+                        class='bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-700 flex items-center gap-1 inline-flex'>
+                        <span class="material-icons text-sm">edit</span>
+                        <span>Editar</span>
+                    </button>
+                    <button onclick="eliminar('${tipo}', '${item[tipo === 'licencias' ? 'LICENCIA' : 'id']}')" 
+                        class='bg-red-500 text-white px-3 py-1 rounded hover:bg-red-700 flex items-center gap-1 inline-flex mt-1'>
+                        <span class="material-icons text-sm">delete</span>
+                        <span>Eliminar</span>
+                    </button>
                 </td>`;
             tableBody.appendChild(row);
         });
