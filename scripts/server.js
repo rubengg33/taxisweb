@@ -39,6 +39,55 @@ app.get("/api/licencias", (req, res) => {
         res.json(result);
     });
 });
+//Crear titular
+app.post("/api/licencias", (req, res) => {
+    console.log("📩 Datos recibidos en el servidor:", req.body); // Para verificar los datos enviados
+
+    const { licencia, dni, nombre_apellidos, matricula, marca_modelo, email, numero_patronal } = req.body;
+
+    if (!licencia || !dni || !nombre_apellidos || !matricula || !marca_modelo || !email || !numero_patronal) {
+        return res.status(400).json({ message: "Faltan campos obligatorios." });
+    }
+
+    const sql = "INSERT INTO licencias (licencia, dni, nombre_apellidos, matricula, marca_modelo, email, numero_patronal) VALUES (?, ?, ?, ?, ?, ?, ?)";
+    db.query(sql, [licencia, dni, nombre_apellidos, matricula, marca_modelo, email, numero_patronal], (err, result) => {
+        if (err) {
+            console.error("❌ Error en la consulta SQL:", err);
+            return res.status(500).json({ message: "Error en la base de datos", error: err.sqlMessage });
+        }
+        console.log("✅ Licencia insertada:", result);
+        res.json({ message: "Titular agregado exitosamente" });
+    }); 
+});
+
+
+// Obtener una licencia por su número
+app.get("/api/licencias/:licencia", (req, res) => {
+    const licencia = req.params.licencia;
+    db.query("SELECT * FROM licencias WHERE LICENCIA = ?", [licencia], (err, result) => {
+        if (err) return res.status(500).json({ error: "Error en el servidor" });
+        if (result.length === 0) return res.status(404).json({ error: "Licencia no encontrada" });
+        res.json(result[0]);
+    });
+});
+
+// Actualizar un titular por licencia
+app.put("/api/licencias/:licencia", (req, res) => {
+    const licencia = req.params.licencia;
+    const { dni, nombre_apellidos, matricula, marca_modelo, email, numero_patronal } = req.body;
+
+    const query = `
+        UPDATE licencias 
+        SET dni = ?, nombre_apellidos = ?, matricula = ?, marca_modelo = ?, email = ?, numero_patronal = ? 
+        WHERE licencia = ?
+    `;
+
+    db.query(query, [dni, nombre_apellidos, matricula, marca_modelo, email, numero_patronal, licencia], (err, result) => {
+        if (err) return res.status(500).json({ error: "Error al actualizar titular", details: err.sqlMessage });
+        if (result.affectedRows === 0) return res.status(404).json({ error: "Titular no encontrado" });
+        res.json({ message: "Titular actualizado correctamente" });
+    });
+});
 
 // Eliminar una licencia por su ID
 app.delete("/api/licencias/:licencia", (req, res) => {
