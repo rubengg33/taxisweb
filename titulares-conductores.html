@@ -31,7 +31,7 @@
                             <th class="border border-gray-400 p-2">Acciones</th>
                         </tr>
                     </thead>
-                    <tbody id="dataTableTitulares"></tbody>
+                    <tbody id="dataTableLicencias"></tbody>
                 </table>
             </div>
             
@@ -216,27 +216,34 @@
             }
             
             async function cargarDatos(url, tablaId, tipo) {
-                console.log("Cargando datos con URL:", url, "en la tabla:", tablaId);
-                try {
-                    const response = await fetch(url);
-                    const data = await response.json();
-                    
-                    const tableBody = document.getElementById(tablaId);
-                    tableBody.innerHTML = "";
-                    
-                    data.forEach(item => {
-                        const row = document.createElement("tr");
-                        row.innerHTML = Object.values(item).map(valor => `<td class='border border-gray-400 p-2 text-center'>${valor || '-'}</td>`).join('') +
-                            `<td class='border border-gray-400 p-2 text-center'>
-                                <button onclick="editar('${tipo}', '${item[tipo === 'licencias' ? 'LICENCIA' : 'id']}')" class='bg-yellow-500 text-white px-2 py-1 rounded hover:bg-yellow-700'>Editar</button>
-                                <button onclick="eliminar('${tipo}', '${item[tipo === 'licencias' ? 'LICENCIA' : 'id']}')" class='bg-red-500 text-white px-2 py-1 rounded hover:bg-red-700'>Eliminar</button>
-                            </td>`;
-                        tableBody.appendChild(row);
-                    });
-                } catch (error) {
-                    console.error("Error cargando datos:", error);
-                }
-            }
+    console.log("Cargando datos con URL:", url, "en la tabla:", tablaId);
+    try {
+        const response = await fetch(url);
+        const data = await response.json();
+        console.log(data);
+        
+        const tableBody = document.getElementById(tablaId);
+        console.log("ID de tabla:", tablaId); // Para depurar
+        if (!tableBody) {
+            console.error(`No se encontró el elemento con ID: ${tablaId}`);
+            return; // Salir de la función si no se encuentra el elemento
+        }
+        
+        tableBody.innerHTML = "";
+        
+        data.forEach(item => {
+            const row = document.createElement("tr");
+            row.innerHTML = Object.values(item).map(valor => `<td class='border border-gray-400 p-2 text-center'>${valor || '-'}</td>`).join('') +
+                `<td class='border border-gray-400 p-2 text-center'>
+                    <button onclick="editar('${tipo}', '${item[tipo === 'licencias' ? 'LICENCIA' : 'id']}')" class='bg-yellow-500 text-white px-2 py-1 rounded hover:bg-yellow-700'>Editar</button>
+                    <button onclick="eliminar('${tipo}', '${item[tipo === 'licencias' ? 'LICENCIA' : 'id']}')" class='bg-red-500 text-white px-2 py-1 rounded hover:bg-red-700'>Eliminar</button>
+                </td>`;
+            tableBody.appendChild(row);
+        });
+    } catch (error) {
+        console.error("Error cargando datos:", error);
+    }
+}
             
             async function editar(tipo, id) {
         try {
@@ -250,7 +257,7 @@
     }
 
     async function eliminar(tipo, id) {
-        if (!confirm("¿Seguro que deseas eliminar este registro?")) return;
+        if (!confirm("¿Seguro que deseas eliminar este registro?")) return; 
 
         try {
             const apiTipo = tipo === 'licencias' ? 'licencias' : 'conductores';
@@ -264,7 +271,7 @@
             console.error("Error eliminando:", error);
         }
     }
-            cargarDatos("http://localhost:3000/api/licencias", "dataTableTitulares", "licencias");
+            cargarDatos("http://localhost:3000/api/licencias", "dataTableLicencias", "licencias");
             cargarDatos("http://localhost:3000/api/conductores", "dataTableConductores", "conductores");
         </script>
     </body>

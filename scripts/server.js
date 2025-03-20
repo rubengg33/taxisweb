@@ -106,7 +106,7 @@ app.get("/api/conductores", (req, res) => {
         res.json(result);
     });
 });
-
+//obtener conductor por id
 app.get("/api/conductores/:id", (req, res) => {
     const id = req.params.id;
     db.query("SELECT * FROM conductores WHERE id = ?", [id], (err, result) => {
@@ -136,9 +136,6 @@ app.post("/api/conductores", (req, res) => {
         res.json({ message: "Conductor agregado exitosamente" });
     });
 });
-
-
-
 
 // Actualizar un conductor por ID
 app.put("/api/conductores/:id", (req, res) => {
