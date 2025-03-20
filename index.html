@@ -36,18 +36,19 @@
     </div>
 
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
-    const userEmail = localStorage.getItem("userEmail");
-    const isAdmin = localStorage.getItem("isAdmin");
+       document.addEventListener("DOMContentLoaded", function() {
+        const userEmail = localStorage.getItem("userEmail");
+        const isAdmin = localStorage.getItem("isAdmin");
 
-    if (userEmail) {
-        if (isAdmin === "true") {
-            window.location.href = "titulares-conductores.html"; // Admin
-        } else {
-            window.location.href = "registro.html"; // Usuario normal
+        if (userEmail) {
+            // Verifica que NO esté ya en titulares-conductores.html
+            if (isAdmin === "true" && window.location.pathname !== "/titulares-conductores.html") {
+                window.location.href = "titulares-conductores.html"; 
+            } else if (isAdmin !== "true" && window.location.pathname !== "/registro.html") {
+                window.location.href = "registro.html"; 
+            }
         }
-    }
-});
+    });
 document.getElementById("loginForm").addEventListener("submit", async function(event) {
     event.preventDefault();
     const email = document.getElementById("email").value;

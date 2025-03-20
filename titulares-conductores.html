@@ -107,14 +107,13 @@
         <script>
     let tipoFormulario = '';
     document.addEventListener("DOMContentLoaded", function () {
-    // Verifica si el usuario ha iniciado sesión
-    const usuarioLogueado = localStorage.getItem("usuario");
+        const userEmail = localStorage.getItem("userEmail");
+        const isAdmin = localStorage.getItem("isAdmin");
 
-    if (!usuarioLogueado) {
-      // Si no hay sesión, redirige al index.html
-      window.location.href = "index.html";
-    }
-  });
+        if (!userEmail || isAdmin !== "true") {
+            window.location.replace("index.html"); // Evita bucle reemplazando la URL en el historial
+        }
+    });
     document.getElementById("logoutButton").addEventListener("click", async () => {
     try {
         const response = await fetch("http://localhost:3000/api/logout", {
