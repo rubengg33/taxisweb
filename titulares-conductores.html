@@ -417,11 +417,11 @@ document.getElementById('buscarConductor').addEventListener('keypress', function
         
         <!-- Botones de navegación flotantes -->
         <div class="fixed bottom-4 right-4 flex flex-col gap-2">
-            <button id="btnSubir" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" 
+            <button id="btnSubir" onclick="window.scrollTo({top: 0})" 
                     class="bg-blue-500 text-white p-2 rounded-full shadow-lg hover:bg-blue-700 transition-colors">
                 <span class="material-icons">arrow_upward</span>
             </button>
-            <button id="btnBajar" onclick="window.scrollTo({top: document.documentElement.scrollHeight, behavior: 'smooth'})" 
+            <button id="btnBajar" onclick="window.scrollTo({top: document.documentElement.scrollHeight})" 
                     class="bg-blue-500 text-white p-2 rounded-full shadow-lg hover:bg-blue-700 transition-colors">
                 <span class="material-icons">arrow_downward</span>
             </button>
