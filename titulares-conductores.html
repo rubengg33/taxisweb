@@ -147,6 +147,19 @@ document.getElementById('buscarConductor').addEventListener('input', function(e)
         if (!userEmail || isAdmin !== "true") {
             window.location.replace("index.html"); // Evita bucle reemplazando la URL en el historial
         }
+
+        // Recuperar términos de búsqueda guardados
+        const busquedaLicencia = localStorage.getItem("busquedaLicencia");
+        const busquedaConductor = localStorage.getItem("busquedaConductor");
+        
+        if (busquedaLicencia) {
+            document.getElementById('buscarLicencia').value = busquedaLicencia;
+            buscar('licencias');
+        }
+        if (busquedaConductor) {
+            document.getElementById('buscarConductor').value = busquedaConductor;
+            buscar('conductores');
+        }
     });
     document.getElementById("logoutButton").addEventListener("click", async () => {
     try {
@@ -172,8 +185,13 @@ document.getElementById('buscarConductor').addEventListener('input', function(e)
 });
 async function buscar(tipo) {
     const termino = document.getElementById(tipo === 'licencias' ? 'buscarLicencia' : 'buscarConductor').value.trim();
+    
+    // Guardar término de búsqueda
+    localStorage.setItem(tipo === 'licencias' ? 'busquedaLicencia' : 'busquedaConductor', termino);
+
     if (!termino) {
-        // Si no hay término de búsqueda, cargar todos los datos
+        // Si no hay término de búsqueda, limpiar localStorage y cargar todos los datos
+        localStorage.removeItem(tipo === 'licencias' ? 'busquedaLicencia' : 'busquedaConductor');
         await cargarDatos(`http://localhost:3000/api/${tipo}`, `dataTable${tipo.charAt(0).toUpperCase() + tipo.slice(1)}`, tipo);
         return;
     }
