@@ -408,5 +408,18 @@ document.getElementById('buscarConductor').addEventListener('keypress', function
             cargarDatos("http://localhost:3000/api/licencias", "dataTableLicencias", "licencias");
             cargarDatos("http://localhost:3000/api/conductores", "dataTableConductores", "conductores");
         </script>
+        
+        <!-- Botones de navegación flotantes -->
+        <div class="fixed bottom-4 right-4 flex flex-col gap-2">
+            <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})" 
+                    class="bg-blue-500 text-white p-2 rounded-full shadow-lg hover:bg-blue-700 transition-colors">
+                <span class="material-icons">arrow_upward</span>
+            </button>
+            <button onclick="window.scrollTo({top: document.documentElement.scrollHeight, behavior: 'smooth'})" 
+                    class="bg-blue-500 text-white p-2 rounded-full shadow-lg hover:bg-blue-700 transition-colors">
+                <span class="material-icons">arrow_downward</span>
+            </button>
+        </div>
+
     </body>
-    </html>
+</html>
