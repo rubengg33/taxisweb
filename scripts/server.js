@@ -131,9 +131,18 @@ app.get("/api/conductores/:id", (req, res) => {
     });
 });
 
-// Crear conductor
+// Añadir este nuevo endpoint para verificar licencia
+app.get("/api/conductores/check-licencia/:licencia", (req, res) => {
+    const licencia = req.params.licencia;
+    db.query("SELECT COUNT(*) as count FROM conductores WHERE licencia = ?", [licencia], (err, result) => {
+        if (err) return res.status(500).json({ error: "Error verificando licencia" });
+        res.json({ exists: result[0].count > 0 });
+    });
+});
+
+// Modificar el endpoint de crear conductor
 app.post("/api/conductores", (req, res) => {
-    console.log("📩 Datos recibidos en el servidor:", req.body); // Ver qué datos llegan al servidor
+    console.log("📩 Datos recibidos en el servidor:", req.body);
 
     const { nombre_apellidos, dni, direccion, codigo_postal, email, numero_seguridad_social, licencia } = req.body;
 
@@ -141,14 +150,26 @@ app.post("/api/conductores", (req, res) => {
         return res.status(400).json({ message: "Faltan campos obligatorios." });
     }
 
-    const sql = "INSERT INTO conductores (nombre_apellidos, dni, direccion, codigo_postal, email, numero_seguridad_social, licencia) VALUES (?, ?, ?, ?, ?, ?, ?)";
-    db.query(sql, [nombre_apellidos, dni, direccion, codigo_postal, email, numero_seguridad_social, licencia], (err, result) => {
+    // Primero verificar si la licencia ya está en uso
+    db.query("SELECT COUNT(*) as count FROM conductores WHERE licencia = ?", [licencia], (err, result) => {
         if (err) {
-            console.error("❌ Error en la consulta SQL:", err);
-            return res.status(500).json({ message: "Error en la base de datos", error: err.sqlMessage });
+            return res.status(500).json({ message: "Error verificando licencia", error: err.sqlMessage });
         }
-        console.log("✅ Conductor insertado:", result);
-        res.json({ message: "Conductor agregado exitosamente" });
+
+        if (result[0].count > 0) {
+            return res.status(409).json({ message: "Esta licencia ya está asignada a otro conductor." });
+        }
+
+        // Si la licencia no está en uso, proceder con la inserción
+        const sql = "INSERT INTO conductores (nombre_apellidos, dni, direccion, codigo_postal, email, numero_seguridad_social, licencia) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        db.query(sql, [nombre_apellidos, dni, direccion, codigo_postal, email, numero_seguridad_social, licencia], (err, result) => {
+            if (err) {
+                console.error("❌ Error en la consulta SQL:", err);
+                return res.status(500).json({ message: "Error en la base de datos", error: err.sqlMessage });
+            }
+            console.log("✅ Conductor insertado:", result);
+            res.json({ message: "Conductor agregado exitosamente" });
+        });
     });
 });
 

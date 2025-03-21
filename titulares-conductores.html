@@ -337,17 +337,22 @@ function limpiarBusqueda(tipo) {
         });
 
         if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`Error en la petición: ${response.status} - ${errorText}`);
+            const errorData = await response.json();
+            if (response.status === 409) {
+                alert(errorData.message || "Esta licencia ya está en uso por otro conductor.");
+                return;
+            }
+            throw new Error(`Error en la petición: ${response.status} - ${errorData.message || 'Error desconocido'}`);
         }
 
         const resultado = await response.json();
         alert(resultado.message || "Datos guardados correctamente");
 
         cerrarFormulario(tipoFormulario);
-       await cargarDatos(`http://localhost:3000/api/${apiTipo}`, `dataTable${tipoFormulario.charAt(0).toUpperCase() + tipoFormulario.slice(1)}`, tipoFormulario);
+        await cargarDatos(`http://localhost:3000/api/${apiTipo}`, `dataTable${tipoFormulario.charAt(0).toUpperCase() + tipoFormulario.slice(1)}`, tipoFormulario);
     } catch (error) {
         console.error("Error guardando:", error);
+        alert(error.message || "Error al guardar los datos");
     }
 }
 
