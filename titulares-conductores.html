@@ -32,15 +32,14 @@
                     <span class="material-icons text-sm mr-1">add</span>
                     Agregar Titular
                 </button>
-                <!-- Actualizar los inputs de búsqueda -->
-                <div class="flex-1 flex gap-2">
+                <div class="flex-1 relative">
                     <input type="text" id="buscarLicencia" placeholder="Buscar en cualquier campo..." 
-                        class="flex-1 p-2 border border-gray-300 rounded">
+                        class="w-full p-2 border border-gray-300 rounded pr-8">
+                    <button onclick="limpiarBusqueda('licencias')" 
+                        class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700">
+                        <span class="material-icons text-sm">close</span>
+                    </button>
                 </div>
-
-                <button onclick="buscar('licencias')" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700">
-                    <span class="material-icons text-sm">search</span>
-                </button>
             </div>
             <table class="w-full table-auto border border-gray-300">
                 <thead>
@@ -65,13 +64,14 @@
                     <span class="material-icons text-sm mr-1">add</span>
                     Agregar Conductor
                 </button>
-                <div class="flex-1 flex gap-2">
+                <div class="flex-1 relative">
                     <input type="text" id="buscarConductor" placeholder="Buscar en cualquier campo..." 
-                        class="flex-1 p-2 border border-gray-300 rounded">
+                        class="w-full p-2 border border-gray-300 rounded pr-8">
+                    <button onclick="limpiarBusqueda('conductores')" 
+                        class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700">
+                        <span class="material-icons text-sm">close</span>
+                    </button>
                 </div>
-                <button onclick="buscar('conductores')" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700">
-                    <span class="material-icons text-sm">search</span>
-                </button>
             </div>
             <table class="w-full table-auto border border-gray-300">
                 <thead>
@@ -235,7 +235,13 @@ document.getElementById('buscarLicencia').addEventListener('keypress', function(
 
 document.getElementById('buscarConductor').addEventListener('keypress', function(e) {
     if (e.key === 'Enter') buscar('conductores');
-});      
+}); 
+function limpiarBusqueda(tipo) {
+    const input = document.getElementById(tipo === 'licencias' ? 'buscarLicencia' : 'buscarConductor');
+    input.value = '';
+    localStorage.removeItem(tipo === 'licencias' ? 'busquedaLicencia' : 'busquedaConductor');
+    buscar(tipo);
+}     
     function abrirFormulario(tipo, datos = null) {
         tipoFormulario = tipo; // Guardamos el tipo seleccionado
         if(tipo === 'conductores'){
