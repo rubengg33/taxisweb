@@ -421,20 +421,37 @@ function limpiarBusqueda(tipo) {
     }
 
     async function eliminar(tipo, id) {
-        if (!confirm("¿Seguro que deseas eliminar este registro?")) return; 
+    if (!confirm("¿Seguro que deseas eliminar este registro?")) return; 
 
-        try {
-            const apiTipo = tipo === 'licencias' ? 'licencias' : 'conductores';
-            const response = await fetch(`http://localhost:3000/api/${apiTipo}/${id}`, {
-                method: "DELETE"
-            });
-            const resultado = await response.json();
-            alert(resultado.message || "Eliminado correctamente");
-            cargarDatos(`http://localhost:3000/api/${apiTipo}`, `dataTable${tipo.charAt(0).toUpperCase() + tipo.slice(1)}`, tipo);
-        } catch (error) {
-            console.error("Error eliminando:", error);
+    try {
+        const apiTipo = tipo === 'licencias' ? 'licencias' : 'conductores';
+        const response = await fetch(`http://localhost:3000/api/${apiTipo}/${id}`, {
+            method: "DELETE"
+        });
+        
+        if (!response.ok) {
+            const errorData = await response.json();
+            
+            // Manejar diferentes tipos de errores
+            if (response.status === 500 || response.status === 409) {
+                alert("No se puede eliminar esta licencia porque está asignada a uno o más conductores. Por favor, elimine primero los conductores asociados.");
+                return;
+            } else if (response.status === 404) {
+                alert("El registro que intenta eliminar no existe o ya fue eliminado.");
+                return;
+            }
+            
+            throw new Error(errorData.message || 'Error desconocido al eliminar');
         }
+
+        const resultado = await response.json();
+        alert(resultado.message || "Eliminado correctamente");
+        await cargarDatos(`http://localhost:3000/api/${apiTipo}`, `dataTable${tipo.charAt(0).toUpperCase() + tipo.slice(1)}`, tipo);
+    } catch (error) {
+        console.error("Error eliminando:", error);
+        alert("No se puede eliminar este registro. Si es una licencia, asegúrese de que no tenga conductores asociados.");
     }
+}
             cargarDatos("http://localhost:3000/api/licencias", "dataTableLicencias", "licencias");
             cargarDatos("http://localhost:3000/api/conductores", "dataTableConductores", "conductores");
         </script>
