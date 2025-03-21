@@ -339,6 +339,18 @@ document.getElementById('buscarConductor').addEventListener('keypress', function
                 document.getElementById('licencias').classList.add('hidden');
                 document.getElementById('conductores').classList.add('hidden');
                 document.getElementById(tabla).classList.remove('hidden');
+                
+                // Actualizar color de los botones de navegación
+                const btnSubir = document.getElementById('btnSubir');
+                const btnBajar = document.getElementById('btnBajar');
+                
+                if (tabla === 'conductores') {
+                    btnSubir.className = 'bg-green-500 text-white p-2 rounded-full shadow-lg hover:bg-green-700 transition-colors';
+                    btnBajar.className = 'bg-green-500 text-white p-2 rounded-full shadow-lg hover:bg-green-700 transition-colors';
+                } else {
+                    btnSubir.className = 'bg-blue-500 text-white p-2 rounded-full shadow-lg hover:bg-blue-700 transition-colors';
+                    btnBajar.className = 'bg-blue-500 text-white p-2 rounded-full shadow-lg hover:bg-blue-700 transition-colors';
+                }
             }
             
             async function cargarDatos(url, tablaId, tipo) {
@@ -411,11 +423,11 @@ document.getElementById('buscarConductor').addEventListener('keypress', function
         
         <!-- Botones de navegación flotantes -->
         <div class="fixed bottom-4 right-4 flex flex-col gap-2">
-            <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})" 
+            <button id="btnSubir" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" 
                     class="bg-blue-500 text-white p-2 rounded-full shadow-lg hover:bg-blue-700 transition-colors">
                 <span class="material-icons">arrow_upward</span>
             </button>
-            <button onclick="window.scrollTo({top: document.documentElement.scrollHeight, behavior: 'smooth'})" 
+            <button id="btnBajar" onclick="window.scrollTo({top: document.documentElement.scrollHeight, behavior: 'smooth'})" 
                     class="bg-blue-500 text-white p-2 rounded-full shadow-lg hover:bg-blue-700 transition-colors">
                 <span class="material-icons">arrow_downward</span>
             </button>
