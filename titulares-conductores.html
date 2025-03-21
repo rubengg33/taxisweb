@@ -360,14 +360,14 @@ document.getElementById('buscarConductor').addEventListener('keypress', function
         data.forEach(item => {
             const row = document.createElement("tr");
             row.innerHTML = Object.values(item).map(valor => `<td class='border border-gray-400 p-2 text-center'>${valor || '-'}</td>`).join('') +
-                `<td class='border border-gray-400 p-2 text-center'>
+                `<td class='border border-gray-400 p-2 text-center flex justify-center gap-2'>
                     <button onclick="editar('${tipo}', '${item[tipo === 'licencias' ? 'LICENCIA' : 'id']}')" 
-                        class='bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-700 flex items-center gap-1 inline-flex'>
+                        class='bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-700 flex items-center gap-1'>
                         <span class="material-icons text-sm">edit</span>
                         <span>Editar</span>
                     </button>
                     <button onclick="eliminar('${tipo}', '${item[tipo === 'licencias' ? 'LICENCIA' : 'id']}')" 
-                        class='bg-red-500 text-white px-3 py-1 rounded hover:bg-red-700 flex items-center gap-1 inline-flex mt-1'>
+                        class='bg-red-500 text-white px-3 py-1 rounded hover:bg-red-700 flex items-center gap-1'>
                         <span class="material-icons text-sm">delete</span>
                         <span>Eliminar</span>
                     </button>
