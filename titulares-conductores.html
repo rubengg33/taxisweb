@@ -16,9 +16,9 @@
     </button>
 
     <!-- Contenedor principal -->
-    <h1 class="text-center text-2xl mb-4">Bienvenido</h1>
+    <h1 class="text-center text-2xl mb-4 mt-16">Bienvenido</h1> <!-- Añadido mt-16 -->
 
-    <div class="w-full max-w-[90%] min-h-[800px] bg-white p-6 rounded-lg shadow-lg"> <!-- Cambiado max-w-6xl a max-w-[90%] -->
+    <div class="w-full max-w-[90%] min-h-[800px] bg-white p-6 rounded-lg shadow-lg">
         <h2 class="text-2xl font-bold text-center mb-4">Gestión de Conductores y Titulares</h2>
 
         <div class="flex justify-center gap-4 mb-4">
@@ -26,7 +26,6 @@
             <button onclick="mostrarTabla('conductores')" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700 mt-4">Ver Conductores</button>
         </div>
 
-        <!-- In the licencias div, after the "Agregar Titular" button -->
         <div id="licencias" class="hidden">
             <h3 class="text-xl font-semibold mb-2 text-center">Titulares</h3>
             <div class="flex gap-2 mb-2">
@@ -60,8 +59,6 @@
                 <tbody id="dataTableLicencias"></tbody>
             </table>
         </div>
-
-        <!-- In the conductores div, after the "Agregar Conductor" button -->
         <div id="conductores" class="hidden">
             <h3 class="text-xl font-semibold mb-2 text-center">Conductores</h3>
             <div class="flex gap-2 mb-2">
@@ -136,7 +133,6 @@
         
         <script>
     let tipoFormulario = '';
-    // Reemplaza los event listeners actuales con estos:
 document.getElementById('buscarLicencia').addEventListener('input', function(e) {
     buscar('licencias');
 });
@@ -145,7 +141,6 @@ document.getElementById('buscarConductor').addEventListener('input', function(e)
     buscar('conductores');
 });
 
-// La función buscar se mantiene igual, ya que ya tenemos la lógica de búsqueda implementada
     document.addEventListener("DOMContentLoaded", function () {
         const userEmail = localStorage.getItem("userEmail");
         const isAdmin = localStorage.getItem("isAdmin");
