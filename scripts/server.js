@@ -21,7 +21,7 @@ const admins = {
     "admin@empresa.com": "1234",
     "otroadmin@empresa.com": "1234"
 };
-
+//
 
 app.get("/", (req, res) => {
     res.send("¡El servidor está funcionando correctamente!");
