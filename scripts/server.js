@@ -198,6 +198,7 @@ app.delete("/api/conductores/:id", (req, res) => {
 app.post("/api/logout", (req, res) => {
     res.json({ message: "Sesión cerrada correctamente" });
 });
+const PORT = process.env.PORT;
 app.listen(PORT, () => {
     console.log(`Servidor ejecutándose en http://localhost:${PORT} 🚀`);
 });
