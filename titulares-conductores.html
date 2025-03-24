@@ -164,7 +164,7 @@ document.getElementById('buscarConductor').addEventListener('input', function(e)
     });
     document.getElementById("logoutButton").addEventListener("click", async () => {
     try {
-        const response = await fetch(`${API_URL}logout`, {
+        const response = await fetch(`${API_URL}/logout`, {
             method: "POST",
             headers: { "Content-Type": "application/json" }
         });
@@ -198,7 +198,7 @@ async function buscar(tipo) {
     }
 
     try {
-        const response = await fetch(`${API_URL}${tipo}/buscar/${termino}`);
+        const response = await fetch(`${API_URL}/${tipo}/buscar/${termino}`);
         if (!response.ok) throw new Error('Error en la búsqueda');
         
         const data = await response.json();
@@ -452,7 +452,7 @@ function limpiarBusqueda(tipo) {
 
         const resultado = await response.json();
         alert(resultado.message || "Eliminado correctamente");
-        await cargarDatos(`${API_URL}/api/${apiTipo}`, `dataTable${tipo.charAt(0).toUpperCase() + tipo.slice(1)}`, tipo);
+        await cargarDatos(`${API_URL}/${apiTipo}`, `dataTable${tipo.charAt(0).toUpperCase() + tipo.slice(1)}`, tipo);
     } catch (error) {
         console.error("Error eliminando:", error);
         alert("No se puede eliminar este registro. Si es una licencia, asegúrese de que no tenga conductores asociados.");
