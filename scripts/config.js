@@ -1,8 +1,6 @@
-require('dotenv').config();  // Cargar variables de entorno desde .env
+let API_URL = "";
 
-let API_URL = process.env.API_URL + "/config";  // Usar la variable API_URL del .env
-
-fetch(API_URL)
+fetch("/api/config")
   .then(res => res.json())
   .then(config => {
     API_URL = config.apiUrl;
