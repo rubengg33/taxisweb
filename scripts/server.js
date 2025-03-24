@@ -23,18 +23,15 @@ const admins = {
 };
 
 
+app.get("/", (req, res) => {
+    res.send("¡El servidor está funcionando correctamente!");
+});
+
 // Backend (Node.js)
 app.get("/api/config", (req, res) => {
     res.json({ apiUrl: process.env.API_URL });
 });
 
-app.get("/aconfig", (req, res) => {
-    console.log("API_URL en el servidor:", process.env.API_URL); // Verifica que la variable está disponible
-    if (!process.env.API_URL) {
-        return res.status(500).json({ error: "API_URL no está definida en el archivo .env" });
-    }
-    res.json({ apiUrl: process.env.API_URL });
-});
 // Endpoint para iniciar sesión
 app.post("/api/login", (req, res) => {
     const { email, dni } = req.body;
