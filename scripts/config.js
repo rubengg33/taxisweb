@@ -1,7 +1,7 @@
 // Define la URL base
-let API_URL = "https://taxisweb.onrender.com";  // URL completa del backend
+let API_URL = "https://taxisweb.onrender.com/api";  // URL completa del backend
 
-fetch(`${API_URL}/api/config`)
+fetch(`${API_URL}/config`)
   .then(res => res.json())
   .then(config => {
     const backendAPIUrl = config.apiUrl; // Usamos una variable diferente para almacenar la URL
