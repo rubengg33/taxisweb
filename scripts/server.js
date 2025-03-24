@@ -23,6 +23,10 @@ const admins = {
 };
 
 
+app.get("/", (req, res) => {
+    res.send("¡El servidor está funcionando correctamente!");
+});
+
 app.get("/config", (req, res) => {
     console.log("API_URL en el servidor:", process.env.API_URL); // Verifica que la variable está disponible
     if (!process.env.API_URL) {
