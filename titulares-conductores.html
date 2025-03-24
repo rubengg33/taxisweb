@@ -163,7 +163,7 @@ document.getElementById('buscarConductor').addEventListener('input', function(e)
     });
     document.getElementById("logoutButton").addEventListener("click", async () => {
     try {
-        const response = await fetch("http://localhost:3000/api/logout", {
+        const response = await fetch(`${API_URL}logout`, {
             method: "POST",
             headers: { "Content-Type": "application/json" }
         });
@@ -192,12 +192,12 @@ async function buscar(tipo) {
     if (!termino) {
         // Si no hay término de búsqueda, limpiar localStorage y cargar todos los datos
         localStorage.removeItem(tipo === 'licencias' ? 'busquedaLicencia' : 'busquedaConductor');
-        await cargarDatos(`http://localhost:3000/api/${tipo}`, `dataTable${tipo.charAt(0).toUpperCase() + tipo.slice(1)}`, tipo);
+        await cargarDatos(`${API_URL}/${tipo}`, `dataTable${tipo.charAt(0).toUpperCase() + tipo.slice(1)}`, tipo);
         return;
     }
 
     try {
-        const response = await fetch(`http://localhost:3000/api/${tipo}/buscar/${termino}`);
+        const response = await fetch(`${API_URL}${tipo}/buscar/${termino}`);
         if (!response.ok) throw new Error('Error en la búsqueda');
         
         const data = await response.json();
@@ -324,7 +324,7 @@ function limpiarBusqueda(tipo) {
         apiTipo = 'conductores';
     }
 
-    const url = id ? `http://localhost:3000/api/${apiTipo}/${id}` : `http://localhost:3000/api/${apiTipo}`;
+    const url = id ? `${API_URL}/${apiTipo}/${id}` : `${API_URL}/${apiTipo}`;
 
     console.log("Guardando datos en:", url);
     console.log("Datos enviados:", datos);
@@ -349,7 +349,7 @@ function limpiarBusqueda(tipo) {
         alert(resultado.message || "Datos guardados correctamente");
 
         cerrarFormulario(tipoFormulario);
-        await cargarDatos(`http://localhost:3000/api/${apiTipo}`, `dataTable${tipoFormulario.charAt(0).toUpperCase() + tipoFormulario.slice(1)}`, tipoFormulario);
+        await cargarDatos(`${API_URL}/${apiTipo}`, `dataTable${tipoFormulario.charAt(0).toUpperCase() + tipoFormulario.slice(1)}`, tipoFormulario);
     } catch (error) {
         console.error("Error guardando:", error);
         alert(error.message || "Error al guardar los datos");
@@ -417,7 +417,7 @@ function limpiarBusqueda(tipo) {
             async function editar(tipo, id) {
         try {
             const apiTipo = tipo === 'licencias' ? 'licencias' : 'conductores';
-            const response = await fetch(`http://localhost:3000/api/${apiTipo}/${id}`);
+            const response = await fetch(`${API_URL}/${apiTipo}/${id}`);
             const datos = await response.json();
             abrirFormulario(tipo, datos);
         } catch (error) {
@@ -430,7 +430,7 @@ function limpiarBusqueda(tipo) {
 
     try {
         const apiTipo = tipo === 'licencias' ? 'licencias' : 'conductores';
-        const response = await fetch(`http://localhost:3000/api/${apiTipo}/${id}`, {
+        const response = await fetch(`${API_URL}/${apiTipo}/${id}`, {
             method: "DELETE"
         });
         
@@ -451,14 +451,14 @@ function limpiarBusqueda(tipo) {
 
         const resultado = await response.json();
         alert(resultado.message || "Eliminado correctamente");
-        await cargarDatos(`http://localhost:3000/api/${apiTipo}`, `dataTable${tipo.charAt(0).toUpperCase() + tipo.slice(1)}`, tipo);
+        await cargarDatos(`${API_URL}/api/${apiTipo}`, `dataTable${tipo.charAt(0).toUpperCase() + tipo.slice(1)}`, tipo);
     } catch (error) {
         console.error("Error eliminando:", error);
         alert("No se puede eliminar este registro. Si es una licencia, asegúrese de que no tenga conductores asociados.");
     }
 }
-            cargarDatos("http://localhost:3000/api/licencias", "dataTableLicencias", "licencias");
-            cargarDatos("http://localhost:3000/api/conductores", "dataTableConductores", "conductores");
+            cargarDatos(`${API_URL}/licencias`, "dataTableLicencias", "licencias");
+            cargarDatos(`${API_URL}/conductores`, "dataTableConductores", "conductores");
         </script>
         
         <!-- Botones de navegación flotantes -->

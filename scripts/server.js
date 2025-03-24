@@ -21,7 +21,12 @@ const admins = {
     "admin@empresa.com": "1234",
     "otroadmin@empresa.com": "1234"
 };
+
 // Endpoint para iniciar sesión
+app.get("/config", (req, res) => {
+    res.json({ apiUrl: process.env.API_URL });
+});
+
 app.post("/api/login", (req, res) => {
     const { email, dni } = req.body;
 
@@ -193,8 +198,8 @@ app.delete("/api/conductores/:id", (req, res) => {
 app.post("/api/logout", (req, res) => {
     res.json({ message: "Sesión cerrada correctamente" });
 });
-app.listen(3000, () => {
-    console.log("Servidor ejecutándose en http://localhost:3000 🚀");
+app.listen(PORT, () => {
+    console.log(`Servidor ejecutándose en http://localhost:${PORT} 🚀`);
 });
 
 // Búsqueda en todos los campos de licencias
