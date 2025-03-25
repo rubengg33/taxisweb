@@ -9,21 +9,73 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <script src="scripts/config.js"></script>
 </head>
-<body class="flex flex-col items-center justify-center min-h-screen bg-gray-100 relative">
-    
-    <!-- Botón de cerrar sesión en la parte superior derecha -->
-    <button class="absolute top-4 right-4 bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700 transition" id="logoutButton">
-        Cerrar sesión
-    </button>
-    <!-- Contenedor principal -->
-    <h1 class="text-center text-2xl mb-4 mt-16">Bienvenido</h1> <!-- Añadido mt-16 -->
+<body class="bg-gradient-to-br from-purple-600 via-indigo-500 to-sky-400 min-h-screen">
+    <!-- Navbar con nuevos colores -->
+    <!-- Navbar structure update -->
+    <nav class="bg-gradient-to-r from-gray-900 to-gray-800 shadow-lg">
+        <div class="w-full">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo section -->
+                <div class="flex items-center">
+                    <img src="img/taxi.png" alt="Logo" class="h-16 w-16 rounded">
+                    <span class="ml-2 text-xl font-semibold text-white">TaxiGest</span>
+                </div>
 
-    <div class="w-full max-w-[90%] min-h-[800px] bg-white p-6 rounded-lg shadow-lg">
-        <h2 class="text-2xl font-bold text-center mb-4">Gestión de Conductores y Titulares</h2>
+                <!-- Desktop menu -->
+                <div class="hidden md:flex items-center space-x-8 pr-4">
+                    <a href="index.html" class="text-gray-300 hover:text-sky-400 transition">Inicio</a>
+                    <a href="#" class="text-gray-300 hover:text-sky-400 transition">Servicios</a>
+                    <a href="#" class="text-gray-300 hover:text-sky-400 transition">Contacto</a>
+                    <a href="#" class="text-gray-300 hover:text-sky-400 transition">Acerca de</a>
+                    <!-- Botón de cerrar sesión actualizado -->
+                    <button class="button-hover bg-gradient-to-r from-red-600 to-red-700 text-white px-8 py-4 rounded-xl flex items-center gap-3 justify-center hover:from-red-700 hover:to-red-800" id="logoutButton">
+                        <span class="material-icons">logout</span>
+                        <span>Cerrar sesión</span>
+                    </button>
+                </div>
+
+                <!-- Mobile menu button container -->
+                <div class="md:hidden relative flex items-center gap-4">
+                    <!-- Botón de cerrar sesión móvil actualizado -->
+                    <button class="button-hover bg-gradient-to-r from-red-600 to-red-700 text-white px-4 py-2 rounded-xl flex items-center gap-2 justify-center hover:from-red-700 hover:to-red-800" id="logoutButtonMobile">
+                        <span class="material-icons text-sm">logout</span>
+                        <span>Cerrar sesión</span>
+                    </button>
+                    <button class="mobile-menu-button p-2">
+                        <span class="material-icons menu-icon text-white transition-transform duration-300">menu</span>
+                    </button>
+                    
+                    <!-- Mobile menu -->
+                    <div class="mobile-menu hidden md:hidden absolute right-0 top-full mt-2 w-48 rounded-lg overflow-hidden bg-gray-900 shadow-lg z-50">
+                        <a href="#" class="block py-3 px-4 text-gray-300 hover:bg-gray-700 hover:text-sky-400 border-b border-gray-700">Inicio</a>
+                        <a href="#" class="block py-3 px-4 text-gray-300 hover:bg-gray-700 hover:text-sky-400 border-b border-gray-700">Servicios</a>
+                        <a href="#" class="block py-3 px-4 text-gray-300 hover:bg-gray-700 hover:text-sky-400 border-b border-gray-700">Contacto</a>
+                        <a href="#" class="block py-3 px-4 text-gray-300 hover:bg-gray-700 hover:text-sky-400">Acerca de</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Contenedor principal -->
+    <div class="flex flex-col items-center justify-center">
+        <h1 class="text-center text-2xl mb-6 mt-16 text-white font-bold">Bienvenido</h1>
+
+        <div class="container mx-auto px-4 flex justify-center">
+            <div class="w-[90%] min-h-[800px] bg-white p-6 rounded-lg shadow-lg">
+                <h2 class="text-2xl font-bold text-center mb-4">Gestión de Conductores y Titulares</h2>
 
         <div class="flex justify-center gap-4 mb-4">
-            <button onclick="mostrarTabla('licencias')" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700 mt-4">Ver Titulares</button>
-            <button onclick="mostrarTabla('conductores')" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700 mt-4">Ver Conductores</button>
+            <button onclick="mostrarTabla('licencias')" 
+                    class="button-hover bg-gradient-to-r from-sky-600 to-blue-700 text-white px-8 py-4 rounded-xl flex items-center gap-3 w-full md:w-64 justify-center hover:from-sky-700 hover:to-blue-800 mt-4">
+                <span class="material-icons">assignment</span>
+                Ver Titulares
+            </button>
+            <button onclick="mostrarTabla('conductores')" 
+                    class="button-hover bg-gradient-to-r from-emerald-500 to-green-600 text-white px-8 py-4 rounded-xl flex items-center gap-3 w-full md:w-64 justify-center hover:from-emerald-600 hover:to-green-700 mt-4">
+                <span class="material-icons">groups</span>
+                Ver Conductores
+            </button>
         </div>
 
         <div id="licencias" class="hidden">
@@ -132,6 +184,27 @@
         </div>
         
         <script>
+            const mobileMenuButton = document.querySelector('.mobile-menu-button');
+        const mobileMenu = document.querySelector('.mobile-menu');
+        const menuIcon = document.querySelector('.menu-icon');
+
+        mobileMenuButton.addEventListener('click', () => {
+            if (mobileMenu.classList.contains('show')) {
+                mobileMenu.classList.remove('show');
+                menuIcon.style.transform = 'rotate(0deg)';
+                setTimeout(() => {
+                    menuIcon.textContent = 'menu';
+                    mobileMenu.classList.add('hidden');
+                }, 150);
+            } else {
+                mobileMenu.classList.remove('hidden');
+                setTimeout(() => {
+                    mobileMenu.classList.add('show');
+                    menuIcon.textContent = 'close';
+                    menuIcon.style.transform = 'rotate(180deg)';
+                }, 10);
+            }
+        });
     let tipoFormulario = '';
 document.getElementById('buscarLicencia').addEventListener('input', function(e) {
     buscar('licencias');
