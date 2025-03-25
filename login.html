@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <!--prueba-->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="scripts/config.js"></script>
+    <title>controldeconductores.com</title>
+</head>
+<body class="flex items-center justify-center min-h-screen bg-gray-100">
+    <div class="w-full max-w-md bg-white p-6 rounded-lg shadow-lg">
+        <h2 class="text-2xl font-bold text-center mb-4">Iniciar Sesión</h2>
+
+        <!-- Alerta de error -->
+        <div id="alertaError" class="alert alert-danger hidden flex items-center justify-between p-4 mb-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+            <div class="flex items-center">
+                <i class="material-icons alert-icon mr-2">info</i>
+                <div class="alert-body">
+                    <div class="font-bold">Error</div>
+                    <div>Correo o DNI incorrectos.</div>
+                </div>  
+            </div>
+            <i class="material-icons alert-close cursor-pointer" onclick="cerrarAlerta()">close</i>
+        </div>
+
+        <form id="loginForm" class="space-y-4"> 
+            <div>
+                <label for="email" class="block text-sm font-medium text-gray-700">Correo Electrónico</label>
+                <input type="email" id="email" class="mt-1 block w-full p-2 border border-gray-300 rounded-md" required>
+            </div>
+            <div>
+                <label for="password" class="block text-sm font-medium text-gray-700">Contraseña</label>
+                <input type="password" id="password" class="mt-1 block w-full p-2 border border-gray-300 rounded-md" required>
+            </div>
+            <button type="submit" class="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600">Ingresar</button>
+        </form>
+    </div>
+
+    <script>
+       document.addEventListener("DOMContentLoaded", function() {
+        const userEmail = localStorage.getItem("userEmail");
+        const isAdmin = localStorage.getItem("isAdmin");
+
+        if (userEmail) {
+            // Verifica que NO esté ya en titulares-conductores.html
+            if (isAdmin === "true" && window.location.pathname !== "/titulares-conductores.html") {
+                window.location.href = "titulares-conductores.html"; 
+            } else if (isAdmin !== "true" && window.location.pathname !== "/registro.html") {
+                window.location.href = "registro.html"; 
+            }
+        }
+    });
+document.getElementById("loginForm").addEventListener("submit", async function(event) {
+    event.preventDefault();
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+//prueba
+    try {
+        const response = await fetch(`${API_URL}/login`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, dni: password })
+        });
+
+        const data = await response.json();
+
+        if (data.exists) {
+            // Guardar sesión en localStorage
+            localStorage.setItem("userEmail", email);
+            localStorage.setItem("isAdmin", data.admin);
+
+            if (data.admin) {
+                window.location.href = "titulares-conductores.html"; // Admin   
+            } else {
+                window.location.href = "registro.html"; // Usuario normal
+            }
+        } else {
+            document.getElementById("alertaError").classList.remove("hidden");
+        }
+    } catch (error) {
+        console.error("Error en el login:", error);
+        document.getElementById("alertaError").classList.remove("hidden");
+    }
+});
+
+    </script>
+</body>
+</html>

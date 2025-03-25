@@ -146,7 +146,7 @@ document.getElementById('buscarConductor').addEventListener('input', function(e)
         const isAdmin = localStorage.getItem("isAdmin");
 
         if (!userEmail || isAdmin !== "true") {
-            window.location.replace("index.html"); // Evita bucle reemplazando la URL en el historial
+            window.location.replace("login.html"); // Evita bucle reemplazando la URL en el historial
         }
 
         // Recuperar términos de búsqueda guardados
@@ -175,7 +175,7 @@ document.getElementById('buscarConductor').addEventListener('input', function(e)
             localStorage.removeItem("isAdmin");
 
             alert("Sesión cerrada correctamente");
-            window.location.href = "index.html"; // Redirige al login
+            window.location.href = "login.html"; // Redirige al login
         } else {
             alert("Error al cerrar sesión");
         }

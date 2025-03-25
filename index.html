@@ -1,89 +1,47 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <!--prueba-->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <script src="scripts/config.js"></script>
-    <title>controldeconductores.com</title>
+    <title>Sistema de Gestión de Taxis</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        .button-hover {
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .button-hover:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+    </style>
 </head>
-<body class="flex items-center justify-center min-h-screen bg-gray-100">
-    <div class="w-full max-w-md bg-white p-6 rounded-lg shadow-lg">
-        <h2 class="text-2xl font-bold text-center mb-4">Iniciar Sesión</h2>
+<body class="bg-gradient-to-br from-blue-100 to-green-100 min-h-screen flex items-center justify-center">
+    <div class="max-w-4xl w-full mx-4">
+        <div class="bg-white rounded-2xl shadow-2xl p-8 text-center">
+            <h1 class="text-4xl font-bold mb-2 text-gray-800">Sistema de Gestión de Taxis</h1>
+            <p class="text-gray-600 mb-8">Seleccione el tipo de acceso que desea realizar</p>
+            
+            <div class="flex flex-col md:flex-row gap-6 justify-center items-center">
+                <!-- Botón de Administración -->
+                <a href="titulares-conductores.html" 
+                   class="button-hover bg-blue-500 text-white px-8 py-4 rounded-xl flex items-center gap-3 w-full md:w-64 justify-center hover:bg-blue-600">
+                    <span class="material-icons">admin_panel_settings</span>
+                    <span class="text-lg font-semibold">Administración</span>
+                </a>
 
-        <!-- Alerta de error -->
-        <div id="alertaError" class="alert alert-danger hidden flex items-center justify-between p-4 mb-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
-            <div class="flex items-center">
-                <i class="material-icons alert-icon mr-2">info</i>
-                <div class="alert-body">
-                    <div class="font-bold">Error</div>
-                    <div>Correo o DNI incorrectos.</div>
-                </div>  
+                <!-- Botón de Conductores -->
+                <a href="registro.html" 
+                   class="button-hover bg-green-500 text-white px-8 py-4 rounded-xl flex items-center gap-3 w-full md:w-64 justify-center hover:bg-green-600">
+                    <span class="material-icons">directions_car</span>
+                    <span class="text-lg font-semibold">Conductores</span>
+                </a>
             </div>
-            <i class="material-icons alert-close cursor-pointer" onclick="cerrarAlerta()">close</i>
+
+            <div class="mt-12 text-sm text-gray-500">
+                <p>© 2025 Sistema de Gestión de Taxis. Todos los derechos reservados.</p>
+            </div>
         </div>
-
-        <form id="loginForm" class="space-y-4"> 
-            <div>
-                <label for="email" class="block text-sm font-medium text-gray-700">Correo Electrónico</label>
-                <input type="email" id="email" class="mt-1 block w-full p-2 border border-gray-300 rounded-md" required>
-            </div>
-            <div>
-                <label for="password" class="block text-sm font-medium text-gray-700">Contraseña</label>
-                <input type="password" id="password" class="mt-1 block w-full p-2 border border-gray-300 rounded-md" required>
-            </div>
-            <button type="submit" class="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600">Ingresar</button>
-        </form>
     </div>
-
-    <script>
-       document.addEventListener("DOMContentLoaded", function() {
-        const userEmail = localStorage.getItem("userEmail");
-        const isAdmin = localStorage.getItem("isAdmin");
-
-        if (userEmail) {
-            // Verifica que NO esté ya en titulares-conductores.html
-            if (isAdmin === "true" && window.location.pathname !== "/titulares-conductores.html") {
-                window.location.href = "titulares-conductores.html"; 
-            } else if (isAdmin !== "true" && window.location.pathname !== "/registro.html") {
-                window.location.href = "registro.html"; 
-            }
-        }
-    });
-document.getElementById("loginForm").addEventListener("submit", async function(event) {
-    event.preventDefault();
-    const email = document.getElementById("email").value;
-    const password = document.getElementById("password").value;
-//prueba
-    try {
-        const response = await fetch(`${API_URL}/login`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email, dni: password })
-        });
-
-        const data = await response.json();
-
-        if (data.exists) {
-            // Guardar sesión en localStorage
-            localStorage.setItem("userEmail", email);
-            localStorage.setItem("isAdmin", data.admin);
-
-            if (data.admin) {
-                window.location.href = "titulares-conductores.html"; // Admin   
-            } else {
-                window.location.href = "registro.html"; // Usuario normal
-            }
-        } else {
-            document.getElementById("alertaError").classList.remove("hidden");
-        }
-    } catch (error) {
-        console.error("Error en el login:", error);
-        document.getElementById("alertaError").classList.remove("hidden");
-    }
-});
-
-    </script>
 </body>
 </html>
