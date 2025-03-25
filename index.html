@@ -48,6 +48,15 @@
             padding-left: 1.5rem;
             background: linear-gradient(to right, transparent, rgba(56, 189, 248, 0.1));
         }
+        
+        /* Animación para el icono del menú */
+        .menu-icon {
+            transition: all 0.3s ease;
+        }
+        
+        .menu-icon.open {
+            transform: rotate(180deg);
+        }
     </style>
 </head>
 <body class="bg-gradient-to-br from-purple-600 via-indigo-500 to-sky-400 min-h-screen">
@@ -73,7 +82,7 @@
                 <!-- Mobile menu button container -->
                 <div class="md:hidden relative">
                     <button class="mobile-menu-button p-2">
-                        <span class="material-icons text-white">menu</span>
+                        <span class="material-icons menu-icon text-white transition-transform duration-300">menu</span>
                     </button>
                     
                     <!-- Mobile menu repositioned -->
@@ -136,17 +145,22 @@
     <script>
         const mobileMenuButton = document.querySelector('.mobile-menu-button');
         const mobileMenu = document.querySelector('.mobile-menu');
+        const menuIcon = document.querySelector('.menu-icon');
 
         mobileMenuButton.addEventListener('click', () => {
             if (mobileMenu.classList.contains('show')) {
                 mobileMenu.classList.remove('show');
+                menuIcon.style.transform = 'rotate(0deg)';
                 setTimeout(() => {
+                    menuIcon.textContent = 'menu';
                     mobileMenu.classList.add('hidden');
-                }, 300); // Esperar a que termine la animación
+                }, 150);
             } else {
                 mobileMenu.classList.remove('hidden');
                 setTimeout(() => {
                     mobileMenu.classList.add('show');
+                    menuIcon.textContent = 'close';
+                    menuIcon.style.transform = 'rotate(180deg)';
                 }, 10);
             }
         });
