@@ -539,23 +539,22 @@ function limpiarBusqueda(tipo) {
             body: JSON.stringify(datos)
         });
 
+        const resultado = await response.json();
+
         if (!response.ok) {
-                    const errorData = await response.json();
-                    if (response.status === 409) {
-                        await showAlert(errorData.message || "Esta licencia ya está en uso por otro conductor.", "error");
-                        return;
-                    }
-                    // ... more error handling
-                }
+            if (response.status === 500) {
+                await showAlert("No puedes agregar un conductor con una licencia que no existe. Por favor, crea primero la licencia.", "error");
+                return;
+            }
+            throw new Error(resultado.message || "Error al guardar los datos");
+        }
 
-                const resultado = await response.json();
-                await showAlert(resultado.message || "Datos guardados correctamente", "success");
-
+        await showAlert(resultado.message || "Datos guardados correctamente", "success");
         cerrarFormulario(tipoFormulario);
         await cargarDatos(`${API_URL}/${apiTipo}`, `dataTable${tipoFormulario.charAt(0).toUpperCase() + tipoFormulario.slice(1)}`, tipoFormulario);
     } catch (error) {
         console.error("Error guardando:", error);
-       await showAlert(error.message || "Error al guardar los datos", "error");
+        await showAlert(error.message || "Error al guardar los datos", "error");
     }
 }
 
