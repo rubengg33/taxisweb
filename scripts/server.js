@@ -4,7 +4,6 @@ const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 require("dotenv").config();
 const cors = require("cors");
-const { adminUsers, initializeAdminPasswords } = require('../config/adminConfig');
 const { sendPasswordResetEmail } = require('../utils/emailService');
 
 const app = express();
@@ -230,8 +229,6 @@ app.get("/api/conductores/buscar/:termino", (req, res) => {
     });
 });
 
-// Initialize admin passwords when server starts
-initializeAdminPasswords();
 
 // Modified login endpoint
 app.post("/api/login", async (req, res) => {
