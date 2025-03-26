@@ -6,8 +6,36 @@
     <title>Gestión de Titulares y Conductores</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Agregar Material Icons -->
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">      
     <script src="scripts/config.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+       @layer utilities {
+        /* Force white text for autofilled inputs */
+        input:-webkit-autofill,
+        input:-webkit-autofill:hover,
+        input:-webkit-autofill:focus,
+        input:-webkit-autofill:active {
+            -webkit-text-fill-color: white !important;
+            -webkit-box-shadow: 0 0 0 30px black inset !important;
+            box-shadow: 0 0 0 30px black inset !important;
+            transition: background-color 5000s ease-in-out 0s;
+            background-clip: content-box !important;
+        }
+
+        /* Additional styles for Firefox and other browsers */
+        input.input-autofill {
+            background-color: black !important;
+            color: white !important;
+        }
+
+        /* Remove menulist button appearance */
+        input:-webkit-autofill {
+            -webkit-appearance: none;
+            appearance: none;
+        }
+    }
+    </style>
 </head>
 <body class="bg-gradient-to-br from-purple-600 via-indigo-500 to-sky-400 min-h-screen">
     <!-- Navbar con nuevos colores -->
@@ -149,13 +177,13 @@
                 <h3 id="formTitle2" class="text-xl font-semibold mb-4 text-center"></h3>
                 <input type="hidden" id="formId2">
                 <div class="space-y-2">
-                    <input id="formLicencia2" type="text" placeholder="Licencia" class="w-full p-2 border border-gray-300 rounded bg-black text-white">
-                    <input id="formDNI2" type="text" placeholder="DNI" class="w-full p-2 border border-gray-300 rounded bg-black text-white">
-                    <input id="formNombre2" type="text" placeholder="Nombre" class="w-full p-2 border border-gray-300 rounded bg-black text-white">
-                    <input id="formMatricula" type="text" placeholder="Matricula" class="w-full p-2 border border-gray-300 rounded bg-black text-white">
-                    <input id="formMM" type="text" placeholder="Marca" class="w-full p-2 border border-gray-300 rounded bg-black text-white">
-                    <input id="formEmail2" type="email" placeholder="Email" class="w-full p-2 border border-gray-300 rounded bg-black text-white">
-                    <input id="formNP" type="text" placeholder="Numero Patronal" class="w-full p-2 border border-gray-300 rounded bg-black text-white">
+                    <input id="formLicencia2" type="text" placeholder="Licencia" class="w-full p-2 border border-gray-300 rounded bg-black text-white input-autofill">
+                    <input id="formDNI2" type="text" placeholder="DNI" class="w-full p-2 border border-gray-300 rounded bg-black text-white input-autofill">
+                    <input id="formNombre2" type="text" placeholder="Nombre" class="w-full p-2 border border-gray-300 rounded bg-black text-white input-autofill">
+                    <input id="formMatricula" type="text" placeholder="Matricula" class="w-full p-2 border border-gray-300 rounded bg-black text-white input-autofill">
+                    <input id="formMM" type="text" placeholder="Marca" class="w-full p-2 border border-gray-300 rounded bg-black text-white input-autofill">
+                    <input id="formEmail2" type="email" placeholder="Email" class="w-full p-2 border border-gray-300 rounded bg-black text-white input-autofill">
+                    <input id="formNP" type="text" placeholder="Numero Patronal" class="w-full p-2 border border-gray-300 rounded bg-black text-white input-autofill">
                 </div>
                 <div class="flex justify-end mt-4 space-x-2">
                     <button onclick="cerrarFormulario('licencias')" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-700">Cancelar</button>
@@ -168,22 +196,88 @@
                 <h3 id="formTitle" class="text-xl font-semibold mb-4 text-center"></h3>
                 <input type="hidden" id="formId">
                 <div class="space-y-2">
-                    <input id="formNombre" type="text" placeholder="Nombre" class="w-full p-2 border border-gray-300 rounded bg-black text-white">
-                    <input id="formDNI" type="text" placeholder="DNI" class="w-full p-2 border border-gray-300 rounded bg-black text-white">
-                    <input id="formDireccion" type="text" placeholder="Dirección" class="w-full p-2 border border-gray-300 rounded bg-black text-white">
-                    <input id="formCP" type="text" placeholder="Código Postal" class="w-full p-2 border border-gray-300 rounded bg-black text-white">
-                    <input id="formEmail" type="email" placeholder="Email" class="w-full p-2 border border-gray-300 rounded bg-black text-white">
-                    <input id="formSS" type="text" placeholder="Seguridad Social" class="w-full p-2 border border-gray-300 rounded bg-black text-white">
-                    <input id="formLicencia" type="text" placeholder="Licencia" class="w-full p-2 border border-gray-300 rounded bg-black text-white    ">
+                    <input id="formNombre" type="text" placeholder="Nombre" class="w-full p-2 border border-gray-300 rounded bg-black text-white input-autofill">
+                    <input id="formDNI" type="text" placeholder="DNI" class="w-full p-2 border border-gray-300 rounded bg-black text-white input-autofill">
+                    <input id="formDireccion" type="text" placeholder="Dirección" class="w-full p-2 border border-gray-300 rounded bg-black text-white input-autofill">
+                    <input id="formCP" type="text" placeholder="Código Postal" class="w-full p-2 border border-gray-300 rounded bg-black text-white input-autofill">
+                    <input id="formEmail" type="email" placeholder="Email" class="w-full p-2 border border-gray-300 rounded bg-black text-white input-autofill">
+                    <input id="formSS" type="text" placeholder="Seguridad Social" class="w-full p-2 border border-gray-300 rounded bg-black text-white input-autofill">
+                    <input id="formLicencia" type="text" placeholder="Licencia" class="w-full p-2 border border-gray-300 rounded bg-black text-white input-autofill">
                 </div>
-                <div class="flex     justify-end mt-4 space-x-2">
+                <div class="flex justify-end mt-4 space-x-2">
                     <button onclick="cerrarFormulario('conductores')" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-700">Cancelar</button>
                     <button onclick="guardarDatos('conductores')" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700">Guardar</button>
                 </div>
             </div>
         </div>
         
-        <script>
+        <script> window.onload = function () {
+            const inputs = document.querySelectorAll('input');
+            
+            // Función para asegurar el color blanco
+            function forceWhiteColor(input) {
+              setTimeout(() => {
+                input.style.color = 'white';  // Forzar color blanco al texto
+                input.style.backgroundColor = 'black';  // Fondo negro
+              }, 50);  // 50ms de retraso, permite que el navegador termine su acción de autocompletado
+            }
+            
+            // Recorremos todos los inputs
+            inputs.forEach(input => {
+              // Cuando el input tiene autocompletado, forzamos el color blanco para el texto
+              input.addEventListener('focus', function () {
+                input.style.backgroundColor = 'black';  // Fondo consistente
+                input.style.color = 'white';  // Texto blanco
+                input.style.boxShadow = 'inset 0 0 0 1000px black';  // Fondo autofill
+              });
+    
+              input.addEventListener('blur', function () {
+                if (!input.value) {
+                  input.style.backgroundColor = 'black';
+                  input.style.color = 'white';  // Texto blanco
+                  input.style.boxShadow = 'inset 0 0 0 1000px black';
+                }
+              });
+    
+              input.addEventListener('input', function () {
+                if (input.value) {
+                  input.style.color = 'white';  // Aseguramos el texto blanco cuando el usuario escribe
+                }
+              });
+    
+              input.addEventListener('change', function () {
+                forceWhiteColor(input);  // Forzar el color blanco después de autocompletado
+              });
+    
+              // Asegurarnos de aplicar el color blanco cuando el autocompletado se aplica (si no hay foco)
+              forceWhiteColor(input);
+            });
+          }
+            // Add these helper functions at the beginning of your script
+            function showAlert(message, type = 'info') {
+                return Swal.fire({
+                    text: message,
+                    icon: type,
+                    background: '#1a1a1a',
+                    color: '#ffffff',
+                    confirmButtonColor: '#3085d6'
+                });
+            }
+
+            async function showConfirm(message) {
+                const result = await Swal.fire({
+                    text: message,
+                    icon: 'warning',
+                    background: '#1a1a1a',
+                    color: '#ffffff',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Sí, eliminar',
+                    cancelButtonText: 'Cancelar'
+                });
+                return result.isConfirmed;
+            }
             const mobileMenuButton = document.querySelector('.mobile-menu-button');
         const mobileMenu = document.querySelector('.mobile-menu');
         const menuIcon = document.querySelector('.menu-icon');
@@ -235,28 +329,27 @@ document.getElementById('buscarConductor').addEventListener('input', function(e)
             buscar('conductores');
         }
     });
-    document.getElementById("logoutButton").addEventListener("click", async () => {
-    try {
-        const response = await fetch(`${API_URL}/logout`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" }
-        });
+ // Replace logout alert
+ document.getElementById("logoutButton").addEventListener("click", async () => {
+                try {
+                    const response = await fetch(`${API_URL}/logout`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" }
+                    });
 
-        if (response.ok) {
-            // 🔹 Borra la sesión del cliente
-            localStorage.removeItem("userEmail");
-            localStorage.removeItem("isAdmin");
-
-            alert("Sesión cerrada correctamente");
-            window.location.href = "login.html"; // Redirige al login
-        } else {
-            alert("Error al cerrar sesión");
-        }
-    } catch (error) {
-        console.error("Error al cerrar sesión:", error);
-        alert("Hubo un problema con la conexión al servidor");
-    }
-});
+                    if (response.ok) {
+                        localStorage.removeItem("userEmail");
+                        localStorage.removeItem("isAdmin");
+                        await showAlert("Sesión cerrada correctamente", "success");
+                        window.location.href = "login.html";
+                    } else {
+                        await showAlert("Error al cerrar sesión", "error");
+                    }
+                } catch (error) {
+                    console.error("Error al cerrar sesión:", error);
+                    await showAlert("Hubo un problema con la conexión al servidor", "error");
+                }
+            });
 async function buscar(tipo) {
     const termino = document.getElementById(tipo === 'licencias' ? 'buscarLicencia' : 'buscarConductor').value.trim();
     
@@ -296,11 +389,12 @@ async function buscar(tipo) {
                 </td>`;
             tableBody.appendChild(row);
         });
+     // ... existing code ...
     } catch (error) {
-        console.error("Error en la búsqueda:", error);
-        alert("Error al realizar la búsqueda");
-    }
-}
+                    console.error("Error en la búsqueda:", error);
+                    await showAlert("Error al realizar la búsqueda", "error");
+                }
+            }
 
 // Add event listeners for Enter key in search inputs
 document.getElementById('buscarLicencia').addEventListener('keypress', function(e) {
@@ -373,9 +467,9 @@ function limpiarBusqueda(tipo) {
         const numero_patronal = document.getElementById('formNP').value.trim();
 
         if (!licencia || !dni || !nombre_apellidos) {
-            alert("Por favor, llena todos los campos obligatorios.");
-            return; 
-        }
+                    await showAlert("Por favor, llena todos los campos obligatorios.", "warning");
+                    return;
+                }
 
         datos = { licencia, dni, nombre_apellidos, matricula, marca_modelo, email, numero_patronal };
         apiTipo = 'licencias';
@@ -388,11 +482,10 @@ function limpiarBusqueda(tipo) {
         const email = document.getElementById('formEmail').value.trim();
         const numero_seguridad_social = document.getElementById('formSS').value.trim();
         const licencia = document.getElementById('formLicencia').value.trim();
-
         if (!nombre_apellidos || !dni || !direccion || !email || !licencia) {
-            alert("Por favor, llena todos los campos obligatorios.");
-            return;
-        }
+                    await showAlert("Por favor, llena todos los campos obligatorios.", "warning");
+                    return;
+                }
 
         datos = { nombre_apellidos, dni, direccion, codigo_postal, email, numero_seguridad_social, licencia };
         apiTipo = 'conductores';
@@ -411,22 +504,22 @@ function limpiarBusqueda(tipo) {
         });
 
         if (!response.ok) {
-            const errorData = await response.json();
-            if (response.status === 409) {
-                alert(errorData.message || "Esta licencia ya está en uso por otro conductor.");
-                return;
-            }
-            throw new Error(`Error en la petición: ${response.status} - ${errorData.message || 'Error desconocido'}`);
-        }
+                    const errorData = await response.json();
+                    if (response.status === 409) {
+                        await showAlert(errorData.message || "Esta licencia ya está en uso por otro conductor.", "error");
+                        return;
+                    }
+                    // ... more error handling
+                }
 
-        const resultado = await response.json();
-        alert(resultado.message || "Datos guardados correctamente");
+                const resultado = await response.json();
+                await showAlert(resultado.message || "Datos guardados correctamente", "success");
 
         cerrarFormulario(tipoFormulario);
         await cargarDatos(`${API_URL}/${apiTipo}`, `dataTable${tipoFormulario.charAt(0).toUpperCase() + tipoFormulario.slice(1)}`, tipoFormulario);
     } catch (error) {
         console.error("Error guardando:", error);
-        alert(error.message || "Error al guardar los datos");
+       await showAlert(error.message || "Error al guardar los datos", "error");
     }
 }
 
@@ -500,37 +593,37 @@ function limpiarBusqueda(tipo) {
     }
 
     async function eliminar(tipo, id) {
-    if (!confirm("¿Seguro que deseas eliminar este registro?")) return; 
+                const confirmed = await showConfirm("¿Seguro que deseas eliminar este registro?");
+                if (!confirmed) return;
 
-    try {
-        const apiTipo = tipo === 'licencias' ? 'licencias' : 'conductores';
-        const response = await fetch(`${API_URL}/${apiTipo}/${id}`, {
-            method: "DELETE"
-        });
-        
-        if (!response.ok) {
-            const errorData = await response.json();
-            
-            // Manejar diferentes tipos de errores
-            if (response.status === 500 || response.status === 409) {
-                alert("No se puede eliminar esta licencia porque está asignada a uno o más conductores. Por favor, elimine primero los conductores asociados.");
-                return;
-            } else if (response.status === 404) {
-                alert("El registro que intenta eliminar no existe o ya fue eliminado.");
-                return;
+                try {
+                    const apiTipo = tipo === 'licencias' ? 'licencias' : 'conductores';
+                    const response = await fetch(`${API_URL}/${apiTipo}/${id}`, {
+                        method: "DELETE"
+                    });
+                    
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        
+                        if (response.status === 500 || response.status === 409) {
+                            await showAlert("No se puede eliminar esta licencia porque está asignada a uno o más conductores. Por favor, elimine primero los conductores asociados.", "error");
+                            return;
+                        } else if (response.status === 404) {
+                            await showAlert("El registro que intenta eliminar no existe o ya fue eliminado.", "warning");
+                            return;
+                        }
+                        
+                        throw new Error(errorData.message || 'Error desconocido al eliminar');
+                    }
+
+                    const resultado = await response.json();
+                    await showAlert(resultado.message || "Eliminado correctamente", "success");
+                    await cargarDatos(`${API_URL}/${apiTipo}`, `dataTable${tipo.charAt(0).toUpperCase() + tipo.slice(1)}`, tipo);
+                } catch (error) {
+                    console.error("Error eliminando:", error);
+                    await showAlert("No se puede eliminar este registro. Si es una licencia, asegúrese de que no tenga conductores asociados.", "error");
+                }
             }
-            
-            throw new Error(errorData.message || 'Error desconocido al eliminar');
-        }
-
-        const resultado = await response.json();
-        alert(resultado.message || "Eliminado correctamente");
-        await cargarDatos(`${API_URL}/${apiTipo}`, `dataTable${tipo.charAt(0).toUpperCase() + tipo.slice(1)}`, tipo);
-    } catch (error) {
-        console.error("Error eliminando:", error);
-        alert("No se puede eliminar este registro. Si es una licencia, asegúrese de que no tenga conductores asociados.");
-    }
-}
             cargarDatos(`${API_URL}/licencias`, "dataTableLicencias", "licencias");
             cargarDatos(`${API_URL}/conductores`, "dataTableConductores", "conductores");
         </script>
