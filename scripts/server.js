@@ -269,6 +269,11 @@ app.post("/api/request-password-reset", async (req, res) => {
     const resetToken = crypto.randomBytes(32).toString('hex');
     const tokenExpiry = Date.now() + 3600000; // 1 hour
 
+    // Add logging
+    console.log('Creating reset token for:', email);
+    console.log('Token:', resetToken);
+
+    // Store token in memory
     adminUsers[email].resetToken = resetToken;
     adminUsers[email].resetTokenExpiry = tokenExpiry;
 
@@ -285,14 +290,38 @@ app.post("/api/request-password-reset", async (req, res) => {
 app.post("/api/reset-password", async (req, res) => {
     const { email, token, newPassword } = req.body;
 
+    // Add logging to debug
+    console.log('Reset password attempt:', { email, tokenReceived: token });
+    console.log('Admin user data:', adminUsers[email]);
+
     const admin = adminUsers[email];
-    if (!admin || admin.resetToken !== token || admin.resetTokenExpiry < Date.now()) {
-        return res.status(400).json({ message: "Token inválido o expirado" });
+    if (!admin) {
+        return res.status(400).json({ message: "Usuario no encontrado" });
     }
 
-    admin.password = await bcrypt.hash(newPassword, 10);
-    admin.resetToken = null;
-    admin.resetTokenExpiry = null;
+    if (!admin.resetToken || !admin.resetTokenExpiry) {
+        return res.status(400).json({ message: "No hay solicitud de restablecimiento activa" });
+    }
 
-    res.json({ message: "Contraseña actualizada correctamente" });
+    if (admin.resetToken !== token) {
+        return res.status(400).json({ message: "Token inválido" });
+    }
+
+    if (admin.resetTokenExpiry < Date.now()) {
+        // Clear expired token
+        admin.resetToken = null;
+        admin.resetTokenExpiry = null;
+        return res.status(400).json({ message: "Token expirado" });
+    }
+
+    try {
+        admin.password = await bcrypt.hash(newPassword, 10);
+        admin.resetToken = null;
+        admin.resetTokenExpiry = null;
+
+        res.json({ message: "Contraseña actualizada correctamente" });
+    } catch (error) {
+        console.error('Error hashing password:', error);
+        res.status(500).json({ message: "Error al actualizar la contraseña" });
+    }
 });
