@@ -35,7 +35,121 @@
                 <input type="password" id="password" class="mt-1 block w-full p-2 border border-gray-300 rounded-md" required>
             </div>
             <button type="submit" class="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600">Ingresar</button>
+            <!-- Add forgot password link -->
+            <div class="text-center">
+                <a href="#" onclick="showResetPasswordForm()" class="text-sm text-blue-500 hover:text-blue-700">¿Olvidaste tu contraseña?</a>
+            </div>
         </form>
+
+        <!-- Add this after your login form -->
+        <div id="resetPasswordForm" class="hidden space-y-4">
+            <h3 class="text-xl font-bold text-center mb-4">Restablecer Contraseña</h3>
+            <div>
+                <label for="resetEmail" class="block text-sm font-medium text-gray-700">Correo Electrónico</label>
+                <input type="email" id="resetEmail" class="mt-1 block w-full p-2 border border-gray-300 rounded-md" required>
+            </div>
+            <button onclick="requestPasswordReset()" class="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600">
+                Enviar correo de recuperación
+            </button>
+            <div class="text-center">
+                <a href="#" onclick="showLoginForm()" class="text-sm text-blue-500 hover:text-blue-700">Volver al inicio de sesión</a>
+            </div>
+        </div>
+
+        <script>
+            // Add these functions to your existing script
+            function showResetPasswordForm() {
+                document.getElementById('loginForm').classList.add('hidden');
+                document.getElementById('resetPasswordForm').classList.remove('hidden');
+            }
+
+            function showLoginForm() {
+                document.getElementById('resetPasswordForm').classList.add('hidden');
+                document.getElementById('loginForm').classList.remove('hidden');
+            }
+
+            async function requestPasswordReset() {
+                const email = document.getElementById('resetEmail').value;
+                
+                try {
+                    const response = await fetch(`${API_URL}/request-password-reset`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email })
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        await Swal.fire({
+                            icon: 'success',
+                            title: '¡Correo enviado!',
+                            text: 'Por favor, revisa tu correo para restablecer tu contraseña.',
+                            confirmButtonColor: '#3085d6'
+                        });
+                        showLoginForm();
+                    } else {
+                        await Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: data.message || 'Error al enviar el correo de recuperación',
+                            confirmButtonColor: '#3085d6'
+                        });
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    await Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Error al conectar con el servidor',
+                        confirmButtonColor: '#3085d6'
+                    });
+                }
+            }
+
+            // Update your existing error handling to use SweetAlert
+            document.getElementById("loginForm").addEventListener("submit", async function(event) {
+                event.preventDefault();
+                const email = document.getElementById("email").value;
+                const password = document.getElementById("password").value;
+
+                try {
+                    const response = await fetch(`${API_URL}/login`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ email, dni: password })
+                    });
+
+                    const data = await response.json();
+
+                    if (data.exists) {
+                        localStorage.setItem("userEmail", email);
+                        localStorage.setItem("isAdmin", data.admin);
+
+                        if (data.admin) {
+                            window.location.href = "titulares-conductores.html";
+                        } else {
+                            window.location.href = "registro.html";
+                        }
+                    } else {
+                        await Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Correo o contraseña incorrectos',
+                            confirmButtonColor: '#3085d6'
+                        });
+                    }
+                } catch (error) {
+                    console.error("Error en el login:", error);
+                    await Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Error al conectar con el servidor',
+                        confirmButtonColor: '#3085d6'
+                    });
+                }
+            });
+        </script>
     </div>
 
     <script>

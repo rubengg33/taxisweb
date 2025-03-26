@@ -1,7 +1,11 @@
 const express = require("express");
 const mysql = require("mysql2");
+const bcrypt = require('bcrypt');
+const crypto = require('crypto');
 require("dotenv").config();
 const cors = require("cors");
+const { adminUsers, initializeAdminPasswords } = require('../config/adminConfig');
+const { sendPasswordResetEmail } = require('../utils/emailService');
 
 const app = express();
 app.use(cors());
@@ -32,27 +36,7 @@ app.get("/api/config", (req, res) => {
     res.json({ apiUrl: process.env.API_URL });
 });
 
-// Endpoint para iniciar sesión
-app.post("/api/login", (req, res) => {
-    const { email, dni } = req.body;
 
-    // Verificar si es un admin (SIN base de datos)
-    if (admins[email] && admins[email] === dni) {
-        return res.json({ exists: true, admin: true });
-    }
-
-    // Si no es admin, verificar en la base de datos
-    const query = "SELECT * FROM conductores WHERE EMAIL = ? AND DNI = ?";
-    db.query(query, [email, dni], (err, result) => {
-        if (err) return res.status(500).json({ error: "Error en el servidor" });
-        
-        if (result.length > 0) {
-            return res.json({ exists: true, admin: false }); // Usuario normal
-        } else {
-            return res.json({ exists: false });
-        }
-    });
-});
 // Obtener todos los titulares (licencias)
 app.get("/api/licencias", (req, res) => {
     db.query("SELECT * FROM licencias", (err, result) => {
@@ -244,4 +228,71 @@ app.get("/api/conductores/buscar/:termino", (req, res) => {
         if (err) return res.status(500).json({ error: err.message });
         res.json(result);
     });
+});
+
+// Initialize admin passwords when server starts
+initializeAdminPasswords();
+
+// Modified login endpoint
+app.post("/api/login", async (req, res) => {
+    const { email, dni } = req.body;
+
+    // Check if admin
+    if (adminUsers[email]) {
+        const isValidPassword = await bcrypt.compare(dni, adminUsers[email].password);
+        if (isValidPassword) {
+            return res.json({ exists: true, admin: true });
+        }
+    }
+
+    // Check regular users
+    const query = "SELECT * FROM conductores WHERE EMAIL = ? AND DNI = ?";
+    db.query(query, [email, dni], (err, result) => {
+        if (err) return res.status(500).json({ error: "Error en el servidor" });
+        
+        if (result.length > 0) {
+            return res.json({ exists: true, admin: false }); // Usuario normal
+        } else {
+            return res.json({ exists: false });
+        }
+    });
+});
+
+// New endpoint for password reset request
+app.post("/api/request-password-reset", async (req, res) => {
+    const { email } = req.body;
+    
+    if (!adminUsers[email]) {
+        return res.status(404).json({ message: "Email no encontrado" });
+    }
+
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    const tokenExpiry = Date.now() + 3600000; // 1 hour
+
+    adminUsers[email].resetToken = resetToken;
+    adminUsers[email].resetTokenExpiry = tokenExpiry;
+
+    try {
+        await sendPasswordResetEmail(email, resetToken);
+        res.json({ message: "Email de recuperación enviado" });
+    } catch (error) {
+        console.error('Error sending email:', error);
+        res.status(500).json({ message: "Error al enviar el email" });
+    }
+});
+
+// New endpoint for password reset
+app.post("/api/reset-password", async (req, res) => {
+    const { email, token, newPassword } = req.body;
+
+    const admin = adminUsers[email];
+    if (!admin || admin.resetToken !== token || admin.resetTokenExpiry < Date.now()) {
+        return res.status(400).json({ message: "Token inválido o expirado" });
+    }
+
+    admin.password = await bcrypt.hash(newPassword, 10);
+    admin.resetToken = null;
+    admin.resetTokenExpiry = null;
+
+    res.json({ message: "Contraseña actualizada correctamente" });
 });
