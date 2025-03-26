@@ -1,6 +1,6 @@
 const express = require("express");
 const mysql = require("mysql2");
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 require("dotenv").config();
 const cors = require("cors");
