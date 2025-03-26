@@ -1,7 +1,7 @@
 const bcrypt = require('bcryptjs');  // Changed from 'bcrypt' to 'bcryptjs'
 
 const adminUsers = {
-    "admin@empresa.com": {
+    "rubengarciagarrido92@gmail.com": {
         password: "", // Will be hashed
         resetToken: null,
         resetTokenExpiry: null
