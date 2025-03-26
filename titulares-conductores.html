@@ -62,8 +62,8 @@
         <h1 class="text-center text-2xl mb-6 mt-16 text-white font-bold">Bienvenido</h1>
 
         <div class="container mx-auto px-4 flex justify-center">
-            <div class="w-[90%] min-h-[800px] bg-white p-6 rounded-lg shadow-lg">
-                <h2 class="text-2xl font-bold text-center mb-4">Gestión de Conductores y Titulares</h2>
+            <div class="w-[90%] min-h-[800px] bg-gray-900 p-6 rounded-lg shadow-lg">
+                <h2 class="text-2xl font-bold text-center mb-4 text-white">Gestión de Conductores y Titulares</h2>
 
         <div class="flex justify-center gap-4 mb-4">
             <button onclick="mostrarTabla('licencias')" 
@@ -79,7 +79,7 @@
         </div>
 
         <div id="licencias" class="hidden">
-            <h3 class="text-xl font-semibold mb-2 text-center">Titulares</h3>
+            <h3 class="text-xl font-semibold mb-2 text-center text-white">Titulares</h3>
             <div class="flex gap-2 mb-2">
                 <button onclick="abrirFormulario('licencias')" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-800">
                     <span class="material-icons text-sm mr-1">add</span>
@@ -87,14 +87,14 @@
                 </button>
                 <div class="flex-1 relative">
                     <input type="text" id="buscarLicencia" placeholder="Buscar en cualquier campo..." 
-                        class="w-full p-2 border border-gray-300 rounded pr-8">
+                        class="w-full p-2 border border-gray-300 rounded pr-8 bg-black text-white">
                     <button onclick="limpiarBusqueda('licencias')" 
                         class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700">
                         <span class="material-icons text-sm">close</span>
                     </button>
                 </div>
             </div>
-            <table class="w-full table-auto border border-gray-300">
+            <table class="w-full table-auto border border-gray-300 text-white">
                 <thead>
                     <tr class="bg-blue-500 text-white">
                         <th class="border border-gray-400 p-2">LICENCIA</th>
@@ -111,7 +111,7 @@
             </table>
         </div>
         <div id="conductores" class="hidden">
-            <h3 class="text-xl font-semibold mb-2 text-center">Conductores</h3>
+            <h3 class="text-xl font-semibold mb-2 text-center text-white">Conductores</h3>
             <div class="flex gap-2 mb-2">
                 <button onclick="abrirFormulario('conductores')" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-800">
                     <span class="material-icons text-sm mr-1">add</span>
@@ -119,14 +119,14 @@
                 </button>
                 <div class="flex-1 relative">
                     <input type="text" id="buscarConductor" placeholder="Buscar en cualquier campo..." 
-                        class="w-full p-2 border border-gray-300 rounded pr-8">
+                        class="w-full p-2 border border-gray-300 rounded pr-8 bg-black text-white">
                     <button onclick="limpiarBusqueda('conductores')" 
                         class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700">
                         <span class="material-icons text-sm">close</span>
                     </button>
                 </div>
             </div>
-            <table class="w-full table-auto border border-gray-300">
+            <table class="w-full table-auto border border-gray-300 text-white">
                 <thead>
                     <tr class="bg-green-500 text-white">
                         <th class="border border-gray-400 p-2">ID</th>
@@ -145,17 +145,17 @@
         </div>
     </div>
         <div id="formularioTitulares" class="fixed inset-0 flex items-center justify-center hidden bg-gray-900 bg-opacity-50">
-            <div class="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
+            <div class="bg-black p-6 rounded-lg shadow-lg max-w-md w-full">
                 <h3 id="formTitle2" class="text-xl font-semibold mb-4 text-center"></h3>
                 <input type="hidden" id="formId2">
                 <div class="space-y-2">
-                    <input id="formLicencia2" type="text" placeholder="Licencia" class="w-full p-2 border border-gray-300 rounded">
-                    <input id="formDNI2" type="text" placeholder="DNI" class="w-full p-2 border border-gray-300 rounded">
-                    <input id="formNombre2" type="text" placeholder="Nombre" class="w-full p-2 border border-gray-300 rounded">
-                    <input id="formMatricula" type="text" placeholder="Matricula" class="w-full p-2 border border-gray-300 rounded">
-                    <input id="formMM" type="text" placeholder="Marca" class="w-full p-2 border border-gray-300 rounded">
-                    <input id="formEmail2" type="email" placeholder="Email" class="w-full p-2 border border-gray-300 rounded">
-                    <input id="formNP" type="text" placeholder="Numero Patronal" class="w-full p-2 border border-gray-300 rounded">
+                    <input id="formLicencia2" type="text" placeholder="Licencia" class="w-full p-2 border border-gray-300 rounded bg-black text-white">
+                    <input id="formDNI2" type="text" placeholder="DNI" class="w-full p-2 border border-gray-300 rounded bg-black text-white">
+                    <input id="formNombre2" type="text" placeholder="Nombre" class="w-full p-2 border border-gray-300 rounded bg-black text-white">
+                    <input id="formMatricula" type="text" placeholder="Matricula" class="w-full p-2 border border-gray-300 rounded bg-black text-white">
+                    <input id="formMM" type="text" placeholder="Marca" class="w-full p-2 border border-gray-300 rounded bg-black text-white">
+                    <input id="formEmail2" type="email" placeholder="Email" class="w-full p-2 border border-gray-300 rounded bg-black text-white">
+                    <input id="formNP" type="text" placeholder="Numero Patronal" class="w-full p-2 border border-gray-300 rounded bg-black text-white">
                 </div>
                 <div class="flex justify-end mt-4 space-x-2">
                     <button onclick="cerrarFormulario('licencias')" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-700">Cancelar</button>
@@ -164,17 +164,17 @@
             </div>
         </div>
         <div id="formularioConductores" class="fixed inset-0 flex items-center justify-center hidden bg-gray-900 bg-opacity-50">
-            <div class="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
+            <div class="bg-black p-6 rounded-lg shadow-lg max-w-md w-full">
                 <h3 id="formTitle" class="text-xl font-semibold mb-4 text-center"></h3>
                 <input type="hidden" id="formId">
                 <div class="space-y-2">
-                    <input id="formNombre" type="text" placeholder="Nombre" class="w-full p-2 border border-gray-300 rounded">
-                    <input id="formDNI" type="text" placeholder="DNI" class="w-full p-2 border border-gray-300 rounded">
-                    <input id="formDireccion" type="text" placeholder="Dirección" class="w-full p-2 border border-gray-300 rounded">
-                    <input id="formCP" type="text" placeholder="Código Postal" class="w-full p-2 border border-gray-300 rounded">
-                    <input id="formEmail" type="email" placeholder="Email" class="w-full p-2 border border-gray-300 rounded">
-                    <input id="formSS" type="text" placeholder="Seguridad Social" class="w-full p-2 border border-gray-300 rounded">
-                    <input id="formLicencia" type="text" placeholder="Licencia" class="w-full p-2 border border-gray-300 rounded">
+                    <input id="formNombre" type="text" placeholder="Nombre" class="w-full p-2 border border-gray-300 rounded bg-black text-white">
+                    <input id="formDNI" type="text" placeholder="DNI" class="w-full p-2 border border-gray-300 rounded bg-black text-white">
+                    <input id="formDireccion" type="text" placeholder="Dirección" class="w-full p-2 border border-gray-300 rounded bg-black text-white">
+                    <input id="formCP" type="text" placeholder="Código Postal" class="w-full p-2 border border-gray-300 rounded bg-black text-white">
+                    <input id="formEmail" type="email" placeholder="Email" class="w-full p-2 border border-gray-300 rounded bg-black text-white">
+                    <input id="formSS" type="text" placeholder="Seguridad Social" class="w-full p-2 border border-gray-300 rounded bg-black text-white">
+                    <input id="formLicencia" type="text" placeholder="Licencia" class="w-full p-2 border border-gray-300 rounded bg-black text-white    ">
                 </div>
                 <div class="flex     justify-end mt-4 space-x-2">
                     <button onclick="cerrarFormulario('conductores')" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-700">Cancelar</button>
