@@ -12,7 +12,7 @@ for sheet_name, data in df.items():
     if "LICENCIA" in data.columns:
         data["LICENCIA"] = data["LICENCIA"].apply(lambda x: f"{int(x):05}" if pd.notna(x) else x)
 
-    # Guardar como CSV
+    # Guardar como CSV  
     data.to_csv(f"{sheet_name}.csv", index=False, encoding='utf-8')
 
 print("Conversión completada 🎉")

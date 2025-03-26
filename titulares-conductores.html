@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestión de Titulares y Conductores</title>
+    <script>
+        // Check authentication immediately
+        if (!localStorage.getItem("userEmail") || localStorage.getItem("isAdmin") !== "true") {
+            window.location.replace("login.html");
+        }
+    </script>
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Agregar Material Icons -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">      
@@ -38,6 +44,36 @@
     </style>
 </head>
 <body class="bg-gradient-to-br from-purple-600 via-indigo-500 to-sky-400 min-h-screen">
+    <!-- Add content-hidden class to the main content -->
+    <div id="mainContent" class="content-hidden">
+        <!-- Your entire content (nav, tables, etc) goes here -->
+    </div>
+
+    <!-- Add a loading state -->
+    <div id="loadingState" class="flex items-center justify-center min-h-screen">
+        <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-white"></div>
+    </div>
+
+    <script>
+        // Move this to the top of your scripts
+        document.addEventListener("DOMContentLoaded", function () {
+            const userEmail = localStorage.getItem("userEmail");
+            const isAdmin = localStorage.getItem("isAdmin");
+            const mainContent = document.getElementById("mainContent");
+            const loadingState = document.getElementById("loadingState");
+
+            if (!userEmail || isAdmin !== "true") {
+                window.location.replace("login.html");
+            } else {
+                mainContent.classList.remove("content-hidden");
+                loadingState.style.display = "none";
+            }
+
+            // ... rest of your existing DOMContentLoaded code ...
+        });
+    </script>
+</body>
+
     <!-- Navbar con nuevos colores -->
     <!-- Navbar structure update -->
     <nav class="bg-gradient-to-r from-gray-900 to-gray-800 shadow-lg">
@@ -174,7 +210,7 @@
     </div>
         <div id="formularioTitulares" class="fixed inset-0 flex items-center justify-center hidden bg-gray-900 bg-opacity-50">
             <div class="bg-black p-6 rounded-lg shadow-lg max-w-md w-full">
-                <h3 id="formTitle2" class="text-xl font-semibold mb-4 text-center"></h3>
+                <h3 id="formTitle2" class="text-xl font-semibold mb-4 text-center text-white"></h3>
                 <input type="hidden" id="formId2">
                 <div class="space-y-2">
                     <input id="formLicencia2" type="text" placeholder="Licencia" class="w-full p-2 border border-gray-300 rounded bg-black text-white input-autofill">
@@ -193,7 +229,7 @@
         </div>
         <div id="formularioConductores" class="fixed inset-0 flex items-center justify-center hidden bg-gray-900 bg-opacity-50">
             <div class="bg-black p-6 rounded-lg shadow-lg max-w-md w-full">
-                <h3 id="formTitle" class="text-xl font-semibold mb-4 text-center"></h3>
+                <h3 id="formTitle" class="text-xl font-semibold mb-4 text-center text-white"></h3>
                 <input type="hidden" id="formId">
                 <div class="space-y-2">
                     <input id="formNombre" type="text" placeholder="Nombre" class="w-full p-2 border border-gray-300 rounded bg-black text-white input-autofill">
@@ -389,7 +425,7 @@ async function buscar(tipo) {
                 </td>`;
             tableBody.appendChild(row);
         });
-     // ... existing code ...
+     // ... existing code ... 
     } catch (error) {
                     console.error("Error en la búsqueda:", error);
                     await showAlert("Error al realizar la búsqueda", "error");
