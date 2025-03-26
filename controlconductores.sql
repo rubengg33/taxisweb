@@ -27,5 +27,15 @@ INSERT INTO licencias (LICENCIA, DNI, NOMBRE_APELLIDOS, MATRICULA, MARCA_MODELO,
 INSERT INTO conductores (NOMBRE_APELLIDOS, DNI, DIRECCION, CODIGO_POSTAL, EMAIL, NUMERO_SEGURIDAD_SOCIAL) VALUES
 ( 'Luis Martínez', '99887766D', 'Calle Falsa 123', '28001', 'luis@example.com', 'SS001');
 
+CREATE TABLE admins (
+    email VARCHAR(255) PRIMARY KEY,
+    password VARCHAR(255) NOT NULL,
+    resetToken VARCHAR(255),
+    resetTokenExpiry BIGINT
+);
+
+INSERT INTO admins (email, password) VALUES 
+('rubengarciagarrido92@gmail.com', '$2a$10$dzwdvnoaG0UGGN0cQJVs4.Gncerp66Q3LzGsq1IpdyckxzE4DZHJ2'),
+('otroadmin@empresa.com', '$2a$10$dzwdvnoaG0UGGN0cQJVs4.Gncerp66Q3LzGsq1IpdyckxzE4DZHJ2');
 SELECT * FROM LICENCIAS;
 SELECT * FROM CONDUCTORES;

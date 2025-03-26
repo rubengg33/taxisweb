@@ -238,14 +238,15 @@ app.post("/api/login", async (req, res) => {
     const { email, dni } = req.body;
 
     // Check if admin
-    if (adminUsers[email]) {
-        const isValidPassword = await bcrypt.compare(dni, adminUsers[email].password);
+    const [admins] = await db.promise().query('SELECT * FROM admins WHERE email = ?', [email]);
+    if (admins.length > 0) {
+        const isValidPassword = await bcrypt.compare(dni, admins[0].password);
         if (isValidPassword) {
             return res.json({ exists: true, admin: true });
         }
     }
 
-    // Check regular users
+    // Check regular users (unchanged)
     const query = "SELECT * FROM conductores WHERE EMAIL = ? AND DNI = ?";
     db.query(query, [email, dni], (err, result) => {
         if (err) return res.status(500).json({ error: "Error en el servidor" });
@@ -258,24 +259,23 @@ app.post("/api/login", async (req, res) => {
     });
 });
 
-// New endpoint for password reset request
+// Password reset request endpoint
 app.post("/api/request-password-reset", async (req, res) => {
     const { email } = req.body;
     
-    if (!adminUsers[email]) {
+    const [admins] = await db.promise().query('SELECT * FROM admins WHERE email = ?', [email]);
+    if (admins.length === 0) {
         return res.status(404).json({ message: "Email no encontrado" });
     }
 
     const resetToken = crypto.randomBytes(32).toString('hex');
     const tokenExpiry = Date.now() + 3600000; // 1 hour
 
-    // Add logging
-    console.log('Creating reset token for:', email);
-    console.log('Token:', resetToken);
-
-    // Store token in memory
-    adminUsers[email].resetToken = resetToken;
-    adminUsers[email].resetTokenExpiry = tokenExpiry;
+    // Store token in database
+    await db.promise().query(
+        'UPDATE admins SET resetToken = ?, resetTokenExpiry = ? WHERE email = ?',
+        [resetToken, tokenExpiry, email]
+    );
 
     try {
         await sendPasswordResetEmail(email, resetToken);
@@ -286,42 +286,34 @@ app.post("/api/request-password-reset", async (req, res) => {
     }
 });
 
-// New endpoint for password reset
+// Password reset endpoint
 app.post("/api/reset-password", async (req, res) => {
     const { email, token, newPassword } = req.body;
 
-    // Add logging to debug
-    console.log('Reset password attempt:', { email, tokenReceived: token });
-    console.log('Admin user data:', adminUsers[email]);
+    const [admins] = await db.promise().query(
+        'SELECT * FROM admins WHERE email = ? AND resetToken = ?',
+        [email, token]
+    );
 
-    const admin = adminUsers[email];
-    if (!admin) {
-        return res.status(400).json({ message: "Usuario no encontrado" });
-    }
-
-    if (!admin.resetToken || !admin.resetTokenExpiry) {
-        return res.status(400).json({ message: "No hay solicitud de restablecimiento activa" });
-    }
-
-    if (admin.resetToken !== token) {
+    if (admins.length === 0) {
         return res.status(400).json({ message: "Token inválido" });
     }
 
-    if (admin.resetTokenExpiry < Date.now()) {
-        // Clear expired token
-        admin.resetToken = null;
-        admin.resetTokenExpiry = null;
+    const admin = admins[0];
+    if (!admin.resetToken || admin.resetTokenExpiry < Date.now()) {
         return res.status(400).json({ message: "Token expirado" });
     }
 
     try {
-        admin.password = await bcrypt.hash(newPassword, 10);
-        admin.resetToken = null;
-        admin.resetTokenExpiry = null;
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+        await db.promise().query(
+            'UPDATE admins SET password = ?, resetToken = NULL, resetTokenExpiry = NULL WHERE email = ?',
+            [hashedPassword, email]
+        );
 
         res.json({ message: "Contraseña actualizada correctamente" });
     } catch (error) {
-        console.error('Error hashing password:', error);
+        console.error('Error updating password:', error);
         res.status(500).json({ message: "Error al actualizar la contraseña" });
     }
 });
