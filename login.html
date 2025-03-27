@@ -7,6 +7,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <script src="scripts/config.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <title>controldeconductores.com</title>
     <style>
         @layer utilities {
@@ -34,154 +35,260 @@
                 appearance: none;
             }
         }
+        /* Animación mejorada del menú móvil */
+        .mobile-menu {
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+            transition: all 0.3s ease-in-out;
+            transform-origin: top right;
+            transform: scale(0.95);
+        }
+        
+        .mobile-menu.show {
+            max-height: 300px;
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .mobile-menu-button {
+            transition: transform 0.2s ease;
+        }
+
+        .mobile-menu-button:hover {
+            transform: scale(1.1);
+        }
+
+        .mobile-menu a {
+            transition: all 0.2s ease;
+        }
+
+        .mobile-menu a:hover {
+            transform: translateX(10px);
+            padding-left: 1.5rem;
+            background: linear-gradient(to right, transparent, rgba(56, 189, 248, 0.1));
+        }
+        
+        /* Animación para el icono del menú */
+        .menu-icon {
+            transition: all 0.3s ease;
+        }
+        
+        .menu-icon.open {
+            transform: rotate(180deg);
+        }
     </style>
 </head>
-<body class="flex items-center justify-center bg-gradient-to-br from-purple-600 via-indigo-500 to-sky-400 min-h-screen">
-    <div class="w-full max-w-md bg-black p-6 rounded-lg shadow-lg">
-        <h2 class="text-2xl font-bold text-center mb-4 text-white">Iniciar Sesión</h2>
+<body class="bg-gradient-to-br from-purple-600 via-indigo-500 to-sky-400 min-h-screen">
+    <!-- Add navbar -->
+    <nav class="bg-gradient-to-r from-gray-900 to-gray-800 shadow-lg">
+        <div class="w-full">
+            <div class="flex justify-between items-center h-16 ml-6">
+                <!-- Logo section -->
+                <div class="flex items-center">
+                    <img src="img/taxi.png" alt="Logo" class="h-16 w-16 rounded">
+                    <span class="ml-2 text-xl font-semibold text-white">TaxiGest</span>
+                </div>
 
-        <form id="loginForm" class="space-y-4"> 
-            <div>
-                <label for="email" class="block text-sm font-medium text-blue-500">Correo Electrónico</label>
-                <input type="email" id="email" class="mt-1 block w-full p-2 border border-gray-300 rounded-md text-white" required>
-            </div>
-            <div>
-                <label for="password" class="block text-sm font-medium text-blue-500">Contraseña</label>
-                <input type="password" id="password" class="mt-1 block w-full p-2 border border-gray-300 rounded-md text-white" required>
-            </div>
-            <button type="submit" class="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600">Ingresar</button>
-            <!-- Add forgot password link -->
-            <div class="text-center">
-                <a href="#" onclick="showResetPasswordForm()" class="text-sm text-blue-500 hover:text-blue-700">¿Olvidaste tu contraseña?</a>
-            </div>
-        </form>
+                <!-- Desktop menu -->
+                <div class="hidden md:flex items-center space-x-8 pr-8">
+                    <a href="index.html" class="text-gray-300 hover:text-sky-400 transition">Inicio</a>
+                    <a href="#" class="text-gray-300 hover:text-sky-400 transition">Servicios</a>
+                    <a href="#" class="text-gray-300 hover:text-sky-400 transition">Contacto</a>
+                    <a href="#" class="text-gray-300 hover:text-sky-400 transition">Acerca de</a>
+                </div>
 
-        <!-- Add this after your login form -->
-        <div id="resetPasswordForm" class="hidden space-y-4">
-            <h3 class="text-xl font-bold text-center mb-4 text-white">Restablecer Contraseña</h3>
-            <div>
-                <label for="resetEmail" class="block text-sm font-medium text-blue-500  ">Correo Electrónico</label>
-                <input type="email" id="resetEmail" class="mt-1 block w-full p-2 border border-gray-300 rounded-md" required>
-            </div>
-            <button onclick="requestPasswordReset()" class="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600">
-                Enviar correo de recuperación
-            </button>
-            <div class="text-center">
-                <a href="#" onclick="showLoginForm()" class="text-sm text-blue-500 hover:text-blue-700">Volver al inicio de sesión</a>
+                <!-- Mobile menu button -->
+                <div class="md:hidden relative">
+                    <button class="mobile-menu-button p-2">
+                        <span class="material-icons menu-icon text-white transition-transform duration-300">menu</span>
+                    </button>
+                    
+                    <!-- Mobile menu -->
+                    <div class="mobile-menu hidden md:hidden absolute right-0 top-full mt-2 w-48 rounded-lg overflow-hidden bg-gray-900 shadow-lg z-50">
+                        <a href="index.html" class="block py-3 px-4 text-gray-300 hover:bg-gray-700 hover:text-sky-400 border-b border-gray-700">Inicio</a>
+                        <a href="#" class="block py-3 px-4 text-gray-300 hover:bg-gray-700 hover:text-sky-400 border-b border-gray-700">Servicios</a>
+                        <a href="#" class="block py-3 px-4 text-gray-300 hover:bg-gray-700 hover:text-sky-400 border-b border-gray-700">Contacto</a>
+                        <a href="#" class="block py-3 px-4 text-gray-300 hover:bg-gray-700 hover:text-sky-400">Acerca de</a>
+                    </div>
+                </div>
             </div>
         </div>
+    </nav>
 
-        <script>
-            // Add these functions to your existing script
-            function showResetPasswordForm() {
-                document.getElementById('loginForm').classList.add('hidden');
-                document.getElementById('resetPasswordForm').classList.remove('hidden');
-            }
+    <!-- Wrap existing content in a container -->
+    <div class="flex items-center justify-center min-h-[calc(100vh-4rem)]">
+        <div class="w-full max-w-md bg-black p-6 rounded-lg shadow-lg">
+            <h2 class="text-2xl font-bold text-center mb-4 text-white">Iniciar Sesión</h2>
 
-            function showLoginForm() {
-                document.getElementById('resetPasswordForm').classList.add('hidden');
-                document.getElementById('loginForm').classList.remove('hidden');
-            }
+            <form id="loginForm" class="space-y-4"> 
+                <div>
+                    <label for="email" class="block text-sm font-medium text-blue-500">Correo Electrónico</label>
+                    <input type="email" id="email" class="mt-1 block w-full p-2 border border-gray-300 rounded-md text-white" required>
+                </div>
+                <div>
+                    <label for="password" class="block text-sm font-medium text-blue-500">Contraseña</label>
+                    <input type="password" id="password" class="mt-1 block w-full p-2 border border-gray-300 rounded-md text-white" required>
+                </div>
+                <button type="submit" class="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600">Ingresar</button>
+                <!-- Add forgot password link -->
+                <div class="text-center">
+                    <a href="#" onclick="showResetPasswordForm()" class="text-sm text-blue-500 hover:text-blue-700">¿Olvidaste tu contraseña?</a>
+                </div>
+            </form>
 
-            async function requestPasswordReset() {
-                const email = document.getElementById('resetEmail').value;
-                
-                try {
-                    const response = await fetch(`${API_URL}/request-password-reset`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ email })
-                    });
+            <!-- Add this after your login form -->
+            <div id="resetPasswordForm" class="hidden space-y-4">
+                <h3 class="text-xl font-bold text-center mb-4 text-white">Restablecer Contraseña</h3>
+                <div>
+                    <label for="resetEmail" class="block text-sm font-medium text-blue-500  ">Correo Electrónico</label>
+                    <input type="email" id="resetEmail" class="mt-1 block w-full p-2 border border-gray-300 rounded-md" required>
+                </div>
+                <button onclick="requestPasswordReset()" class="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600">
+                    Enviar correo de recuperación
+                </button>
+                <div class="text-center">
+                    <a href="#" onclick="showLoginForm()" class="text-sm text-blue-500 hover:text-blue-700">Volver al inicio de sesión</a>
+                </div>
+            </div>
 
-                    const data = await response.json();
-
-                    if (response.ok) {
-                        await Swal.fire({
-                            icon: 'success',
-                            title: '¡Correo enviado!',
-                            text: 'Por favor, revisa tu correo para restablecer tu contraseña.',
-                            confirmButtonColor: '#3085d6'
-                        });
-                        showLoginForm();
-                    } else {
-                        await Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: data.message || 'Error al enviar el correo de recuperación',
-                            confirmButtonColor: '#3085d6'
-                        });
-                    }
-                } catch (error) {
-                    console.error('Error:', error);
-                    await Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: 'Error al conectar con el servidor',
-                        confirmButtonColor: '#3085d6'
-                    });
+            <script>
+                // Add these functions to your existing script
+                function showResetPasswordForm() {
+                    document.getElementById('loginForm').classList.add('hidden');
+                    document.getElementById('resetPasswordForm').classList.remove('hidden');
                 }
-            }
 
-            // Update your existing error handling to use SweetAlert
-            document.getElementById("loginForm").addEventListener("submit", async function(event) {
-                event.preventDefault();
-                const email = document.getElementById("email").value;
-                const password = document.getElementById("password").value;
-
-                try {
-                    const response = await fetch(`${API_URL}/login`, {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ email, dni: password })
-                    });
-
-                    const data = await response.json();
-
-                    if (data.exists) {
-                        localStorage.setItem("userEmail", email);
-                        localStorage.setItem("isAdmin", data.admin);
-
-                        if (data.admin) {
-                            window.location.href = "titulares-conductores.html";
-                        } else {
-                            window.location.href = "registro.html";
-                        }
-                    } else {
-                        await Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: 'Correo o contraseña incorrectos',
-                            confirmButtonColor: '#3085d6'
-                        });
-                    }
-                } catch (error) {
-                    console.error("Error en el login:", error);
-                    await Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: 'Error al conectar con el servidor',
-                        confirmButtonColor: '#3085d6'
-                    });
+                function showLoginForm() {
+                    document.getElementById('resetPasswordForm').classList.add('hidden');
+                    document.getElementById('loginForm').classList.remove('hidden');
                 }
-            });
+
+                async function requestPasswordReset() {
+                    const email = document.getElementById('resetEmail').value;
+                    
+                    try {
+                        const response = await fetch(`${API_URL}/request-password-reset`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ email })
+                        });
     
+                        const data = await response.json();
+    
+                        if (response.ok) {
+                            await Swal.fire({
+                                icon: 'success',
+                                title: '¡Correo enviado!',
+                                text: 'Por favor, revisa tu correo para restablecer tu contraseña.',
+                                confirmButtonColor: '#3085d6'
+                            });
+                            showLoginForm();
+                        } else {
+                            await Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: data.message || 'Error al enviar el correo de recuperación',
+                                confirmButtonColor: '#3085d6'
+                            });
+                        }
+                    } catch (error) {
+                        console.error('Error:', error);
+                        await Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Error al conectar con el servidor',
+                            confirmButtonColor: '#3085d6'
+                        });
+                    }
+                }
+
+                // Update your existing error handling to use SweetAlert
+                document.getElementById("loginForm").addEventListener("submit", async function(event) {
+                    event.preventDefault();
+                    const email = document.getElementById("email").value;
+                    const password = document.getElementById("password").value;
+    
+                    try {
+                        const response = await fetch(`${API_URL}/login`, {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ email, dni: password })
+                        });
+    
+                        const data = await response.json();
+    
+                        if (data.exists) {
+                            localStorage.setItem("userEmail", email);
+                            localStorage.setItem("isAdmin", data.admin);
+    
+                            if (data.admin) {
+                                window.location.href = "titulares-conductores.html";
+                            } else {
+                                window.location.href = "registro.html";
+                            }
+                        } else {
+                            await Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: 'Correo o contraseña incorrectos',
+                                confirmButtonColor: '#3085d6'
+                            });
+                        }
+                    } catch (error) {
+                        console.error("Error en el login:", error);
+                        await Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Error al conectar con el servidor',
+                            confirmButtonColor: '#3085d6'
+                        });
+                    }
+                });
+        
        document.addEventListener("DOMContentLoaded", function() {
-        const userEmail = localStorage.getItem("userEmail");
-        const isAdmin = localStorage.getItem("isAdmin");
-
-        if (userEmail) {
-            // Verifica que NO esté ya en titulares-conductores.html
-            if (isAdmin === "true" && window.location.pathname !== "/titulares-conductores.html") {
-                window.location.href = "titulares-conductores.html"; 
-            } else if (isAdmin !== "true" && window.location.pathname !== "/registro.html") {
-                window.location.href = "registro.html"; 
+            const userEmail = localStorage.getItem("userEmail");
+            const isAdmin = localStorage.getItem("isAdmin");
+    
+            if (userEmail) {
+                // Verifica que NO esté ya en titulares-conductores.html
+                if (isAdmin === "true" && window.location.pathname !== "/titulares-conductores.html") {
+                    window.location.href = "titulares-conductores.html"; 
+                } else if (isAdmin !== "true" && window.location.pathname !== "/registro.html") {
+                    window.location.href = "registro.html"; 
+                }
             }
-        }
-    });
+        });
+    
 
-
-    </script>
+        </script>
+        </div>
     </div>
+
+    <!-- Add mobile menu script at the end of body -->
+    <script>
+        const mobileMenuButton = document.querySelector('.mobile-menu-button');
+        const mobileMenu = document.querySelector('.mobile-menu');
+        const menuIcon = document.querySelector('.menu-icon');
+
+        mobileMenuButton.addEventListener('click', () => {
+            if (mobileMenu.classList.contains('show')) {
+                mobileMenu.classList.remove('show');
+                menuIcon.style.transform = 'rotate(0deg)';
+                setTimeout(() => {
+                    menuIcon.textContent = 'menu';
+                    mobileMenu.classList.add('hidden');
+                }, 150);
+            } else {
+                mobileMenu.classList.remove('hidden');
+                setTimeout(() => {
+                    mobileMenu.classList.add('show');
+                    menuIcon.textContent = 'close';
+                    menuIcon.style.transform = 'rotate(180deg)';
+                }, 10);
+            }
+        });
+    </script>
 </body>
 </html>
 
