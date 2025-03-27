@@ -128,7 +128,12 @@
                 </div>
                 <div>
                     <label for="password" class="block text-sm font-medium text-blue-500">Contraseña</label>
-                    <input type="password" id="password" class="mt-1 block w-full p-2 border border-gray-300 rounded-md text-white bg-black" required>
+                    <div class="relative">
+                        <input type="password" id="password" class="mt-1 block w-full p-2 border border-gray-300 rounded-md text-white bg-black" required>
+                        <button type="button" class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-200" onclick="togglePasswordVisibility()">
+                            <span class="material-icons" id="passwordToggleIcon">visibility_off</span>
+                        </button>
+                    </div>
                 </div>
                 <button type="submit" class="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600">Ingresar</button>
                 <!-- Add forgot password link -->
@@ -423,5 +428,18 @@
 
             forceWhiteColor(input);
         });
+    }
+
+    function togglePasswordVisibility() {
+        const passwordInput = document.getElementById('password');
+        const passwordToggleIcon = document.getElementById('passwordToggleIcon');
+        
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            passwordToggleIcon.textContent = 'visibility';
+        } else {
+            passwordInput.type = 'password';
+            passwordToggleIcon.textContent = 'visibility_off';
+        }
     }
 </script>
