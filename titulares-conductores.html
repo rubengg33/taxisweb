@@ -391,24 +391,19 @@ document.getElementById('buscarConductor').addEventListener('input', function(e)
 async function buscar(tipo) {
     const termino = document.getElementById(tipo === 'licencias' ? 'buscarLicencia' : 'buscarConductor').value.trim();
     
-    // Guardar término de búsqueda
     localStorage.setItem(tipo === 'licencias' ? 'busquedaLicencia' : 'busquedaConductor', termino);
 
     if (!termino) {
-        // Si no hay término de búsqueda, limpiar localStorage y cargar todos los datos
         localStorage.removeItem(tipo === 'licencias' ? 'busquedaLicencia' : 'busquedaConductor');
         await cargarDatos(`${API_URL}/${tipo}`, `dataTable${tipo.charAt(0).toUpperCase() + tipo.slice(1)}`, tipo);
         return;
     }
 
     try {
-        const response = await fetch(url, {
-            method: id ? "PUT" : "POST",
-            headers: getAuthHeaders(), // Replace the existing headers with getAuthHeaders
-            body: JSON.stringify(datos)
+        const response = await fetch(`${API_URL}/${tipo}/search?q=${encodeURIComponent(termino)}`, {
+            headers: getAuthHeaders()
         });
 
-        const resultado = await response.json();
         if (!response.ok) throw new Error('Error en la búsqueda');
         
         const data = await response.json();
@@ -433,12 +428,11 @@ async function buscar(tipo) {
                 </td>`;
             tableBody.appendChild(row);
         });
-     // ... existing code ... 
     } catch (error) {
-                    console.error("Error en la búsqueda:", error);
-                    await showAlert("Error al realizar la búsqueda", "error");
-                }
-            }
+        console.error("Error en la búsqueda:", error);
+        await showAlert("Error al realizar la búsqueda", "error");
+    }
+}
 
 // Add event listeners for Enter key in search inputs
 document.getElementById('buscarLicencia').addEventListener('keypress', function(e) {
