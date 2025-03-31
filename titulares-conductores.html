@@ -402,9 +402,13 @@ async function buscar(tipo) {
     }
 
     try {
-        const response = await fetch(`${API_URL}/${tipo}/buscar/${termino}`, {
-            headers: getAuthHeaders() // Add authentication headers
+        const response = await fetch(url, {
+            method: id ? "PUT" : "POST",
+            headers: getAuthHeaders(), // Replace the existing headers with getAuthHeaders
+            body: JSON.stringify(datos)
         });
+
+        const resultado = await response.json();
         if (!response.ok) throw new Error('Error en la búsqueda');
         
         const data = await response.json();
@@ -539,7 +543,7 @@ function limpiarBusqueda(tipo) {
     try {
         const response = await fetch(url, {
             method: id ? "PUT" : "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: getAuthHeaders(), // Replace the existing headers with getAuthHeaders
             body: JSON.stringify(datos)
         });
 
