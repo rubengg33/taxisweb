@@ -2,9 +2,36 @@ const express = require("express");
 const mysql = require("mysql2");
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
+const jwt = require('jsonwebtoken'); // Add this line
 require("dotenv").config();
 const cors = require("cors");
 const { sendPasswordResetEmail } = require('../utils/emailService');
+
+// Add the middleware functions
+const authenticateToken = (req, res, next) => {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+
+    if (!token) {
+        return res.status(401).json({ message: 'Access denied' });
+    }
+
+    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+        if (err) {
+            return res.status(403).json({ message: 'Invalid token' });
+        }
+        req.user = user;
+        next();
+    });
+};
+
+const validateApiKey = (req, res, next) => {
+    const apiKey = req.headers['x-api-key'];
+    if (!apiKey || apiKey !== process.env.API_KEY) {
+        return res.status(401).json({ message: 'Invalid API Key' });
+    }
+    next();
+};
 
 const app = express();
 app.use(cors());
@@ -37,7 +64,7 @@ app.get("/api/config", (req, res) => {
 
 
 // Obtener todos los titulares (licencias)
-app.get("/api/licencias", (req, res) => {
+app.get("/api/licencias", authenticateToken, validateApiKey, (req, res) => {
     db.query("SELECT * FROM licencias", (err, result) => {
         if (err) return res.status(500).json({ error: err.message });
         res.json(result);
@@ -239,17 +266,19 @@ app.post("/api/login", async (req, res) => {
     if (admins.length > 0) {
         const isValidPassword = await bcrypt.compare(dni, admins[0].password);
         if (isValidPassword) {
-            return res.json({ exists: true, admin: true });
+            const token = jwt.sign({ email, isAdmin: true }, process.env.JWT_SECRET, { expiresIn: '24h' });
+            return res.json({ exists: true, admin: true, token });
         }
     }
 
-    // Check regular users (unchanged)
+    // Check regular users
     const query = "SELECT * FROM conductores WHERE EMAIL = ? AND DNI = ?";
     db.query(query, [email, dni], (err, result) => {
         if (err) return res.status(500).json({ error: "Error en el servidor" });
         
         if (result.length > 0) {
-            return res.json({ exists: true, admin: false }); // Usuario normal
+            const token = jwt.sign({ email, isAdmin: false }, process.env.JWT_SECRET, { expiresIn: '24h' });
+            return res.json({ exists: true, admin: false, token });
         } else {
             return res.json({ exists: false });
         }

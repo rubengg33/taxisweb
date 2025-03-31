@@ -232,6 +232,8 @@
                         if (data.exists) {
                             localStorage.setItem("userEmail", email);
                             localStorage.setItem("isAdmin", data.admin);
+                            // Store the JWT token
+                            localStorage.setItem("token", data.token); // The server should return this token
     
                             await Swal.fire({
                                 text: '¡Bienvenido! Sesión iniciada correctamente',
