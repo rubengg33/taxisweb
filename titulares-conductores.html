@@ -400,7 +400,7 @@ async function buscar(tipo) {
     }
 
     try {
-        const response = await fetch(`${API_URL}/${tipo}/search?q=${encodeURIComponent(termino)}`, {
+        const response = await fetch(`${API_URL}/${tipo}/buscar/${termino}`, {
             headers: getAuthHeaders()
         });
 
