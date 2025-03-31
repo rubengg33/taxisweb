@@ -633,16 +633,25 @@ function limpiarBusqueda(tipo) {
     }
 }
             
-            async function editar(tipo, id) {
-        try {
-            const apiTipo = tipo === 'licencias' ? 'licencias' : 'conductores';
-            const response = await fetch(`${API_URL}/${apiTipo}/${id}`);
-            const datos = await response.json();
-            abrirFormulario(tipo, datos);
-        } catch (error) {
-            console.error("Error obteniendo datos:", error);
+async function editar(tipo, id) {
+    try {
+        const apiTipo = tipo === 'licencias' ? 'licencias' : 'conductores';
+        const response = await fetch(`${API_URL}/${apiTipo}/${id}`, {
+            headers: getAuthHeaders() // Add authentication headers
+        });
+        
+        if (!response.ok) {
+            throw new Error('Error al obtener los datos');
         }
+        
+        const datos = await response.json();
+        abrirFormulario(tipo, datos);
+    } catch (error) {
+        console.error("Error obteniendo datos:", error);
+        await showAlert("Error al cargar los datos", "error");
     }
+}
+
 
     async function eliminar(tipo, id) {
                 const confirmed = await showConfirm("¿Seguro que deseas eliminar este registro?");
