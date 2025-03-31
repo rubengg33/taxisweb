@@ -104,16 +104,26 @@ app.get("/api/licencias/:licencia", (req, res) => {
 
 // Actualizar un titular por licencia
 app.put("/api/licencias/:licencia", (req, res) => {
-    const licencia = req.params.licencia;
-    const { dni, nombre_apellidos, matricula, marca_modelo, email, numero_patronal } = req.body;
+    const oldLicencia = req.params.licencia;
+    const { licencia, dni, nombre_apellidos, matricula, marca_modelo, email, numero_patronal } = req.body;
 
     const query = `
         UPDATE licencias 
-        SET dni = ?, nombre_apellidos = ?, matricula = ?, marca_modelo = ?, email = ?, numero_patronal = ? 
+        SET licencia = ?, dni = ?, nombre_apellidos = ?, matricula = ?, marca_modelo = ?, 
+            email = ?, numero_patronal = ? 
         WHERE licencia = ?
     `;
 
-    db.query(query, [dni, nombre_apellidos, matricula, marca_modelo, email, numero_patronal, licencia], (err, result) => {
+    db.query(query, [
+        licencia || oldLicencia, // Use new license if provided, otherwise keep the old one
+        dni, 
+        nombre_apellidos, 
+        matricula, 
+        marca_modelo, 
+        email, 
+        numero_patronal, 
+        oldLicencia
+    ], (err, result) => {
         if (err) return res.status(500).json({ error: "Error al actualizar titular", details: err.sqlMessage });
         if (result.affectedRows === 0) return res.status(404).json({ error: "Titular no encontrado" });
         res.json({ message: "Titular actualizado correctamente" });
