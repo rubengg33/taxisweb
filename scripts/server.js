@@ -129,16 +129,16 @@ app.delete("/api/licencias/:licencia", (req, res) => {
         res.json({ message: "Licencia eliminada correctamente" });
     });
 });
-
 // Obtener todos los conductores
-app.get("/api/conductores", (req, res) => {
+app.get("/api/conductores", authenticateToken, validateApiKey, (req, res) => {
     db.query("SELECT * FROM conductores", (err, result) => {
         if (err) return res.status(500).json({ error: err.message });
         res.json(result);
     });
 });
-//obtener conductor por id
-app.get("/api/conductores/:id", (req, res) => {
+
+// También proteger las demás rutas de conductores
+app.get("/api/conductores/:id", authenticateToken, validateApiKey, (req, res) => {
     const id = req.params.id;
     db.query("SELECT * FROM conductores WHERE id = ?", [id], (err, result) => {
         if (err) return res.status(500).json({ error: "Error obteniendo conductor" });
@@ -148,7 +148,7 @@ app.get("/api/conductores/:id", (req, res) => {
 });
 
 // Añadir este nuevo endpoint para verificar licencia
-app.get("/api/conductores/check-licencia/:licencia", (req, res) => {
+app.get("/api/conductores/check-licencia/:licencia", authenticateToken, validateApiKey, (req, res) => {
     const licencia = req.params.licencia;
     db.query("SELECT COUNT(*) as count FROM conductores WHERE licencia = ?", [licencia], (err, result) => {
         if (err) return res.status(500).json({ error: "Error verificando licencia" });
@@ -157,7 +157,7 @@ app.get("/api/conductores/check-licencia/:licencia", (req, res) => {
 });
 
 // Modificar el endpoint de crear conductor
-app.post("/api/conductores", (req, res) => {
+app.post("/api/conductores", authenticateToken, validateApiKey, (req, res) => {
     console.log("📩 Datos recibidos en el servidor:", req.body);
 
     const { nombre_apellidos, dni, direccion, codigo_postal, email, numero_seguridad_social, licencia } = req.body;
