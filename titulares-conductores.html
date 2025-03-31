@@ -654,7 +654,8 @@ async function editar(tipo, id) {
                 try {
                     const apiTipo = tipo === 'licencias' ? 'licencias' : 'conductores';
                     const response = await fetch(`${API_URL}/${apiTipo}/${id}`, {
-                        method: "DELETE"
+                        method: "DELETE",
+                        headers: getAuthHeaders() // Add authentication headers
                     });
                     
                     if (!response.ok) {

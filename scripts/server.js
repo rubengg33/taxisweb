@@ -230,7 +230,7 @@ app.listen(PORT, () => {
 });
 
 // Búsqueda en todos los campos de licencias
-app.get("/api/licencias/buscar/:termino", (req, res) => {
+app.get("/api/licencias/buscar/:termino", authenticateToken, validateApiKey, (req, res) => {
     const termino = req.params.termino;
     const query = `SELECT * FROM licencias WHERE 
         LICENCIA LIKE ? OR 
@@ -248,7 +248,7 @@ app.get("/api/licencias/buscar/:termino", (req, res) => {
 });
 
 // Búsqueda en todos los campos de conductores
-app.get("/api/conductores/buscar/:termino", (req, res) => {
+app.get("/api/conductores/buscar/:termino", authenticateToken, validateApiKey, (req, res) => {
     const termino = req.params.termino;
     const query = `SELECT * FROM conductores WHERE 
         id LIKE ? OR 
