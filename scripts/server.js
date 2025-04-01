@@ -295,6 +295,51 @@ app.post("/api/login", async (req, res) => {
     });
 });
 
+// Login endpoint for empresa
+app.post("/api/login-empresa", async (req, res) => {
+    const { email, dni } = req.body;
+
+    try {
+        // Check if the email and DNI exist in licencias table
+        const query = "SELECT * FROM licencias WHERE EMAIL = ? AND DNI = ?";
+        db.query(query, [email, dni], (err, result) => {
+            if (err) {
+                console.error("Error en la consulta:", err);
+                return res.status(500).json({ error: "Error en el servidor" });
+            }
+            
+            if (result.length > 0) {
+                // Create JWT token for empresa
+                const token = jwt.sign(
+                    { 
+                        email, 
+                        isEmpresa: true,
+                        licencia: result[0].LICENCIA 
+                    }, 
+                    process.env.JWT_SECRET, 
+                    { expiresIn: '24h' }
+                );
+
+                return res.json({ 
+                    exists: true,
+                    token,
+                    empresaData: {
+                        nombre: result[0].NOMBRE_APELLIDOS,
+                        licencia: result[0].LICENCIA,
+                        matricula: result[0].MATRICULA,
+                        marca_modelo: result[0].MARCA_MODELO
+                    }
+                });
+            } else {
+                return res.json({ exists: false });
+            }
+        });
+    } catch (error) {
+        console.error("Error en login-empresa:", error);
+        return res.status(500).json({ error: "Error en el servidor" });
+    }
+});
+
 // Password reset request endpoint
 app.post("/api/request-password-reset", async (req, res) => {
     const { email } = req.body;
