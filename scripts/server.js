@@ -269,12 +269,12 @@ app.get("/api/conductores/buscar/:termino", authenticateToken, validateApiKey, (
 
 // Modified login endpoint
 app.post("/api/login", async (req, res) => {
-    const { email, dni } = req.body;
+    const { email, password } = req.body;
 
     // Check if admin
     const [admins] = await db.promise().query('SELECT * FROM admins WHERE email = ?', [email]);
     if (admins.length > 0) {
-        const isValidPassword = await bcrypt.compare(dni, admins[0].password);
+        const isValidPassword = await bcrypt.compare(password, admins[0].password);
         if (isValidPassword) {
             const token = jwt.sign({ email, isAdmin: true }, process.env.JWT_SECRET, { expiresIn: '24h' });
             return res.json({ exists: true, admin: true, token });
