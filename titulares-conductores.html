@@ -347,14 +347,7 @@ document.getElementById('buscarConductor').addEventListener('input', function(e)
 });
 
     document.addEventListener("DOMContentLoaded", function () {
-        const userEmail = localStorage.getItem("userEmail");
-        const isAdmin = localStorage.getItem("isAdmin");
-
-        if (!userEmail || isAdmin !== "true") {
-            window.location.replace("login.html"); // Evita bucle reemplazando la URL en el historial
-        }
-
-        // Recuperar términos de búsqueda guardados
+         // Recuperar términos de búsqueda guardados
         const busquedaLicencia = localStorage.getItem("busquedaLicencia");
         const busquedaConductor = localStorage.getItem("busquedaConductor");
         
