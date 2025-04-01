@@ -4,12 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestión de Titulares y Conductores</title>
-    <script>
-        // Check authentication immediately
-        if (!localStorage.getItem("userEmail") || localStorage.getItem("isAdmin") !== "true") {
-            window.location.replace("login.html");
-        }
-    </script>
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Agregar Material Icons -->
     <link rel="icon" type="image/png" sizes="512x512" href="img/favicon/android-chrome-512x512.png">
@@ -17,6 +11,24 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">      
     <script src="scripts/config.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        // Move this to the top of your scripts
+        document.addEventListener("DOMContentLoaded", function () {
+            const userEmail = localStorage.getItem("userEmail");
+            const isAdmin = localStorage.getItem("isAdmin");
+            const mainContent = document.getElementById("mainContent");
+            const loadingState = document.getElementById("loadingState");
+
+            if (!userEmail || isAdmin !== "true") {
+                window.location.replace("login.html");
+            } else {
+                mainContent.classList.remove("content-hidden");
+                loadingState.style.display = "none";
+            }
+
+            // ... rest of your existing DOMContentLoaded code ...
+        });
+    </script>
     <style>
        @layer utilities {
         /* Force white text for autofilled inputs */
@@ -55,25 +67,6 @@
     <div id="loadingState" class="flex items-center justify-center min-h-screen">
         <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-white"></div>
     </div>
-
-    <script>
-        // Move this to the top of your scripts
-        document.addEventListener("DOMContentLoaded", function () {
-            const userEmail = localStorage.getItem("userEmail");
-            const isAdmin = localStorage.getItem("isAdmin");
-            const mainContent = document.getElementById("mainContent");
-            const loadingState = document.getElementById("loadingState");
-
-            if (!userEmail || isAdmin !== "true") {
-                window.location.replace("login.html");
-            } else {
-                mainContent.classList.remove("content-hidden");
-                loadingState.style.display = "none";
-            }
-
-            // ... rest of your existing DOMContentLoaded code ...
-        });
-    </script>
 </body>
 
     <!-- Navbar con nuevos colores -->
