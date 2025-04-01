@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="icon" type="image/png" sizes="512x512" href="img/favicon/android-chrome-512x512.png">
+    <link rel="manifest" href="img/favicon/site.webmanifest">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <title>Document</title>
+    <style>
+        @layer utilities {
+            /* Force white text for autofilled inputs */
+            input:-webkit-autofill,
+            input:-webkit-autofill:hover,
+            input:-webkit-autofill:focus,
+            input:-webkit-autofill:active {
+                -webkit-text-fill-color: white !important;
+                -webkit-box-shadow: 0 0 0 30px black inset !important;
+                box-shadow: 0 0 0 30px black inset !important;
+                transition: background-color 5000s ease-in-out 0s;
+                background-clip: content-box !important;
+            }
+
+            /* Additional styles for Firefox and other browsers */
+            input.input-autofill {
+                background-color: black !important;
+                color: white !important;
+            }
+
+            /* Remove menulist button appearance */
+            input:-webkit-autofill {
+                -webkit-appearance: none;
+                appearance: none;
+            }
+        }
+        /* Animación mejorada del menú móvil */
+        .mobile-menu {
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+            transition: all 0.3s ease-in-out;
+            transform-origin: top right;
+            transform: scale(0.95);
+        }
+        
+        .mobile-menu.show {
+            max-height: 300px;
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .mobile-menu-button {
+            transition: transform 0.2s ease;
+        }
+
+        .mobile-menu-button:hover {
+            transform: scale(1.1);
+        }
+
+        .mobile-menu a {
+            transition: all 0.2s ease;
+        }
+
+        .mobile-menu a:hover {
+            transform: translateX(10px);
+            padding-left: 1.5rem;
+            background: linear-gradient(to right, transparent, rgba(56, 189, 248, 0.1));
+        }
+        
+        /* Animación para el icono del menú */
+        .menu-icon {
+            transition: all 0.3s ease;
+        }
+        
+        .menu-icon.open {
+            transform: rotate(180deg);
+        }
+    </style>
+</head>
+<body>
+    <body class="bg-gradient-to-br from-purple-600 via-indigo-500 to-sky-400 min-h-screen">
+        <!-- Add navbar -->
+        <nav class="bg-gradient-to-r from-gray-900 to-gray-800 shadow-lg">
+            <div class="w-full">
+                <div class="flex justify-between items-center h-16 ml-6">
+                    <!-- Logo section -->
+                    <div class="flex items-center">
+                        <img src="img/taxi.png" alt="Logo" class="h-16 w-16 rounded">
+                        <span class="ml-2 text-xl font-semibold text-white">TaxiGest</span>
+                    </div>
+    
+                    <!-- Desktop menu -->
+                    <div class="hidden md:flex items-center space-x-8 pr-8">
+                        <a href="index.html" class="text-gray-300 hover:text-sky-400 transition">Inicio</a>
+                        <a href="#" class="text-gray-300 hover:text-sky-400 transition">Servicios</a>
+                        <a href="#" class="text-gray-300 hover:text-sky-400 transition">Contacto</a>
+                        <a href="#" class="text-gray-300 hover:text-sky-400 transition">Acerca de</a>
+                    </div>
+    
+                    <!-- Mobile menu button -->
+                    <div class="md:hidden relative">
+                        <button class="mobile-menu-button p-2">
+                            <span class="material-icons menu-icon text-white transition-transform duration-300">menu</span>
+                        </button>
+                        
+                        <!-- Mobile menu -->
+                        <div class="mobile-menu hidden md:hidden absolute right-0 top-full mt-2 w-48 rounded-lg overflow-hidden bg-gray-900 shadow-lg z-50">
+                            <a href="index.html" class="block py-3 px-4 text-gray-300 hover:bg-gray-700 hover:text-sky-400 border-b border-gray-700">Inicio</a>
+                            <a href="#" class="block py-3 px-4 text-gray-300 hover:bg-gray-700 hover:text-sky-400 border-b border-gray-700">Servicios</a>
+                            <a href="#" class="block py-3 px-4 text-gray-300 hover:bg-gray-700 hover:text-sky-400 border-b border-gray-700">Contacto</a>
+                            <a href="#" class="block py-3 px-4 text-gray-300 hover:bg-gray-700 hover:text-sky-400">Acerca de</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+        <!-- Wrap existing content in a container -->
+        <div class="flex items-center justify-center min-h-[calc(100vh-4rem)]">
+            <div class="w-full max-w-md bg-black p-6 rounded-lg shadow-lg">
+                <h2 class="text-2xl font-bold text-center mb-4 text-white">Iniciar Sesión</h2>
+    
+                <form id="loginForm" class="space-y-4"> 
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-blue-500">Correo Electrónico</label>
+                        <input type="email" id="email" class="mt-1 block w-full p-2 border border-gray-300 rounded-md text-white bg-black" required>
+                    </div>
+                    <div>
+                        <label for="password" class="block text-sm font-medium text-blue-500">Contraseña</label>
+                        <div class="relative">
+                            <input type="password" id="password" class="mt-1 block w-full p-2 border border-gray-300 rounded-md text-white bg-black" required>
+                            <button type="button" class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-200" onclick="togglePasswordVisibility()">
+                                <span class="material-icons" id="passwordToggleIcon">visibility_off</span>
+                            </button>
+                        </div>
+                    </div>
+                    <button type="submit" class="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600">Ingresar</button>
+                </form>
+                <script>
+                    //menu movil
+                     const mobileMenuButton = document.querySelector('.mobile-menu-button');
+        const mobileMenu = document.querySelector('.mobile-menu');
+        const menuIcon = document.querySelector('.menu-icon');
+
+        mobileMenuButton.addEventListener('click', () => {
+            if (mobileMenu.classList.contains('show')) {
+                mobileMenu.classList.remove('show');
+                menuIcon.style.transform = 'rotate(0deg)';
+                setTimeout(() => {
+                    menuIcon.textContent = 'menu';
+                    mobileMenu.classList.add('hidden');
+                }, 150);
+            } else {
+                mobileMenu.classList.remove('hidden');
+                setTimeout(() => {
+                    mobileMenu.classList.add('show');
+                    menuIcon.textContent = 'close';
+                    menuIcon.style.transform = 'rotate(180deg)';
+                }, 10);
+            }
+        });
+//color blanco inputs
+        window.onload = function () {
+        const inputs = document.querySelectorAll('input');
+        
+        function forceWhiteColor(input) {
+            setTimeout(() => {
+                input.style.color = 'white';
+                input.style.backgroundColor = 'black';
+            }, 50);
+        }
+        
+        inputs.forEach(input => {
+            input.addEventListener('focus', function () {
+                input.style.backgroundColor = 'black';
+                input.style.color = 'white';
+                input.style.boxShadow = 'inset 0 0 0 1000px black';
+            });
+
+            input.addEventListener('blur', function () {
+                if (!input.value) {
+                    input.style.backgroundColor = 'black';
+                    input.style.color = 'white';
+                    input.style.boxShadow = 'inset 0 0 0 1000px black';
+                }
+            });
+
+            input.addEventListener('input', function () {
+                if (input.value) {
+                    input.style.color = 'white';
+                }
+            });
+
+            input.addEventListener('change', function () {
+                forceWhiteColor(input);
+            });
+
+            forceWhiteColor(input);
+        });
+    }
+
+    function togglePasswordVisibility() {
+        const passwordInput = document.getElementById('password');
+        const passwordToggleIcon = document.getElementById('passwordToggleIcon');
+        
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            passwordToggleIcon.textContent = 'visibility';
+        } else {
+            passwordInput.type = 'password';
+            passwordToggleIcon.textContent = 'visibility_off';
+        }
+    }
+
+                </script>
+</body>
+</html>    
