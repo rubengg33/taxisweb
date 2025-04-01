@@ -11,24 +11,6 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">      
     <script src="scripts/config.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script>
-        // Move this to the top of your scripts
-        document.addEventListener("DOMContentLoaded", function () {
-            const userEmail = localStorage.getItem("userEmail");
-            const isAdmin = localStorage.getItem("isAdmin");
-            const mainContent = document.getElementById("mainContent");
-            const loadingState = document.getElementById("loadingState");
-
-            if (!userEmail || isAdmin !== "true") {
-                window.location.replace("login.html");
-            } else {
-                mainContent.classList.remove("content-hidden");
-                loadingState.style.display = "none";
-            }
-
-            // ... rest of your existing DOMContentLoaded code ...
-        });
-    </script>
     <style>
        @layer utilities {
         /* Force white text for autofilled inputs */
@@ -55,7 +37,75 @@
             appearance: none;
         }
     }
+        .button-hover { 
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .button-hover:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Animación mejorada del menú móvil */
+        .mobile-menu {
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+            transition: all 0.3s ease-in-out;
+            transform-origin: top right;
+            transform: scale(0.95);
+        }
+        
+        .mobile-menu.show {
+            max-height: 300px;
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .mobile-menu-button {
+            transition: transform 0.2s ease;
+        }
+
+        .mobile-menu-button:hover {
+            transform: scale(1.1);
+        }
+
+        .mobile-menu a {
+            transition: all 0.2s ease;
+        }
+
+        .mobile-menu a:hover {
+            transform: translateX(10px);
+            padding-left: 1.5rem;
+            background: linear-gradient(to right, transparent, rgba(56, 189, 248, 0.1));
+        }
+        
+        /* Animación para el icono del menú */
+        .menu-icon {
+            transition: all 0.3s ease;
+        }
+        
+        .menu-icon.open {
+            transform: rotate(180deg);
+        }
     </style>
+    <script>
+        // Move this to the top of your scripts
+        document.addEventListener("DOMContentLoaded", function () {
+            const userEmail = localStorage.getItem("userEmail");
+            const isAdmin = localStorage.getItem("isAdmin");
+            const mainContent = document.getElementById("mainContent");
+            const loadingState = document.getElementById("loadingState");
+
+            if (!userEmail || isAdmin !== "true") {
+                window.location.replace("login.html");
+            } else {
+                mainContent.classList.remove("content-hidden");
+                loadingState.style.display = "none";
+            }
+
+            // ... rest of your existing DOMContentLoaded code ...
+        });
+    </script>
 </head>
 <body class="bg-gradient-to-br from-purple-600 via-indigo-500 to-sky-400 min-h-screen">
     <!-- Add content-hidden class to the main content -->
