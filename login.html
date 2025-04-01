@@ -223,12 +223,12 @@
                         const response = await fetch(`${API_URL}/login`, {
                             method: "POST",
                             headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({ email, dni: password })
+                            body: JSON.stringify({ email, password })
                         });
     
                         const data = await response.json();
     
-                        if (data.exists) {
+                        if (data.exists && data.admin) {
                             localStorage.setItem("userEmail", email);
                             localStorage.setItem("isAdmin", data.admin);
                             // Store the JWT token
@@ -242,11 +242,8 @@
                                 confirmButtonColor: '#3085d6'
                             });
     
-                            if (data.admin) {
+                            
                                 window.location.href = "titulares-conductores.html";
-                            } else {
-                                window.location.href = "registro.html";
-                            }
                         } else {
                             await Swal.fire({
                                 icon: 'error',
@@ -274,15 +271,10 @@
             const userEmail = localStorage.getItem("userEmail");
             const isAdmin = localStorage.getItem("isAdmin");
     
-            if (userEmail) {
-                // Verifica que NO esté ya en titulares-conductores.html
-                if (isAdmin === "true" && window.location.pathname !== "/titulares-conductores.html") {
-                    window.location.href = "titulares-conductores.html"; 
-                } else if (isAdmin !== "true" && window.location.pathname !== "/registro.html") {
-                    window.location.href = "registro.html"; 
-                }
-            }
-        });
+            if (userEmail && isAdmin === "true" && window.location.pathname !== "/titulares-conductores.html") {
+        window.location.href = "titulares-conductores.html";
+    }
+});
     
 
         </script>

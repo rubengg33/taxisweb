@@ -280,19 +280,7 @@ app.post("/api/login", async (req, res) => {
             return res.json({ exists: true, admin: true, token });
         }
     }
-
-    // Check regular users
-    const query = "SELECT * FROM conductores WHERE EMAIL = ? AND DNI = ?";
-    db.query(query, [email, dni], (err, result) => {
-        if (err) return res.status(500).json({ error: "Error en el servidor" });
-        
-        if (result.length > 0) {
-            const token = jwt.sign({ email, isAdmin: false }, process.env.JWT_SECRET, { expiresIn: '24h' });
-            return res.json({ exists: true, admin: false, token });
-        } else {
-            return res.json({ exists: false });
-        }
-    });
+      return res.json({ exists: false });
 });
 
 // Login endpoint for empresa
