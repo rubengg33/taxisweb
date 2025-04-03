@@ -210,27 +210,30 @@
 // Add this to your existing script section
 async function loadConductores() {
     try {
-        const response = await fetch(`${API_URL}/conductores`, {
+        const licenciaActual = document.getElementById('empresaLicencia').textContent;
+        const response = await fetch(`${API_URL}/eventos/${licenciaActual}`, {
             headers: getAuthHeaders()
         });
         
-        if (!response.ok) throw new Error('Error fetching conductores');
+        if (!response.ok) throw new Error('Error fetching eventos');
         
-        const conductores = await response.json();
+        const eventos = await response.json();
         const select = document.getElementById('conductorSelect');
-        const licenciaActual = document.getElementById('empresaLicencia').textContent;
         
-        // Filter conductores by current licencia
-        const conductoresLicencia = conductores.filter(c => c.licencia === licenciaActual);
+        // Get unique conductores with their DNI
+        const conductores = [...new Set(eventos.map(evento => 
+            JSON.stringify({
+                nombre: evento.nombre_conductor,
+                dni: evento.dni
+            })
+        ))].map(str => JSON.parse(str));
         
-        // Clear existing options except the first one
         select.innerHTML = '<option value="">Seleccione un conductor...</option>';
         
-        // Add conductores to select
-        conductoresLicencia.forEach(conductor => {
+        conductores.forEach(conductor => {
             const option = document.createElement('option');
-            option.value = conductor.id;
-            option.textContent = `${conductor.nombre_apellidos} - ${conductor.dni}`;
+            option.value = JSON.stringify(conductor);
+            option.textContent = `${conductor.nombre} - ${conductor.dni}`;
             select.appendChild(option);
         });
     } catch (error) {
@@ -238,58 +241,46 @@ async function loadConductores() {
     }
 }
 
-// Handle conductor selection
+// Update the conductor selection handler
 document.getElementById('conductorSelect').addEventListener('change', async function(e) {
-    const conductorId = e.target.value;
     const conductorInfo = document.getElementById('conductorInfo');
     const statsGrid = document.getElementById('statsGrid');
     
-    if (!conductorId) {
+    if (!e.target.value) {
         conductorInfo.classList.add('hidden');
         statsGrid.classList.add('hidden');
         return;
     }
     
     try {
-        const response = await fetch(`${API_URL}/conductores/${conductorId}`, {
-            headers: getAuthHeaders()
-        });
-        
-        if (!response.ok) throw new Error('Error fetching conductor details');
-        
-        const conductor = await response.json();
-        
-        // Update conductor info
-        document.getElementById('conductorNombre').textContent = conductor.nombre_apellidos;
-        document.getElementById('conductorDNI').textContent = conductor.dni;
-        document.getElementById('conductorEmail').textContent = conductor.email;
-        document.getElementById('conductorDireccion').textContent = conductor.direccion;
-        
+        const conductor = JSON.parse(e.target.value);
         conductorInfo.classList.remove('hidden');
         statsGrid.classList.remove('hidden');
         
+        // Update conductor info with available data
+        document.getElementById('conductorNombre').textContent = conductor.nombre;
+        document.getElementById('conductorDNI').textContent = conductor.dni;
+        
         // Calculate hours for this specific conductor
-        await calculateHours(conductorId);
+        await calculateHours(conductor.nombre);
     } catch (error) {
         console.error('Error:', error);
     }
 });
 
-// Modify your existing DOMContentLoaded event
-document.addEventListener('DOMContentLoaded', async function() {
-    await loadConductores();
-});
-
-// Update your calculateHours function to accept conductorId
-async function calculateHours(conductorId) {
+// Update calculateHours to use conductor name instead of ID
+async function calculateHours(conductorNombre) {
     try {
-        const response = await fetch(`${API_URL}/eventos/${conductorId}`, {
+        const licencia = document.getElementById('empresaLicencia').textContent;
+        const response = await fetch(`${API_URL}/eventos/${licencia}`, {
             headers: getAuthHeaders()
         });
         if (!response.ok) throw new Error('Error fetching data');
 
         const eventos = await response.json();
-        console.log('Eventos recibidos:', eventos); // Debug log
+        // Filter eventos for specific conductor
+        const eventosConductor = eventos.filter(evento => evento.nombre_conductor === conductorNombre);
+        console.log('Eventos recibidos:', eventosConductor);
 
         let totalWorking = 0;
         let totalRest = 0;
