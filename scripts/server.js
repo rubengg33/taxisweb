@@ -282,18 +282,18 @@ app.post("/api/login", async (req, res) => {
     }
       return res.json({ exists: false });
 });
-// ... existing imports and middleware ...
-
 app.get('/api/eventos', authenticateToken, async (req, res) => {
     try {
         const query = `
-            SELECT evento, fecha_hora, licencia
-            FROM eventos 
-            WHERE licencia = ?
-            ORDER BY fecha_hora ASC`;
+            SELECT e.evento, e.fecha_hora
+            FROM eventos e
+            INNER JOIN conductores c ON e.licencia = c.licencia
+            INNER JOIN licencias l ON c.licencia = l.LICENCIA
+            WHERE l.EMAIL = ?
+            ORDER BY e.fecha_hora ASC`;
         
-        const licencia = req.user.licencia;
-        db.query(query, [licencia], (err, result) => {
+        const email = req.user.email;
+        db.query(query, [email], (err, result) => {
             if (err) {
                 console.error('Error in eventos query:', err);
                 return res.status(500).json({ error: 'Error interno del servidor' });
@@ -306,7 +306,6 @@ app.get('/api/eventos', authenticateToken, async (req, res) => {
     }
 });
 
-// ... rest of your server code ...
 // Login endpoint for empresa
 app.post("/api/login-empresa", async (req, res) => {
     const { email, dni } = req.body;
