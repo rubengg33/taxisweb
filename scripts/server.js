@@ -287,16 +287,21 @@ app.post("/api/login", async (req, res) => {
 app.get('/api/eventos', authenticateToken, async (req, res) => {
     try {
         const query = `
-            SELECT e.evento, e.fecha_hora, e.licencia
-            FROM eventos e
-            WHERE e.licencia = ?
-            ORDER BY e.fecha_hora ASC`;
+            SELECT evento, fecha_hora, licencia
+            FROM eventos 
+            WHERE licencia = ?
+            ORDER BY fecha_hora ASC`;
         
-        const licencia = req.user.licencia; // Get licencia from authenticated user
-        const [rows] = await pool.query(query, [licencia]);
-        res.json(rows);
+        const licencia = req.user.licencia;
+        db.query(query, [licencia], (err, result) => {
+            if (err) {
+                console.error('Error in eventos query:', err);
+                return res.status(500).json({ error: 'Error interno del servidor' });
+            }
+            res.json(result);
+        });
     } catch (error) {
-        console.error('Error fetching eventos:', error);
+        console.error('Error in eventos endpoint:', error);
         res.status(500).json({ error: 'Error interno del servidor' });
     }
 });
