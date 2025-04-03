@@ -219,7 +219,51 @@
 </html>
 
 <script>
-// Add this to your existing script section
+// Add these helper functions
+function showAlert(message, type = 'info') {
+    return Swal.fire({
+        text: message,
+        icon: type,
+        background: '#1a1a1a',
+        color: '#ffffff',
+        confirmButtonColor: '#3085d6'
+    });
+}
+
+// Add logout handlers
+document.addEventListener('DOMContentLoaded', function() {
+    const logoutButton = document.getElementById('logoutButton');
+    const logoutButtonMobile = document.getElementById('logoutButtonMobile');
+
+    async function handleLogout() {
+        try {
+            const response = await fetch(`${API_URL}/logout`, {
+                method: "POST",
+                headers: getAuthHeaders()
+            });
+
+            if (response.ok) {
+                localStorage.removeItem("empresaEmail");
+                localStorage.removeItem("isEmpresa");
+                localStorage.removeItem("token");
+                localStorage.removeItem("empresaData");
+                
+                await showAlert("Sesión cerrada correctamente", "success");
+                window.location.href = "login-empresa.html";
+            } else {
+                await showAlert("Error al cerrar sesión", "error");
+            }
+        } catch (error) {
+            console.error("Error al cerrar sesión:", error);
+            await showAlert("Hubo un problema con la conexión al servidor", "error");
+        }
+    }
+
+    if (logoutButton) logoutButton.addEventListener('click', handleLogout);
+    if (logoutButtonMobile) logoutButtonMobile.addEventListener('click', handleLogout);
+});
+</script>
+
 async function loadConductores() {
     try {
         const licenciaActual = document.getElementById('empresaLicencia').textContent;
