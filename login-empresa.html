@@ -249,20 +249,17 @@
             });
 
             const data = await response.json();
+            console.log('Server response:', data); // Debug log
 
             if (data.exists) {
-                // Store all the data we receive from login
                 localStorage.setItem("empresaEmail", email);
                 localStorage.setItem("token", data.token);
                 localStorage.setItem("isEmpresa", "true");
                 
-                // Store empresa data from the login response
-                const empresaData = {
-                    licencia: data.licencia,
-                    matricula: data.matricula,
-                    marca_modelo: data.marca_modelo
-                };
-                localStorage.setItem("empresaData", JSON.stringify(empresaData));
+                // Store empresa data directly from the login response
+                if (data.empresaData) {
+                    localStorage.setItem("empresaData", JSON.stringify(data.empresaData));
+                }
 
                 await Swal.fire({
                     text: '¡Bienvenido! Sesión iniciada correctamente',
