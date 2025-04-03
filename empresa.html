@@ -245,31 +245,49 @@ async function calculateHours() {
         if (!response.ok) throw new Error('Error fetching data');
 
         const eventos = await response.json();
+        console.log('Eventos recibidos:', eventos); // Debug log
+
         let totalWorking = 0;
         let totalRest = 0;
 
-        // Ordenar eventos por fecha_hora
-        const sortedEventos = eventos.sort((a, b) => new Date(a.fecha_hora) - new Date(b.fecha_hora));
-        
-        // Procesar eventos en pares
-        for (let i = 0; i < sortedEventos.length - 1; i++) {
-            const currentEvento = sortedEventos[i];
-            const nextEvento = sortedEventos[i + 1];
-            
-            if (currentEvento.evento === 'inicio_jornada' && nextEvento.evento === 'fin_jornada') {
-                const start = new Date(currentEvento.fecha_hora);
-                const end = new Date(nextEvento.fecha_hora);
-                totalWorking += (end - start) / 1000;
-                i++;
+        // Group events by type
+        const workPeriods = [];
+        const restPeriods = [];
+
+        eventos.forEach(evento => {
+            if (evento.evento === 'inicio_jornada') {
+                workPeriods.push({ start: new Date(evento.fecha_hora) });
+            } else if (evento.evento === 'fin_jornada') {
+                const lastWorkPeriod = workPeriods[workPeriods.length - 1];
+                if (lastWorkPeriod && !lastWorkPeriod.end) {
+                    lastWorkPeriod.end = new Date(evento.fecha_hora);
+                }
+            } else if (evento.evento === 'inicio_descanso') {
+                restPeriods.push({ start: new Date(evento.fecha_hora) });
+            } else if (evento.evento === 'fin_descanso') {
+                const lastRestPeriod = restPeriods[restPeriods.length - 1];
+                if (lastRestPeriod && !lastRestPeriod.end) {
+                    lastRestPeriod.end = new Date(evento.fecha_hora);
+                }
             }
-            
-            if (currentEvento.evento === 'inicio_descanso' && nextEvento.evento === 'fin_descanso') {
-                const start = new Date(currentEvento.fecha_hora);
-                const end = new Date(nextEvento.fecha_hora);
-                totalRest += (end - start) / 1000;
-                i++;
+        });
+
+        // Calculate total working time
+        workPeriods.forEach(period => {
+            if (period.start && period.end) {
+                totalWorking += (period.end - period.start) / 1000;
             }
-        }
+        });
+
+        // Calculate total rest time
+        restPeriods.forEach(period => {
+            if (period.start && period.end) {
+                totalRest += (period.end - period.start) / 1000;
+            }
+        });
+
+        console.log('Total working seconds:', totalWorking); // Debug log
+        console.log('Total rest seconds:', totalRest); // Debug log
 
         // Format time for working hours
         const workingHours = Math.floor(totalWorking / 3600);

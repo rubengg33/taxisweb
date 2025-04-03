@@ -298,6 +298,7 @@ app.get('/api/eventos', authenticateToken, async (req, res) => {
                 console.error('Error in eventos query:', err);
                 return res.status(500).json({ error: 'Error interno del servidor' });
             }
+            console.log('Eventos encontrados:', result); // Debug log
             res.json(result);
         });
     } catch (error) {
