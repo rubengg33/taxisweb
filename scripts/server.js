@@ -284,16 +284,23 @@ app.post("/api/login", async (req, res) => {
 });
 app.get('/api/eventos', authenticateToken, async (req, res) => {
     try {
+        // First get the licencia from the authenticated empresa
+        const empresaEmail = req.user.email;
+        
         const query = `
             SELECT e.evento, e.fecha_hora
             FROM eventos e
             INNER JOIN conductores c ON e.licencia = c.licencia
-            INNER JOIN licencias l ON c.licencia = l.LICENCIA
-            WHERE l.EMAIL = ?
+            WHERE c.licencia = (
+                SELECT LICENCIA 
+                FROM licencias 
+                WHERE EMAIL = ?
+            )
             ORDER BY e.fecha_hora ASC`;
         
-        const email = req.user.email;
-        db.query(query, [email], (err, result) => {
+        console.log('Email empresa:', empresaEmail); // Debug log
+        
+        db.query(query, [empresaEmail], (err, result) => {
             if (err) {
                 console.error('Error in eventos query:', err);
                 return res.status(500).json({ error: 'Error interno del servidor' });
