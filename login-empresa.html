@@ -251,17 +251,18 @@
             const data = await response.json();
 
             if (data.exists) {
+                // Store all the data we receive from login
                 localStorage.setItem("empresaEmail", email);
                 localStorage.setItem("token", data.token);
                 localStorage.setItem("isEmpresa", "true");
-
-                // Add token verification logging
-                const token = localStorage.getItem('token');
-                console.log('Token:', token);
-
-                // Decode and check token content
-                const tokenPayload = JSON.parse(atob(token.split('.')[1]));
-                console.log('Token payload:', tokenPayload);
+                
+                // Store empresa data from the login response
+                const empresaData = {
+                    licencia: data.licencia,
+                    matricula: data.matricula,
+                    marca_modelo: data.marca_modelo
+                };
+                localStorage.setItem("empresaData", JSON.stringify(empresaData));
 
                 await Swal.fire({
                     text: '¡Bienvenido! Sesión iniciada correctamente',
