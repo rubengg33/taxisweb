@@ -9,13 +9,23 @@
     <link rel="manifest" href="img/favicon/site.webmanifest">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <title>Document</title>
+    <script>
+        const token = localStorage.getItem("token");
+        const empresaEmail = localStorage.getItem("empresaEmail");
+        const isEmpresa = localStorage.getItem("isEmpresa");
+
+        if (token && empresaEmail && isEmpresa === "true") {
+            window.location.replace = "empresa.html";
+        }
+   
+    </script>
     <style>
         @layer utilities {
             /* Force white text for autofilled inputs */
             input:-webkit-autofill,
             input:-webkit-autofill:hover,
             input:-webkit-autofill:focus,
-            input:-webkit-autofill:active {
+            input:-webkit-autofill:active { 
                 -webkit-text-fill-color: white !important;
                 -webkit-box-shadow: 0 0 0 30px black inset !important;
                 box-shadow: 0 0 0 30px black inset !important;
@@ -269,16 +279,6 @@
         }
     });
 
-    // Add DOMContentLoaded check for existing session
-    document.addEventListener("DOMContentLoaded", function() {
-        const token = localStorage.getItem("token");
-        const empresaEmail = localStorage.getItem("empresaEmail");
-        const isEmpresa = localStorage.getItem("isEmpresa");
-
-        if (token && empresaEmail && isEmpresa === "true") {
-            window.location.href = "empresa.html";
-        }
-    });
                 </script>
 </body>
 </html>
