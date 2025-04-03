@@ -282,19 +282,17 @@ app.post("/api/login", async (req, res) => {
     }
       return res.json({ exists: false });
 });
-app.get('/api/eventos', authenticateToken, async (req, res) => {
+app.get('/api/eventos/:licencia?', authenticateToken, async (req, res) => {
     try {
         console.log('Full user object from token:', req.user);
-        console.log('Token headers:', req.headers.authorization);
         
-        const empresaEmail = req.user.email;
-        const licencia = req.user.licencia;
+        // Get licencia either from params or token
+        const licencia = req.params.licencia || req.user.licencia;
         
-        console.log('Email:', empresaEmail);
-        console.log('Licencia:', licencia);
+        console.log('Licencia being queried:', licencia);
 
         if (!licencia) {
-            console.error('No licencia found in token');
+            console.error('No licencia found');
             return res.status(400).json({ error: 'No se encontró la licencia asociada' });
         }
 
@@ -310,7 +308,6 @@ app.get('/api/eventos', authenticateToken, async (req, res) => {
                 return res.status(500).json({ error: 'Error en la base de datos' });
             }
             
-            // Even if no events are found, return an empty array instead of error
             res.json(result || []);
         });
     } catch (error) {

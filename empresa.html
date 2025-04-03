@@ -123,7 +123,7 @@
 
     <!-- Main content wrapper -->
     <div class="container mx-auto px-4 py-6">
-        <!-- Welcome section moved here, right after navbar -->
+        <!-- Welcome section -->
         <div class="bg-gray-900 rounded-lg shadow-xl p-6 md:p-8 mb-8">
             <div class="text-center">
                 <h1 class="text-2xl md:text-3xl font-bold text-white mb-2">Bienvenido Empresa</h1>
@@ -136,8 +136,29 @@
             </div>
         </div>
 
-        <!-- Stats Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Conductor Selector Section -->
+        <div class="bg-gray-900 rounded-lg shadow-xl p-6 md:p-8 mb-8">
+            <div class="text-center mb-4">
+                <h3 class="text-xl text-white font-semibold">Seleccionar Conductor</h3>
+            </div>
+            <div class="flex flex-col items-center gap-4">
+                <select id="conductorSelect" class="w-full md:w-2/3 p-3 rounded-lg bg-gray-800 text-white border border-gray-700 focus:border-sky-400 focus:ring focus:ring-sky-400 focus:ring-opacity-50">
+                    <option value="">Seleccione un conductor...</option>
+                </select>
+                <!-- Conductor Info Card -->
+                <div id="conductorInfo" class="hidden w-full md:w-2/3 bg-gray-800 rounded-lg p-4 border border-gray-700">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-gray-300">
+                        <p>Nombre: <span id="conductorNombre" class="text-sky-400"></span></p>
+                        <p>DNI: <span id="conductorDNI" class="text-sky-400"></span></p>
+                        <p>Email: <span id="conductorEmail" class="text-sky-400"></span></p>
+                        <p>Dirección: <span id="conductorDireccion" class="text-sky-400"></span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Grid (will be shown after selecting a conductor) -->
+        <div id="statsGrid" class="hidden grid grid-cols-1 md:grid-cols-2 gap-6">
             <!-- Working Hours Card -->
             <div class="bg-gradient-to-br from-blue-900 to-blue-800 rounded-lg p-6 shadow-lg">
                 <div class="flex items-center justify-between">
@@ -187,15 +208,84 @@
 
 <script>
 // Add this to your existing script section
-async function calculateHours() {
+async function loadConductores() {
     try {
-        const response = await fetch(`${API_URL}/eventos`, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${localStorage.getItem('token')}`
-            }
+        const response = await fetch(`${API_URL}/conductores`, {
+            headers: getAuthHeaders()
         });
+        
+        if (!response.ok) throw new Error('Error fetching conductores');
+        
+        const conductores = await response.json();
+        const select = document.getElementById('conductorSelect');
+        const licenciaActual = document.getElementById('empresaLicencia').textContent;
+        
+        // Filter conductores by current licencia
+        const conductoresLicencia = conductores.filter(c => c.licencia === licenciaActual);
+        
+        // Clear existing options except the first one
+        select.innerHTML = '<option value="">Seleccione un conductor...</option>';
+        
+        // Add conductores to select
+        conductoresLicencia.forEach(conductor => {
+            const option = document.createElement('option');
+            option.value = conductor.id;
+            option.textContent = `${conductor.nombre_apellidos} - ${conductor.dni}`;
+            select.appendChild(option);
+        });
+    } catch (error) {
+        console.error('Error loading conductores:', error);
+    }
+}
 
+// Handle conductor selection
+document.getElementById('conductorSelect').addEventListener('change', async function(e) {
+    const conductorId = e.target.value;
+    const conductorInfo = document.getElementById('conductorInfo');
+    const statsGrid = document.getElementById('statsGrid');
+    
+    if (!conductorId) {
+        conductorInfo.classList.add('hidden');
+        statsGrid.classList.add('hidden');
+        return;
+    }
+    
+    try {
+        const response = await fetch(`${API_URL}/conductores/${conductorId}`, {
+            headers: getAuthHeaders()
+        });
+        
+        if (!response.ok) throw new Error('Error fetching conductor details');
+        
+        const conductor = await response.json();
+        
+        // Update conductor info
+        document.getElementById('conductorNombre').textContent = conductor.nombre_apellidos;
+        document.getElementById('conductorDNI').textContent = conductor.dni;
+        document.getElementById('conductorEmail').textContent = conductor.email;
+        document.getElementById('conductorDireccion').textContent = conductor.direccion;
+        
+        conductorInfo.classList.remove('hidden');
+        statsGrid.classList.remove('hidden');
+        
+        // Calculate hours for this specific conductor
+        await calculateHours(conductorId);
+    } catch (error) {
+        console.error('Error:', error);
+    }
+});
+
+// Modify your existing DOMContentLoaded event
+document.addEventListener('DOMContentLoaded', async function() {
+    await loadConductores();
+});
+
+// Update your calculateHours function to accept conductorId
+async function calculateHours(conductorId) {
+    try {
+        const response = await fetch(`${API_URL}/eventos/${conductorId}`, {
+            headers: getAuthHeaders()
+        });
         if (!response.ok) throw new Error('Error fetching data');
 
         const eventos = await response.json();
@@ -264,7 +354,4 @@ async function calculateHours() {
         document.getElementById('totalRestHours').textContent = 'Error';
     }
 }
-
-// Call the function when the page loads
-document.addEventListener('DOMContentLoaded', calculateHours);
 </script>
