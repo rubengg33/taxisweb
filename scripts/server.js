@@ -285,13 +285,12 @@ app.post("/api/login", async (req, res) => {
 app.get('/api/eventos', authenticateToken, async (req, res) => {
     try {
         const empresaEmail = req.user.email;
-        const licencia = req.user.licencia; // Get licencia from token
+        const licencia = req.user.licencia;
         
-        console.log('Debug info:', {
-            empresaEmail,
-            licencia,
-            token: req.headers.authorization
-        });
+        if (!licencia) {
+            console.error('No licencia found in token');
+            return res.status(400).json({ error: 'No se encontró la licencia asociada' });
+        }
 
         const query = `
             SELECT e.evento, e.fecha_hora
@@ -301,18 +300,15 @@ app.get('/api/eventos', authenticateToken, async (req, res) => {
         
         db.query(query, [licencia], (err, result) => {
             if (err) {
-                console.error('Error in eventos query:', err);
-                return res.status(500).json({ error: 'Error interno del servidor' });
+                console.error('Database error:', err);
+                return res.status(500).json({ error: 'Error en la base de datos' });
             }
-            console.log('Query result:', {
-                licenciaUsed: licencia,
-                eventsFound: result.length,
-                events: result
-            });
-            res.json(result);
+            
+            // Even if no events are found, return an empty array instead of error
+            res.json(result || []);
         });
     } catch (error) {
-        console.error('Error in eventos endpoint:', error);
+        console.error('Unexpected error:', error);
         res.status(500).json({ error: 'Error interno del servidor' });
     }
 });
