@@ -284,9 +284,15 @@ app.post("/api/login", async (req, res) => {
 });
 app.get('/api/eventos', authenticateToken, async (req, res) => {
     try {
+        console.log('Full user object from token:', req.user);
+        console.log('Token headers:', req.headers.authorization);
+        
         const empresaEmail = req.user.email;
         const licencia = req.user.licencia;
         
+        console.log('Email:', empresaEmail);
+        console.log('Licencia:', licencia);
+
         if (!licencia) {
             console.error('No licencia found in token');
             return res.status(400).json({ error: 'No se encontró la licencia asociada' });

@@ -255,6 +255,14 @@
                 localStorage.setItem("token", data.token);
                 localStorage.setItem("isEmpresa", "true");
 
+                // Add token verification logging
+                const token = localStorage.getItem('token');
+                console.log('Token:', token);
+
+                // Decode and check token content
+                const tokenPayload = JSON.parse(atob(token.split('.')[1]));
+                console.log('Token payload:', tokenPayload);
+
                 await Swal.fire({
                     text: '¡Bienvenido! Sesión iniciada correctamente',
                     icon: 'success',
