@@ -195,7 +195,19 @@
             
             try {
                 loadingState.classList.remove('hidden');
-                await calculateHours(); // Your existing function
+                
+                // Load empresa data from localStorage
+                const empresaData = JSON.parse(localStorage.getItem('empresaData'));
+                if (empresaData) {
+                    document.getElementById('empresaLicencia').textContent = empresaData.licencia;
+                    document.getElementById('empresaMatricula').textContent = empresaData.matricula;
+                    document.getElementById('empresaMarcaModelo').textContent = empresaData.marca_modelo;
+                }
+
+                // Load conductores after empresa data is loaded
+                await loadConductores();
+                await calculateHours();
+                
                 loadingState.classList.add('hidden');
             } catch (error) {
                 console.error('Error:', error);
