@@ -282,7 +282,26 @@ app.post("/api/login", async (req, res) => {
     }
       return res.json({ exists: false });
 });
+// ... existing imports and middleware ...
 
+app.get('/api/eventos', authenticateToken, async (req, res) => {
+    try {
+        const query = `
+            SELECT e.evento, e.fecha_hora, e.licencia
+            FROM eventos e
+            WHERE e.licencia = ?
+            ORDER BY e.fecha_hora ASC`;
+        
+        const licencia = req.user.licencia; // Get licencia from authenticated user
+        const [rows] = await pool.query(query, [licencia]);
+        res.json(rows);
+    } catch (error) {
+        console.error('Error fetching eventos:', error);
+        res.status(500).json({ error: 'Error interno del servidor' });
+    }
+});
+
+// ... rest of your server code ...
 // Login endpoint for empresa
 app.post("/api/login-empresa", async (req, res) => {
     const { email, dni } = req.body;

@@ -194,3 +194,95 @@
     </script>
 </body>
 </html>
+
+<!-- After the loading state div -->
+<div class="container mx-auto px-4 mt-8">
+    <div class="bg-gray-900 rounded-lg shadow-xl p-6 md:p-8">
+        <!-- Welcome Header -->
+        <div class="text-center mb-6">
+            <h1 class="text-2xl md:text-3xl font-bold text-white mb-2">Bienvenido Empresa</h1>
+            <h2 class="text-xl md:text-2xl text-sky-400">Jornada de Conductor</h2>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Working Hours Card -->
+            <div class="bg-gradient-to-br from-blue-900 to-blue-800 rounded-lg p-6 shadow-lg">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-300 text-sm">Horas Totales Trabajadas</p>
+                        <h3 class="text-2xl font-bold text-white" id="totalWorkingHours">Calculando...</h3>
+                    </div>
+                    <span class="material-icons text-4xl text-blue-400">work_history</span>
+                </div>
+            </div>
+
+            <!-- Rest Hours Card -->
+            <div class="bg-gradient-to-br from-green-900 to-green-800 rounded-lg p-6 shadow-lg">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-300 text-sm">Horas Totales Descansadas</p>
+                        <h3 class="text-2xl font-bold text-white" id="totalRestHours">Calculando...</h3>
+                    </div>
+                    <span class="material-icons text-4xl text-green-400">bedtime</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Add this to your existing script section
+async function calculateHours() {
+    try {
+        const response = await fetch(`${API_URL}/eventos`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
+            }
+        });
+
+        if (!response.ok) throw new Error('Error fetching data');
+
+        const eventos = await response.json();
+        let totalWorking = 0;
+        let totalRest = 0;
+
+        // Ordenar eventos por fecha_hora
+        const sortedEventos = eventos.sort((a, b) => new Date(a.fecha_hora) - new Date(b.fecha_hora));
+        
+        // Procesar eventos en pares
+        for (let i = 0; i < sortedEventos.length - 1; i++) {
+            const currentEvento = sortedEventos[i];
+            const nextEvento = sortedEventos[i + 1];
+            
+            if (currentEvento.evento === 'inicio_jornada' && nextEvento.evento === 'fin_jornada') {
+                const start = new Date(currentEvento.fecha_hora);
+                const end = new Date(nextEvento.fecha_hora);
+                totalWorking += (end - start) / (1000 * 60 * 60);
+                i++; // Skip the next event since we've already processed it
+            }
+            
+            if (currentEvento.evento === 'inicio_descanso' && nextEvento.evento === 'fin_descanso') {
+                const start = new Date(currentEvento.fecha_hora);
+                const end = new Date(nextEvento.fecha_hora);
+                totalRest += (end - start) / (1000 * 60 * 60);
+                i++; // Skip the next event since we've already processed it
+            }
+        }
+
+        document.getElementById('totalWorkingHours').textContent = 
+            `${Math.round(totalWorking * 10) / 10}h`;
+        document.getElementById('totalRestHours').textContent = 
+            `${Math.round(totalRest * 10) / 10}h`;
+
+    } catch (error) {
+        console.error('Error:', error);
+        document.getElementById('totalWorkingHours').textContent = 'Error';
+        document.getElementById('totalRestHours').textContent = 'Error';
+    }
+}
+
+// Call the function when the page loads
+document.addEventListener('DOMContentLoaded', calculateHours);
+</script>
