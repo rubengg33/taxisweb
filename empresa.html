@@ -259,22 +259,32 @@ async function calculateHours() {
             if (currentEvento.evento === 'inicio_jornada' && nextEvento.evento === 'fin_jornada') {
                 const start = new Date(currentEvento.fecha_hora);
                 const end = new Date(nextEvento.fecha_hora);
-                totalWorking += (end - start) / (1000 * 60 * 60);
-                i++; // Skip the next event since we've already processed it
+                totalWorking += (end - start) / 1000;
+                i++;
             }
             
             if (currentEvento.evento === 'inicio_descanso' && nextEvento.evento === 'fin_descanso') {
                 const start = new Date(currentEvento.fecha_hora);
                 const end = new Date(nextEvento.fecha_hora);
-                totalRest += (end - start) / (1000 * 60 * 60);
-                i++; // Skip the next event since we've already processed it
+                totalRest += (end - start) / 1000;
+                i++;
             }
         }
 
+        // Format time for working hours
+        const workingHours = Math.floor(totalWorking / 3600);
+        const workingMinutes = Math.floor((totalWorking % 3600) / 60);
+        const workingSeconds = Math.floor(totalWorking % 60);
+
+        // Format time for rest hours
+        const restHours = Math.floor(totalRest / 3600);
+        const restMinutes = Math.floor((totalRest % 3600) / 60);
+        const restSeconds = Math.floor(totalRest % 60);
+
         document.getElementById('totalWorkingHours').textContent = 
-            `${Math.round(totalWorking * 10) / 10}h`;
+            `${workingHours}h ${workingMinutes}m ${workingSeconds}s`;
         document.getElementById('totalRestHours').textContent = 
-            `${Math.round(totalRest * 10) / 10}h`;
+            `${restHours}h ${restMinutes}m ${restSeconds}s`;
 
     } catch (error) {
         console.error('Error:', error);
