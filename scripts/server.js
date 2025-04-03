@@ -284,28 +284,31 @@ app.post("/api/login", async (req, res) => {
 });
 app.get('/api/eventos', authenticateToken, async (req, res) => {
     try {
-        // First get the licencia from the authenticated empresa
         const empresaEmail = req.user.email;
+        const licencia = req.user.licencia; // Get licencia from token
         
+        console.log('Debug info:', {
+            empresaEmail,
+            licencia,
+            token: req.headers.authorization
+        });
+
         const query = `
             SELECT e.evento, e.fecha_hora
             FROM eventos e
-            INNER JOIN conductores c ON e.licencia = c.licencia
-            WHERE c.licencia = (
-                SELECT LICENCIA 
-                FROM licencias 
-                WHERE EMAIL = ?
-            )
+            WHERE e.licencia = ?
             ORDER BY e.fecha_hora ASC`;
         
-        console.log('Email empresa:', empresaEmail); // Debug log
-        
-        db.query(query, [empresaEmail], (err, result) => {
+        db.query(query, [licencia], (err, result) => {
             if (err) {
                 console.error('Error in eventos query:', err);
                 return res.status(500).json({ error: 'Error interno del servidor' });
             }
-            console.log('Eventos encontrados:', result); // Debug log
+            console.log('Query result:', {
+                licenciaUsed: licencia,
+                eventsFound: result.length,
+                events: result
+            });
             res.json(result);
         });
     } catch (error) {
