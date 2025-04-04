@@ -264,8 +264,13 @@
             console.log('Login response data:', data); // Debug log
     
             if (data.exists) {
+                // Extract empresaData from the response
+                const serverEmpresaData = data.empresaData;
+                
+                console.log('Server empresa data:', serverEmpresaData); // Debug log
+    
                 // First verify we have all required data
-                if (!data.licencia || !data.matricula || !data.marca_modelo || !data.dni) {
+                if (!serverEmpresaData || !serverEmpresaData.licencia || !serverEmpresaData.matricula || !serverEmpresaData.marca_modelo) {
                     throw new Error('Missing empresa data from server');
                 }
     
@@ -276,11 +281,12 @@
                 
                 // Create empresaData object with server data
                 const empresaData = {
-                    licencia: data.licencia,
-                    matricula: data.matricula,
-                    marca_modelo: data.marca_modelo,
-                    dni: data.dni,
-                    email: data.email || email
+                    licencia: serverEmpresaData.licencia,
+                    matricula: serverEmpresaData.matricula,
+                    marca_modelo: serverEmpresaData.marca_modelo,
+                    dni: serverEmpresaData.dni || '',
+                    email: email,
+                    nombre: serverEmpresaData.nombre || ''
                 };
                 
                 console.log('Storing empresaData:', empresaData); // Debug log
