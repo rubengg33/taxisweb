@@ -243,7 +243,8 @@
                     throw new Error('No empresa data found');
                 }
 
-                const response = await fetch(`${API_URL}/eventos/${empresaData.licencia}`, {
+                // Change the endpoint to fetch conductors instead of events
+                const response = await fetch(`${API_URL}/conductores/licencia/${empresaData.licencia}`, {
                     headers: getAuthHeaders()
                 });
 

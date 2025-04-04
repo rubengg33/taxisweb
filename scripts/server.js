@@ -419,3 +419,32 @@ app.post("/api/reset-password", async (req, res) => {
         res.status(500).json({ message: "Error al actualizar la contraseña" });
     }
 });
+
+// Add this new endpoint after your other routes
+app.get("/api/conductores/licencia/:licencia", authenticateToken, async (req, res) => {
+    try {
+        const licencia = req.params.licencia;
+        
+        // Query to get conductors associated with a license
+        const query = `
+            SELECT DISTINCT 
+                c.nombre_conductor,
+                c.dni,
+                c.email
+            FROM conductores c
+            INNER JOIN eventos e ON c.dni = e.dni_conductor
+            WHERE e.licencia = ?
+            ORDER BY c.nombre_conductor`;
+
+        db.query(query, [licencia], (error, results) => {  // Changed connection to db
+            if (error) {
+                console.error('Database error:', error);
+                return res.status(500).json({ message: "Error interno del servidor" });
+            }
+            res.json(results);
+        });
+    } catch (error) {
+        console.error('Server error:', error);
+        res.status(500).json({ message: "Error interno del servidor" });
+    }
+});
