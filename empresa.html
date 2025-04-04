@@ -193,21 +193,80 @@
 
     <!-- Update the script to properly handle loading state -->
     <script>
+        // Update the DOMContentLoaded event handler
         document.addEventListener('DOMContentLoaded', async function() {
             const loadingState = document.getElementById('loadingState');
+            const welcomeSection = document.querySelector('.welcome-section');
             
             try {
                 loadingState.classList.remove('hidden');
                 
-                // Load conductores without showing empresa data
+                const empresaDataRaw = localStorage.getItem('empresaData');
+                const empresaData = JSON.parse(empresaDataRaw);
+
+                if (empresaData) {
+                    // Update all empresa data fields
+                    document.getElementById('empresaLicencia').textContent = empresaData.licencia || '';
+                    document.getElementById('empresaMatricula').textContent = empresaData.matricula || '';
+                    document.getElementById('empresaMarcaModelo').textContent = empresaData.marca_modelo || '';
+                    document.getElementById('empresaDNI').textContent = empresaData.dni || '';
+                    document.getElementById('empresaEmail').textContent = empresaData.email || '';
+                    
+                    // Initially hide the welcome section
+                    welcomeSection.classList.add('hidden');
+                }
+
                 await loadConductores();
-                
                 loadingState.classList.add('hidden');
             } catch (error) {
                 console.error('Error in DOMContentLoaded:', error);
                 loadingState.classList.add('hidden');
             }
         });
+        
+        // Update loadConductores to only show names in dropdown
+        async function loadConductores() {
+            try {
+                const empresaData = JSON.parse(localStorage.getItem('empresaData'));
+                if (!empresaData || !empresaData.licencia) {
+                    throw new Error('No empresa data found');
+                }
+
+                const response = await fetch(`${API_URL}/eventos/${empresaData.licencia}`, {
+                    headers: getAuthHeaders()
+                });
+                
+                if (!response.ok) throw new Error('Error fetching eventos');
+                
+                const eventos = await response.json();
+                const select = document.getElementById('conductorSelect');
+                
+                // Get unique conductores
+                const conductoresMap = new Map();
+                eventos.forEach(evento => {
+                    if (evento.nombre_conductor) {
+                        conductoresMap.set(evento.dni, {
+                            nombre: evento.nombre_conductor,
+                            dni: evento.dni,
+                            email: evento.email
+                        });
+                    }
+                });
+                
+                // Clear and populate select
+                select.innerHTML = '<option value="">Seleccione un conductor...</option>';
+                
+                conductoresMap.forEach(conductor => {
+                    const option = document.createElement('option');
+                    option.value = JSON.stringify(conductor);
+                    option.textContent = conductor.nombre; // Only show the name in dropdown
+                    select.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error loading conductores:', error);
+                await showAlert('Error al cargar los conductores', 'error');
+            }
+        }
     </script>
 </body>
 </html>
@@ -258,56 +317,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 <script>
-async function loadConductores() {
-    try {
-        const empresaDataRaw = localStorage.getItem('empresaData');
-        if (!empresaDataRaw) {
-            throw new Error('No empresa data found');
-        }
 
-        const empresaData = JSON.parse(empresaDataRaw);
-        console.log('Using empresaData:', empresaData); // Debug log
-
-        const response = await fetch(`${API_URL}/eventos/${empresaData.licencia}`, {
-            headers: getAuthHeaders()
-        });
-        
-        if (!response.ok) throw new Error('Error fetching eventos');
-        
-        const eventos = await response.json();
-        console.log('Eventos recibidos:', eventos);
-        
-        const select = document.getElementById('conductorSelect');
-        
-        // Get unique conductores
-        const conductoresMap = new Map();
-        eventos.forEach(evento => {
-            if (evento.nombre_conductor && evento.dni) {
-                conductoresMap.set(evento.dni, {
-                    nombre: evento.nombre_conductor,
-                    dni: evento.dni,
-                    email: evento.email
-                });
-            }
-        });
-        
-        const conductores = Array.from(conductoresMap.values());
-        console.log('Conductores procesados:', conductores);
-        
-        // Clear and populate select
-        select.innerHTML = '<option value="">Seleccione un conductor...</option>';
-        
-        conductores.forEach(conductor => {
-            const option = document.createElement('option');
-            option.value = JSON.stringify(conductor);
-            option.textContent = conductor.nombre;
-            select.appendChild(option);
-        });
-    } catch (error) {
-        console.error('Error loading conductores:', error);
-        await showAlert('Error al cargar los conductores', 'error');
-    }
-}
 
 // Update the conductor selection handler to show empresa data
 document.getElementById('conductorSelect').addEventListener('change', async function(e) {
