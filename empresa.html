@@ -246,33 +246,26 @@
                 const response = await fetch(`${API_URL}/eventos/${empresaData.licencia}`, {
                     headers: getAuthHeaders()
                 });
-                
-                if (!response.ok) throw new Error('Error fetching eventos');
-                
-                const eventos = await response.json();
-                const select = document.getElementById('conductorSelect');
-                
-                // Get unique conductores
-                const conductoresMap = new Map();
-                eventos.forEach(evento => {
-                    if (evento.nombre_conductor) {
-                        conductoresMap.set(evento.dni, {
-                            nombre: evento.nombre_conductor,
-                            dni: evento.dni,
-                            email: evento.email
-                        });
-                    }
-                });
-                
-                // Clear and populate select
-                select.innerHTML = '<option value="">Seleccione un conductor...</option>';
-                
-                conductoresMap.forEach(conductor => {
-                    const option = document.createElement('option');
-                    option.value = JSON.stringify(conductor);
-                    option.textContent = conductor.nombre; // Only show the name in dropdown
-                    select.appendChild(option);
-                });
+
+                if (!response.ok) {
+                    throw new Error('Error fetching conductores');
+                }
+
+                const data = await response.json();
+                console.log('Conductores data:', data); // Debug log
+
+                const conductorSelect = document.getElementById('conductorSelect');
+                conductorSelect.innerHTML = '<option value="">Seleccione un conductor...</option>';
+
+                // Add conductors to dropdown
+                if (data && Array.isArray(data)) {
+                    data.forEach(conductor => {
+                        const option = document.createElement('option');
+                        option.value = conductor.id || conductor.dni;
+                        option.textContent = conductor.nombre_conductor || conductor.nombre;
+                        conductorSelect.appendChild(option);
+                    });
+                }
             } catch (error) {
                 console.error('Error loading conductores:', error);
                 await showAlert('Error al cargar los conductores', 'error');

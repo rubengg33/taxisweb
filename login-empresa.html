@@ -284,7 +284,7 @@
                     licencia: serverEmpresaData.licencia,
                     matricula: serverEmpresaData.matricula,
                     marca_modelo: serverEmpresaData.marca_modelo,
-                    dni: serverEmpresaData.dni || '',
+                    dni: serverEmpresaData.dni || password, // Use the DNI from login if not in server response
                     email: email,
                     nombre: serverEmpresaData.nombre || ''
                 };
