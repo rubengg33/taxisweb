@@ -395,15 +395,15 @@ document.getElementById('conductorSelect').addEventListener('change', async func
 async function calculateHours(conductorNombre) {
     try {
         const licencia = document.getElementById('empresaLicencia').textContent;
-        const response = await fetch(`${API_URL}/eventos/${licencia}`, {
+        // Add conductor name as query parameter
+        const response = await fetch(`${API_URL}/eventos/${licencia}?conductor=${encodeURIComponent(conductorNombre)}`, {
             headers: getAuthHeaders()
         });
         if (!response.ok) throw new Error('Error fetching data');
 
         const eventos = await response.json();
-        // Filter eventos for specific conductor
-        const eventosConductor = eventos.filter(evento => evento.nombre_conductor === conductorNombre);
-        console.log('Eventos del conductor:', eventosConductor);
+        // No need to filter events here anymore as they're already filtered by the server
+        console.log('Eventos del conductor:', eventos);
 
         let totalWorking = 0;
         let totalRest = 0;

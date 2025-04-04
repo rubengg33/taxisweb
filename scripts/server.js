@@ -327,32 +327,30 @@ app.post("/api/login", async (req, res) => {
     }
       return res.json({ exists: false });
 });
+// Update the eventos endpoint
 app.get('/api/eventos/:licencia?', authenticateToken, async (req, res) => {
     try {
-        console.log('Full user object from token:', req.user);
-        
-        // Get licencia either from params or token
-        const licencia = req.params.licencia || req.user.licencia;
-        
-        console.log('Licencia being queried:', licencia);
+        const licencia = req.params.licencia;
+        const conductorNombre = req.query.conductor; // Add this line
 
         if (!licencia) {
-            console.error('No licencia found');
             return res.status(400).json({ error: 'No se encontró la licencia asociada' });
         }
 
         const query = `
-            SELECT e.evento, e.fecha_hora
+            SELECT e.evento, e.fecha_hora, e.nombre_conductor
             FROM eventos e
             WHERE e.licencia = ?
+            ${conductorNombre ? 'AND e.nombre_conductor = ?' : ''}
             ORDER BY e.fecha_hora ASC`;
         
-        db.query(query, [licencia], (err, result) => {
+        const queryParams = conductorNombre ? [licencia, conductorNombre] : [licencia];
+        
+        db.query(query, queryParams, (err, result) => {
             if (err) {
                 console.error('Database error:', err);
                 return res.status(500).json({ error: 'Error en la base de datos' });
             }
-            
             res.json(result || []);
         });
     } catch (error) {
