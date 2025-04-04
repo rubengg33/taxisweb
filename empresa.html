@@ -280,16 +280,20 @@ async function loadConductores() {
         if (!response.ok) throw new Error('Error fetching eventos');
         
         const eventos = await response.json();
+        console.log('Eventos recibidos:', eventos); // Debug log
+        
         const select = document.getElementById('conductorSelect');
         
         // Get unique conductores with their complete information
         const conductores = [...new Set(eventos.map(evento => 
             JSON.stringify({
-                nombre: evento.nombre_conductor,
-                dni: evento.dni,
+                nombre: evento.nombre_conductor, // This one keeps the suffix
+                dni: evento.dni,                // These don't have suffixes
                 email: evento.email
             })
         ))].map(str => JSON.parse(str));
+        
+        console.log('Conductores procesados:', conductores); // Debug log
         
         // Clear and populate select
         select.innerHTML = '<option value="">Seleccione un conductor...</option>';
@@ -300,21 +304,6 @@ async function loadConductores() {
                 option.value = JSON.stringify(conductor);
                 option.textContent = `${conductor.nombre} - ${conductor.dni}`;
                 select.appendChild(option);
-            }
-        });
-
-        // Update conductor info when selected
-        select.addEventListener('change', function(e) {
-            const conductorInfo = document.getElementById('conductorInfo');
-            if (this.value) {
-                const conductor = JSON.parse(this.value);
-                document.getElementById('conductorNombre').textContent = conductor.nombre || 'No disponible';
-                document.getElementById('conductorDNI').textContent = conductor.dni || 'No disponible';
-                document.getElementById('conductorEmail').textContent = conductor.email || 'No disponible';
-                // Removed direccion display
-                conductorInfo.classList.remove('hidden');
-            } else {
-                conductorInfo.classList.add('hidden');
             }
         });
     } catch (error) {
@@ -342,6 +331,7 @@ document.getElementById('conductorSelect').addEventListener('change', async func
         // Update conductor info with available data
         document.getElementById('conductorNombre').textContent = conductor.nombre;
         document.getElementById('conductorDNI').textContent = conductor.dni;
+        document.getElementById('conductorEmail').textContent = conductor.email;
         
         // Calculate hours for this specific conductor
         await calculateHours(conductor.nombre);
@@ -350,7 +340,7 @@ document.getElementById('conductorSelect').addEventListener('change', async func
     }
 });
 
-// Update calculateHours to use conductor name instead of ID
+// Also in calculateHours function
 async function calculateHours(conductorNombre) {
     try {
         const licencia = document.getElementById('empresaLicencia').textContent;
