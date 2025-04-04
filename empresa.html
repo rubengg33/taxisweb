@@ -261,8 +261,8 @@
                 if (data && Array.isArray(data)) {
                     data.forEach(conductor => {
                         const option = document.createElement('option');
-                        option.value = conductor.id || conductor.dni;
-                        option.textContent = conductor.nombre_conductor || conductor.nombre;
+                        option.value = conductor.id || conductor.dni; // Use ID or DNI as value
+                        option.textContent = conductor.nombre_conductor; // Use nombre_conductor for display
                         conductorSelect.appendChild(option);
                     });
                 }
@@ -337,26 +337,40 @@ document.getElementById('conductorSelect').addEventListener('change', async func
     }
     
     try {
-        const conductor = JSON.parse(e.target.value);
+        // Remove JSON.parse since the value is already a string
+        const conductorId = e.target.value;
         const empresaData = JSON.parse(localStorage.getItem('empresaData'));
         
-        // Show and update empresa data
+        // Fetch conductor details using the selected ID
+        const response = await fetch(`${API_URL}/conductor/${conductorId}`, {
+            headers: getAuthHeaders()
+        });
+        
+        if (!response.ok) {
+            throw new Error('Error fetching conductor data');
+        }
+        
+        const conductor = await response.json();
+        
+        // Show empresa data
         welcomeSection.classList.remove('hidden');
         document.getElementById('empresaLicencia').textContent = empresaData.licencia;
         document.getElementById('empresaMatricula').textContent = empresaData.matricula;
         document.getElementById('empresaMarcaModelo').textContent = empresaData.marca_modelo;
         
-        // Show and update conductor info
+        // Show conductor info
         conductorInfo.classList.remove('hidden');
         statsGrid.classList.remove('hidden');
         
-        document.getElementById('conductorNombre').textContent = conductor.nombre;
+        // Use nombre_conductor instead of nombre
+        document.getElementById('conductorNombre').textContent = conductor.nombre_conductor;
         document.getElementById('conductorDNI').textContent = conductor.dni;
         document.getElementById('conductorEmail').textContent = conductor.email;
         
-        await calculateHours(conductor.nombre);
+        await calculateHours(conductor.nombre_conductor);
     } catch (error) {
         console.error('Error:', error);
+        await showAlert('Error al cargar los datos del conductor', 'error');
     }
 });
 
