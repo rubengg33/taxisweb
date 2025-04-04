@@ -253,18 +253,19 @@
 
             if (data.exists) {
                 localStorage.setItem("empresaEmail", email);
-                localStorage.setItem("token", data.token);
                 localStorage.setItem("isEmpresa", "true");
+                localStorage.setItem("token", data.token);
                 
-                // Store empresa data with the correct structure
                 const empresaData = {
-                    licencia: data.empresaData.licencia,
-                    matricula: data.empresaData.matricula,
-                    marca_modelo: data.empresaData.marca_modelo
+                    licencia: data.licencia,
+                    matricula: data.matricula,
+                    marca_modelo: data.marca_modelo,
+                    dni: data.dni,           // Add DNI
+                    email: data.email        // Add email
                 };
-                console.log('Storing empresaData:', empresaData); // Debug log
+                console.log('Storing empresaData:', empresaData);
                 localStorage.setItem("empresaData", JSON.stringify(empresaData));
-
+                
                 await Swal.fire({
                     text: '¡Bienvenido! Sesión iniciada correctamente',
                     icon: 'success',

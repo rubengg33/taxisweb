@@ -124,14 +124,17 @@
     <!-- Main content wrapper -->
     <div class="container mx-auto px-4 py-6">
         <!-- Welcome section -->
+        <!-- Welcome section -->
         <div class="bg-gray-900 rounded-lg shadow-xl p-6 md:p-8 mb-8">
             <div class="text-center">
                 <h1 class="text-2xl md:text-3xl font-bold text-white mb-2">Bienvenido Empresa</h1>
                 <h2 class="text-xl md:text-2xl text-sky-400 mb-4">Jornada de Conductor</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-gray-300">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-gray-300">
                     <p>Licencia: <span id="empresaLicencia" class="text-sky-400"></span></p>
                     <p>Matrícula: <span id="empresaMatricula" class="text-sky-400"></span></p>
                     <p>Vehículo: <span id="empresaMarcaModelo" class="text-sky-400"></span></p>
+                    <p>DNI: <span id="empresaDNI" class="text-sky-400"></span></p>
+                    <p>Email: <span id="empresaEmail" class="text-sky-400"></span></p>
                 </div>
             </div>
         </div>
@@ -189,30 +192,25 @@
 
     <!-- Update the script to properly handle loading state -->
     <script>
+        // First, let's modify the DOMContentLoaded event handler
         document.addEventListener('DOMContentLoaded', async function() {
             const loadingState = document.getElementById('loadingState');
             
             try {
                 loadingState.classList.remove('hidden');
                 
-                // Load empresa data from localStorage with debug
+                // Load empresa data from localStorage but don't display it yet
                 const empresaDataRaw = localStorage.getItem('empresaData');
                 console.log('Raw empresaData from localStorage:', empresaDataRaw);
                 
                 const empresaData = JSON.parse(empresaDataRaw);
                 console.log('Parsed empresaData:', empresaData);
-                
-                if (empresaData && empresaData.licencia) {
-                    document.getElementById('empresaLicencia').textContent = empresaData.licencia;
-                    document.getElementById('empresaMatricula').textContent = empresaData.matricula;
-                    document.getElementById('empresaMarcaModelo').textContent = empresaData.marca_modelo;
-                } else {
-                    console.error('empresaData is missing or incomplete:', empresaData);
-                }
 
+                // Hide the welcome section initially
+                document.querySelector('.welcome-section').classList.add('hidden');
+                
                 // Load conductores after empresa data is loaded
                 await loadConductores();
-                await calculateHours();
                 
                 loadingState.classList.add('hidden');
             } catch (error) {
@@ -270,17 +268,18 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 <script>
+// Modify the loadConductores function to fix the name issue
 async function loadConductores() {
     try {
-        const licenciaActual = document.getElementById('empresaLicencia').textContent;
-        const response = await fetch(`${API_URL}/eventos/${licenciaActual}`, {
+        const empresaData = JSON.parse(localStorage.getItem('empresaData'));
+        const response = await fetch(`${API_URL}/eventos/${empresaData.licencia}`, {
             headers: getAuthHeaders()
         });
         
         if (!response.ok) throw new Error('Error fetching eventos');
         
         const eventos = await response.json();
-        console.log('Eventos recibidos:', eventos); // Debug log
+        console.log('Eventos recibidos:', eventos);
         
         const select = document.getElementById('conductorSelect');
         
@@ -293,16 +292,16 @@ async function loadConductores() {
             })
         ))].map(str => JSON.parse(str));
         
-        console.log('Conductores procesados:', conductores); // Debug log
-        
         // Clear and populate select
         select.innerHTML = '<option value="">Seleccione un conductor...</option>';
         
         conductores.forEach(conductor => {
-            const option = document.createElement('option');
-            option.value = JSON.stringify(conductor);
-            option.textContent = conductor.nombre || 'Sin nombre'; // Show the name in the dropdown
-            select.appendChild(option);
+            if (conductor.nombre) { // Only add if nombre exists
+                const option = document.createElement('option');
+                option.value = JSON.stringify(conductor);
+                option.textContent = conductor.nombre; // Just show the name
+                select.appendChild(option);
+            }
         });
     } catch (error) {
         console.error('Error loading conductores:', error);
@@ -310,28 +309,37 @@ async function loadConductores() {
     }
 }
 
-// Update the conductor selection handler
+// Update the conductor selection handler to show empresa data
 document.getElementById('conductorSelect').addEventListener('change', async function(e) {
     const conductorInfo = document.getElementById('conductorInfo');
     const statsGrid = document.getElementById('statsGrid');
+    const welcomeSection = document.querySelector('.welcome-section');
     
     if (!e.target.value) {
         conductorInfo.classList.add('hidden');
         statsGrid.classList.add('hidden');
+        welcomeSection.classList.add('hidden');
         return;
     }
     
     try {
         const conductor = JSON.parse(e.target.value);
+        const empresaData = JSON.parse(localStorage.getItem('empresaData'));
+        
+        // Show and update empresa data
+        welcomeSection.classList.remove('hidden');
+        document.getElementById('empresaLicencia').textContent = empresaData.licencia;
+        document.getElementById('empresaMatricula').textContent = empresaData.matricula;
+        document.getElementById('empresaMarcaModelo').textContent = empresaData.marca_modelo;
+        
+        // Show and update conductor info
         conductorInfo.classList.remove('hidden');
         statsGrid.classList.remove('hidden');
         
-        // Update conductor info with available data
         document.getElementById('conductorNombre').textContent = conductor.nombre;
         document.getElementById('conductorDNI').textContent = conductor.dni;
         document.getElementById('conductorEmail').textContent = conductor.email;
         
-        // Calculate hours for this specific conductor
         await calculateHours(conductor.nombre);
     } catch (error) {
         console.error('Error:', error);
