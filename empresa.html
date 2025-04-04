@@ -403,7 +403,7 @@ async function calculateHours(conductorNombre) {
         const eventos = await response.json();
         // Filter eventos for specific conductor
         const eventosConductor = eventos.filter(evento => evento.nombre_conductor === conductorNombre);
-        console.log('Eventos recibidos:', eventosConductor);
+        console.log('Eventos del conductor:', eventosConductor);
 
         let totalWorking = 0;
         let totalRest = 0;
@@ -412,7 +412,8 @@ async function calculateHours(conductorNombre) {
         const workPeriods = [];
         const restPeriods = [];
 
-        eventos.forEach(evento => {
+        // Use eventosConductor instead of eventos
+        eventosConductor.forEach(evento => {
             if (evento.evento === 'inicio_jornada') {
                 workPeriods.push({ start: new Date(evento.fecha_hora) });
             } else if (evento.evento === 'fin_jornada') {
@@ -444,8 +445,10 @@ async function calculateHours(conductorNombre) {
             }
         });
 
-        console.log('Total working seconds:', totalWorking); // Debug log
-        console.log('Total rest seconds:', totalRest); // Debug log
+        console.log('Periodos de trabajo:', workPeriods);
+        console.log('Periodos de descanso:', restPeriods);
+        console.log('Total working seconds:', totalWorking);
+        console.log('Total rest seconds:', totalRest);
 
         // Format time for working hours
         const workingHours = Math.floor(totalWorking / 3600);
