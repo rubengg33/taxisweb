@@ -395,14 +395,12 @@ document.getElementById('conductorSelect').addEventListener('change', async func
 async function calculateHours(conductorNombre) {
     try {
         const licencia = document.getElementById('empresaLicencia').textContent;
-        // Add conductor name as query parameter
         const response = await fetch(`${API_URL}/eventos/${licencia}?conductor=${encodeURIComponent(conductorNombre)}`, {
             headers: getAuthHeaders()
         });
         if (!response.ok) throw new Error('Error fetching data');
 
         const eventos = await response.json();
-        // No need to filter events here anymore as they're already filtered by the server
         console.log('Eventos del conductor:', eventos);
 
         let totalWorking = 0;
@@ -412,8 +410,8 @@ async function calculateHours(conductorNombre) {
         const workPeriods = [];
         const restPeriods = [];
 
-        // Use eventosConductor instead of eventos
-        eventosConductor.forEach(evento => {
+        // Use eventos instead of eventosConductor
+        eventos.forEach(evento => {
             if (evento.evento === 'inicio_jornada') {
                 workPeriods.push({ start: new Date(evento.fecha_hora) });
             } else if (evento.evento === 'fin_jornada') {
