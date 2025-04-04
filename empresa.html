@@ -196,12 +196,19 @@
             try {
                 loadingState.classList.remove('hidden');
                 
-                // Load empresa data from localStorage
-                const empresaData = JSON.parse(localStorage.getItem('empresaData'));
-                if (empresaData) {
+                // Load empresa data from localStorage with debug
+                const empresaDataRaw = localStorage.getItem('empresaData');
+                console.log('Raw empresaData from localStorage:', empresaDataRaw);
+                
+                const empresaData = JSON.parse(empresaDataRaw);
+                console.log('Parsed empresaData:', empresaData);
+                
+                if (empresaData && empresaData.licencia) {
                     document.getElementById('empresaLicencia').textContent = empresaData.licencia;
                     document.getElementById('empresaMatricula').textContent = empresaData.matricula;
                     document.getElementById('empresaMarcaModelo').textContent = empresaData.marca_modelo;
+                } else {
+                    console.error('empresaData is missing or incomplete:', empresaData);
                 }
 
                 // Load conductores after empresa data is loaded
@@ -210,7 +217,7 @@
                 
                 loadingState.classList.add('hidden');
             } catch (error) {
-                console.error('Error:', error);
+                console.error('Error in DOMContentLoaded:', error);
                 loadingState.classList.add('hidden');
             }
         });
