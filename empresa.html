@@ -287,8 +287,8 @@ async function loadConductores() {
         // Get unique conductores with their complete information
         const conductores = [...new Set(eventos.map(evento => 
             JSON.stringify({
-                nombre: evento.nombre_conductor, // This one keeps the suffix
-                dni: evento.dni,                // These don't have suffixes
+                nombre: evento.nombre_conductor,
+                dni: evento.dni,
                 email: evento.email
             })
         ))].map(str => JSON.parse(str));
@@ -299,12 +299,10 @@ async function loadConductores() {
         select.innerHTML = '<option value="">Seleccione un conductor...</option>';
         
         conductores.forEach(conductor => {
-            if (conductor.nombre && conductor.dni) {
-                const option = document.createElement('option');
-                option.value = JSON.stringify(conductor);
-                option.textContent = `${conductor.nombre} - ${conductor.dni}`;
-                select.appendChild(option);
-            }
+            const option = document.createElement('option');
+            option.value = JSON.stringify(conductor);
+            option.textContent = conductor.nombre || 'Sin nombre'; // Show the name in the dropdown
+            select.appendChild(option);
         });
     } catch (error) {
         console.error('Error loading conductores:', error);
