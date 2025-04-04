@@ -151,7 +151,6 @@
                         <p>Nombre: <span id="conductorNombre" class="text-sky-400"></span></p>
                         <p>DNI: <span id="conductorDNI" class="text-sky-400"></span></p>
                         <p>Email: <span id="conductorEmail" class="text-sky-400"></span></p>
-                        <p>Dirección: <span id="conductorDireccion" class="text-sky-400"></span></p>
                     </div>
                 </div>
             </div>
@@ -283,24 +282,44 @@ async function loadConductores() {
         const eventos = await response.json();
         const select = document.getElementById('conductorSelect');
         
-        // Get unique conductores with their DNI
+        // Get unique conductores with their complete information
         const conductores = [...new Set(eventos.map(evento => 
             JSON.stringify({
                 nombre: evento.nombre_conductor,
-                dni: evento.dni
+                dni: evento.dni,
+                email: evento.email
             })
         ))].map(str => JSON.parse(str));
         
+        // Clear and populate select
         select.innerHTML = '<option value="">Seleccione un conductor...</option>';
         
         conductores.forEach(conductor => {
-            const option = document.createElement('option');
-            option.value = JSON.stringify(conductor);
-            option.textContent = `${conductor.nombre} - ${conductor.dni}`;
-            select.appendChild(option);
+            if (conductor.nombre && conductor.dni) {
+                const option = document.createElement('option');
+                option.value = JSON.stringify(conductor);
+                option.textContent = `${conductor.nombre} - ${conductor.dni}`;
+                select.appendChild(option);
+            }
+        });
+
+        // Update conductor info when selected
+        select.addEventListener('change', function(e) {
+            const conductorInfo = document.getElementById('conductorInfo');
+            if (this.value) {
+                const conductor = JSON.parse(this.value);
+                document.getElementById('conductorNombre').textContent = conductor.nombre || 'No disponible';
+                document.getElementById('conductorDNI').textContent = conductor.dni || 'No disponible';
+                document.getElementById('conductorEmail').textContent = conductor.email || 'No disponible';
+                // Removed direccion display
+                conductorInfo.classList.remove('hidden');
+            } else {
+                conductorInfo.classList.add('hidden');
+            }
         });
     } catch (error) {
         console.error('Error loading conductores:', error);
+        await showAlert('Error al cargar los conductores', 'error');
     }
 }
 
