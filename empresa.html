@@ -360,7 +360,7 @@ document.getElementById('conductorSelect').addEventListener('change', async func
         const empresaData = JSON.parse(localStorage.getItem('empresaData'));
         
         // Fetch conductor details using the selected ID
-        const response = await fetch(`${API_URL}/conductor/${conductorId}`, {
+        const response = await fetch(`${API_URL}/conductores/${conductorId}`, {
             headers: getAuthHeaders()
         });
         
