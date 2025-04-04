@@ -202,25 +202,36 @@
                 loadingState.classList.remove('hidden');
                 
                 const empresaDataRaw = localStorage.getItem('empresaData');
-                const empresaData = JSON.parse(empresaDataRaw);
-
-                if (empresaData) {
-                    // Update all empresa data fields
-                    document.getElementById('empresaLicencia').textContent = empresaData.licencia || '';
-                    document.getElementById('empresaMatricula').textContent = empresaData.matricula || '';
-                    document.getElementById('empresaMarcaModelo').textContent = empresaData.marca_modelo || '';
-                    document.getElementById('empresaDNI').textContent = empresaData.dni || '';
-                    document.getElementById('empresaEmail').textContent = empresaData.email || '';
-                    
-                    // Initially hide the welcome section
-                    welcomeSection.classList.add('hidden');
+                console.log('Raw empresaData:', empresaDataRaw); // Debug log
+                
+                if (!empresaDataRaw) {
+                    throw new Error('No empresa data found in localStorage');
                 }
+
+                const empresaData = JSON.parse(empresaDataRaw);
+                console.log('Parsed empresaData:', empresaData); // Debug log
+
+                if (!empresaData || !empresaData.licencia) {
+                    throw new Error('Invalid empresa data structure');
+                }
+
+                // Update empresa data fields
+                document.getElementById('empresaLicencia').textContent = empresaData.licencia;
+                document.getElementById('empresaMatricula').textContent = empresaData.matricula;
+                document.getElementById('empresaMarcaModelo').textContent = empresaData.marca_modelo;
+                document.getElementById('empresaDNI').textContent = empresaData.dni;
+                document.getElementById('empresaEmail').textContent = empresaData.email;
+                
+                // Initially hide the welcome section
+                welcomeSection.classList.add('hidden');
 
                 await loadConductores();
                 loadingState.classList.add('hidden');
             } catch (error) {
                 console.error('Error in DOMContentLoaded:', error);
                 loadingState.classList.add('hidden');
+                await showAlert('Error al cargar los datos de la empresa. Por favor, inicie sesión nuevamente.', 'error');
+                window.location.href = 'login-empresa.html';
             }
         });
         
