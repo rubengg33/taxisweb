@@ -403,60 +403,46 @@ async function calculateHours(conductorNombre) {
         const eventos = await response.json();
         console.log('Eventos del conductor:', eventos);
 
-        let totalWorking = 0;
-        let totalRest = 0;
+        // Initialize timestamps sums
+        let sumInicioJornada = 0;
+        let sumFinJornada = 0;
+        let sumInicioDescanso = 0;
+        let sumFinDescanso = 0;
 
-        // Group events by type
-        const workPeriods = [];
-        const restPeriods = [];
-
-        // Use eventos instead of eventosConductor
+        // Calculate sums for each type of event
         eventos.forEach(evento => {
-            if (evento.evento === 'inicio_jornada') {
-                workPeriods.push({ start: new Date(evento.fecha_hora) });
-            } else if (evento.evento === 'fin_jornada') {
-                const lastWorkPeriod = workPeriods[workPeriods.length - 1];
-                if (lastWorkPeriod && !lastWorkPeriod.end) {
-                    lastWorkPeriod.end = new Date(evento.fecha_hora);
-                }
-            } else if (evento.evento === 'inicio_descanso') {
-                restPeriods.push({ start: new Date(evento.fecha_hora) });
-            } else if (evento.evento === 'fin_descanso') {
-                const lastRestPeriod = restPeriods[restPeriods.length - 1];
-                if (lastRestPeriod && !lastRestPeriod.end) {
-                    lastRestPeriod.end = new Date(evento.fecha_hora);
-                }
+            const timestamp = new Date(evento.fecha_hora).getTime();
+            switch (evento.evento) {
+                case 'inicio_jornada':
+                    sumInicioJornada += timestamp;
+                    break;
+                case 'fin_jornada':
+                    sumFinJornada += timestamp;
+                    break;
+                case 'inicio_descanso':
+                    sumInicioDescanso += timestamp;
+                    break;
+                case 'fin_descanso':
+                    sumFinDescanso += timestamp;
+                    break;
             }
         });
 
-        // Calculate total working time
-        workPeriods.forEach(period => {
-            if (period.start && period.end) {
-                totalWorking += (period.end - period.start) / 1000;
-            }
-        });
+        // Calculate total working and rest time in milliseconds
+        const totalWorking = sumFinJornada - sumInicioJornada;
+        const totalRest = sumFinDescanso - sumInicioDescanso;
 
-        // Calculate total rest time
-        restPeriods.forEach(period => {
-            if (period.start && period.end) {
-                totalRest += (period.end - period.start) / 1000;
-            }
-        });
+        console.log('Total working milliseconds:', totalWorking);
+        console.log('Total rest milliseconds:', totalRest);
 
-        console.log('Periodos de trabajo:', workPeriods);
-        console.log('Periodos de descanso:', restPeriods);
-        console.log('Total working seconds:', totalWorking);
-        console.log('Total rest seconds:', totalRest);
+        // Convert to hours, minutes, seconds
+        const workingHours = Math.floor(totalWorking / (1000 * 60 * 60));
+        const workingMinutes = Math.floor((totalWorking % (1000 * 60 * 60)) / (1000 * 60));
+        const workingSeconds = Math.floor((totalWorking % (1000 * 60)) / 1000);
 
-        // Format time for working hours
-        const workingHours = Math.floor(totalWorking / 3600);
-        const workingMinutes = Math.floor((totalWorking % 3600) / 60);
-        const workingSeconds = Math.floor(totalWorking % 60);
-
-        // Format time for rest hours
-        const restHours = Math.floor(totalRest / 3600);
-        const restMinutes = Math.floor((totalRest % 3600) / 60);
-        const restSeconds = Math.floor(totalRest % 60);
+        const restHours = Math.floor(totalRest / (1000 * 60 * 60));
+        const restMinutes = Math.floor((totalRest % (1000 * 60 * 60)) / (1000 * 60));
+        const restSeconds = Math.floor((totalRest % (1000 * 60)) / 1000);
 
         document.getElementById('totalWorkingHours').textContent = 
             `${workingHours}h ${workingMinutes}m ${workingSeconds}s`;
