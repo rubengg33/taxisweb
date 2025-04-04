@@ -146,7 +146,42 @@ app.get("/api/conductores", authenticateToken, validateApiKey, (req, res) => {
         res.json(result);
     });
 });
+// ... existing code ...
 
+// Add this new endpoint for getting conductor by DNI (place it before the /api/conductores/:id endpoint)
+app.get("/api/conductores/dni/:dni", authenticateToken, async (req, res) => {
+    try {
+        const dni = req.params.dni;
+        
+        const query = `
+            SELECT 
+                nombre_apellidos,
+                dni,
+                email,
+                direccion,
+                codigo_postal,
+                numero_seguridad_social,
+                licencia
+            FROM conductores 
+            WHERE dni = ?`;
+
+        db.query(query, [dni], (error, results) => {
+            if (error) {
+                console.error('Database error:', error);
+                return res.status(500).json({ message: "Error interno del servidor" });
+            }
+            if (results.length === 0) {
+                return res.status(404).json({ message: "Conductor no encontrado" });
+            }
+            res.json(results[0]);
+        });
+    } catch (error) {
+        console.error('Server error:', error);
+        res.status(500).json({ message: "Error interno del servidor" });
+    }
+});
+
+// Keep existing /api/conductores/:id endpoint as is
 // También proteger las demás rutas de conductores
 app.get("/api/conductores/:id", authenticateToken, validateApiKey, (req, res) => {
     const id = req.params.id;

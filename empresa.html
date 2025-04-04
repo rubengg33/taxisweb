@@ -357,8 +357,9 @@ document.getElementById('conductorSelect').addEventListener('change', async func
     try {
         const conductorId = e.target.value;
         const empresaData = JSON.parse(localStorage.getItem('empresaData'));
-        
-        const response = await fetch(`${API_URL}/conductores/${conductorId}`, {
+         
+        // Updated to use the new dni endpoint
+        const response = await fetch(`${API_URL}/conductores/dni/${conductorId}`, {
             headers: getAuthHeaders()
         });
         
