@@ -180,7 +180,17 @@ app.get("/api/conductores/dni/:dni", authenticateToken, async (req, res) => {
         res.status(500).json({ message: "Error interno del servidor" });
     }
 });
+// ... existing code ...
 
+// Update CORS configuration
+app.use(cors({
+    origin: 'https://controldeconductores.com',
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'x-api-key'],
+    credentials: true
+}));
+
+// ... rest of your server code ...
 // Keep existing /api/conductores/:id endpoint as is
 // También proteger las demás rutas de conductores
 app.get("/api/conductores/:id", authenticateToken, validateApiKey, (req, res) => {
