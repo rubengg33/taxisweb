@@ -257,12 +257,29 @@
                 const conductorSelect = document.getElementById('conductorSelect');
                 conductorSelect.innerHTML = '<option value="">Seleccione un conductor...</option>';
 
-                // Add conductors to dropdown
+                // Add conductors to dropdown only if they have valid data
                 if (data && Array.isArray(data)) {
-                    data.forEach(conductor => {
+                    // Filter out duplicates and invalid entries
+                    const uniqueConductors = data.reduce((acc, conductor) => {
+                        if (conductor && 
+                            conductor.nombre_conductor && 
+                            conductor.dni && 
+                            !acc.some(c => c.dni === conductor.dni)) {
+                            acc.push(conductor);
+                        }
+                        return acc;
+                    }, []);
+
+                    // Sort conductors by name
+                    uniqueConductors.sort((a, b) => 
+                        a.nombre_conductor.localeCompare(b.nombre_conductor)
+                    );
+
+                    // Add valid conductors to dropdown
+                    uniqueConductors.forEach(conductor => {
                         const option = document.createElement('option');
-                        option.value = conductor.id || conductor.dni; // Use ID or DNI as value
-                        option.textContent = conductor.nombre_conductor; // Use nombre_conductor for display
+                        option.value = conductor.dni; // Use DNI as value
+                        option.textContent = conductor.nombre_conductor;
                         conductorSelect.appendChild(option);
                     });
                 }
