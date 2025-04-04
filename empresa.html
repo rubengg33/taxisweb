@@ -192,23 +192,28 @@
 
     <!-- Update the script to properly handle loading state -->
     <script>
-        // First, let's modify the DOMContentLoaded event handler
+        // Update the DOMContentLoaded event handler
         document.addEventListener('DOMContentLoaded', async function() {
             const loadingState = document.getElementById('loadingState');
             
             try {
                 loadingState.classList.remove('hidden');
                 
-                // Load empresa data from localStorage but don't display it yet
                 const empresaDataRaw = localStorage.getItem('empresaData');
                 console.log('Raw empresaData from localStorage:', empresaDataRaw);
                 
                 const empresaData = JSON.parse(empresaDataRaw);
                 console.log('Parsed empresaData:', empresaData);
 
-                // Hide the welcome section initially
-                document.querySelector('.welcome-section').classList.add('hidden');
-                
+                if (empresaData) {
+                    // Update all empresa data fields
+                    document.getElementById('empresaLicencia').textContent = empresaData.licencia || '';
+                    document.getElementById('empresaMatricula').textContent = empresaData.matricula || '';
+                    document.getElementById('empresaMarcaModelo').textContent = empresaData.marca_modelo || '';
+                    document.getElementById('empresaDNI').textContent = empresaData.dni || '';
+                    document.getElementById('empresaEmail').textContent = empresaData.email || '';
+                }
+
                 // Load conductores after empresa data is loaded
                 await loadConductores();
                 
