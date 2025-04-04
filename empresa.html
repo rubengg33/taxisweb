@@ -125,7 +125,8 @@
     <div class="container mx-auto px-4 py-6">
         <!-- Welcome section -->
         <!-- Welcome section -->
-        <div class="bg-gray-900 rounded-lg shadow-xl p-6 md:p-8 mb-8">
+        <!-- Welcome section -->
+        <div class="bg-gray-900 rounded-lg shadow-xl p-6 md:p-8 mb-8 welcome-section hidden">
             <div class="text-center">
                 <h1 class="text-2xl md:text-3xl font-bold text-white mb-2">Bienvenido Empresa</h1>
                 <h2 class="text-xl md:text-2xl text-sky-400 mb-4">Jornada de Conductor</h2>
@@ -192,29 +193,13 @@
 
     <!-- Update the script to properly handle loading state -->
     <script>
-        // Update the DOMContentLoaded event handler
         document.addEventListener('DOMContentLoaded', async function() {
             const loadingState = document.getElementById('loadingState');
             
             try {
                 loadingState.classList.remove('hidden');
                 
-                const empresaDataRaw = localStorage.getItem('empresaData');
-                console.log('Raw empresaData from localStorage:', empresaDataRaw);
-                
-                const empresaData = JSON.parse(empresaDataRaw);
-                console.log('Parsed empresaData:', empresaData);
-
-                if (empresaData) {
-                    // Update all empresa data fields
-                    document.getElementById('empresaLicencia').textContent = empresaData.licencia || '';
-                    document.getElementById('empresaMatricula').textContent = empresaData.matricula || '';
-                    document.getElementById('empresaMarcaModelo').textContent = empresaData.marca_modelo || '';
-                    document.getElementById('empresaDNI').textContent = empresaData.dni || '';
-                    document.getElementById('empresaEmail').textContent = empresaData.email || '';
-                }
-
-                // Load conductores after empresa data is loaded
+                // Load conductores without showing empresa data
                 await loadConductores();
                 
                 loadingState.classList.add('hidden');
@@ -273,10 +258,16 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 <script>
-// Modify the loadConductores function to fix the name issue
 async function loadConductores() {
     try {
-        const empresaData = JSON.parse(localStorage.getItem('empresaData'));
+        const empresaDataRaw = localStorage.getItem('empresaData');
+        if (!empresaDataRaw) {
+            throw new Error('No empresa data found');
+        }
+
+        const empresaData = JSON.parse(empresaDataRaw);
+        console.log('Using empresaData:', empresaData); // Debug log
+
         const response = await fetch(`${API_URL}/eventos/${empresaData.licencia}`, {
             headers: getAuthHeaders()
         });
@@ -288,25 +279,29 @@ async function loadConductores() {
         
         const select = document.getElementById('conductorSelect');
         
-        // Get unique conductores with their complete information
-        const conductores = [...new Set(eventos.map(evento => 
-            JSON.stringify({
-                nombre: evento.nombre_conductor,
-                dni: evento.dni,
-                email: evento.email
-            })
-        ))].map(str => JSON.parse(str));
+        // Get unique conductores
+        const conductoresMap = new Map();
+        eventos.forEach(evento => {
+            if (evento.nombre_conductor && evento.dni) {
+                conductoresMap.set(evento.dni, {
+                    nombre: evento.nombre_conductor,
+                    dni: evento.dni,
+                    email: evento.email
+                });
+            }
+        });
+        
+        const conductores = Array.from(conductoresMap.values());
+        console.log('Conductores procesados:', conductores);
         
         // Clear and populate select
         select.innerHTML = '<option value="">Seleccione un conductor...</option>';
         
         conductores.forEach(conductor => {
-            if (conductor.nombre) { // Only add if nombre exists
-                const option = document.createElement('option');
-                option.value = JSON.stringify(conductor);
-                option.textContent = conductor.nombre; // Just show the name
-                select.appendChild(option);
-            }
+            const option = document.createElement('option');
+            option.value = JSON.stringify(conductor);
+            option.textContent = conductor.nombre;
+            select.appendChild(option);
         });
     } catch (error) {
         console.error('Error loading conductores:', error);

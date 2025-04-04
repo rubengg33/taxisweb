@@ -251,6 +251,7 @@
             const data = await response.json();
             console.log('Login response:', data); // Debug log
 
+            // In the login success handler
             if (data.exists) {
                 localStorage.setItem("empresaEmail", email);
                 localStorage.setItem("isEmpresa", "true");
@@ -261,8 +262,7 @@
                     matricula: data.matricula,
                     marca_modelo: data.marca_modelo,
                     dni: data.dni,
-                    email: data.email,
-                    nombre_conductor: data.nombre_conductor || data.nombre_apellidos // Handle both possible field names
+                    email: data.email
                 };
                 
                 console.log('Storing empresaData:', empresaData);
