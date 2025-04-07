@@ -196,101 +196,100 @@
     <script>
         // Update the DOMContentLoaded event handler
         document.addEventListener('DOMContentLoaded', async function() {
-    const loadingState = document.getElementById('loadingState');
-    const welcomeSection = document.querySelector('.welcome-section');
+            const loadingState = document.getElementById('loadingState');
+            const welcomeSection = document.querySelector('.welcome-section');
+            
+            try {
+                loadingState.classList.remove('hidden');
+                const isAdmin = localStorage.getItem("isAdmin") === "true";
+                
+                if (!isAdmin) {
+                    const empresaDataRaw = localStorage.getItem('empresaData');
+                    if (!empresaDataRaw) {
+                        throw new Error('No empresa data found in localStorage');
+                    }
     
-    try {
-        loadingState.classList.remove('hidden');
-        
-        const isAdmin = localStorage.getItem("isAdmin") === "true";
-        
-        if (!isAdmin) {
-            const empresaDataRaw = localStorage.getItem('empresaData');
-            if (!empresaDataRaw) {
-                throw new Error('No empresa data found in localStorage');
+                    const empresaData = JSON.parse(empresaDataRaw);
+                    // Update empresa data fields
+                    document.getElementById('empresaLicencia').textContent = empresaData.licencia || 'N/A';
+                    document.getElementById('empresaMatricula').textContent = empresaData.matricula || 'N/A';
+                    document.getElementById('empresaMarcaModelo').textContent = empresaData.marca_modelo || 'N/A';
+                    document.getElementById('empresaDNI').textContent = empresaData.dni || 'N/A';
+                    document.getElementById('empresaEmail').textContent = empresaData.email || empresaData.empresaEmail || 'N/A';
+                } else {
+                    // For admin, show different welcome message
+                    document.getElementById('empresaLicencia').textContent = "Admin View";
+                    document.getElementById('empresaMatricula').textContent = "N/A";
+                    document.getElementById('empresaMarcaModelo').textContent = "N/A";
+                    document.getElementById('empresaDNI').textContent = "Admin";
+                    document.getElementById('empresaEmail').textContent = localStorage.getItem("userEmail") || "Admin";
+                }
+                
+                welcomeSection.classList.remove('hidden');
+                await loadConductores();
+                loadingState.classList.add('hidden');
+            } catch (error) {
+                console.error('Error in DOMContentLoaded:', error);
+                loadingState.classList.add('hidden');
+                await showAlert('Error al cargar los datos. Por favor, inicie sesión nuevamente.', 'error');
+                window.location.href = 'login-empresa.html';
             }
-
-            const empresaData = JSON.parse(empresaDataRaw);
-            // Update empresa data fields
-            document.getElementById('empresaLicencia').textContent = empresaData.licencia;
-            document.getElementById('empresaMatricula').textContent = empresaData.matricula;
-            document.getElementById('empresaMarcaModelo').textContent = empresaData.marca_modelo;
-            document.getElementById('empresaDNI').textContent = empresaData.dni;
-            document.getElementById('empresaEmail').textContent = empresaData.email;
-        } else {
-            // For admin, show different welcome message
-            document.getElementById('empresaLicencia').textContent = "Admin View";
-            document.getElementById('empresaMatricula').textContent = "N/A";
-            document.getElementById('empresaMarcaModelo').textContent = "N/A";
-            document.getElementById('empresaDNI').textContent = "Admin";
-            document.getElementById('empresaEmail').textContent = localStorage.getItem("userEmail") || "Admin";
-        }
-        
-        welcomeSection.classList.remove('hidden');
-        await loadConductores();
-        loadingState.classList.add('hidden');
-    } catch (error) {
-        console.error('Error in DOMContentLoaded:', error);
-        loadingState.classList.add('hidden');
-        await showAlert('Error al cargar los datos. Por favor, inicie sesión nuevamente.', 'error');
-        window.location.href = 'login-empresa.html';
-    }
-});
+        });
         
         // Update loadConductores to only show names in dropdown
         async function loadConductores() {
-    try {
-        const isAdmin = localStorage.getItem("isAdmin") === "true";
-        const empresaData = !isAdmin ? JSON.parse(localStorage.getItem('empresaData')) : null;
-
-        let endpoint;
-        if (isAdmin) {
-            endpoint = `${API_URL}/conductores/all`;
-        } else {
-            endpoint = `${API_URL}/conductores/licencia/${empresaData.licencia}`;
-        }
-
-        const response = await fetch(endpoint, {
-            method: 'GET',
-            headers: getAuthHeaders()
-            // Removed credentials: 'include'
-        });
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const data = await response.json();
-        const conductorSelect = document.getElementById('conductorSelect');
-        conductorSelect.innerHTML = '<option value="">Seleccione un conductor...</option>';
-
-        if (data && Array.isArray(data)) {
-            const uniqueConductors = data.reduce((acc, conductor) => {
-                if (conductor && conductor.nombre_apellidos && conductor.dni && 
-                    !acc.some(c => c.dni === conductor.dni)) {
-                    acc.push(conductor);
+            try {
+                const isAdmin = localStorage.getItem("isAdmin") === "true";
+                const empresaData = !isAdmin ? JSON.parse(localStorage.getItem('empresaData')) : null;
+    
+                let endpoint;
+                if (isAdmin) {
+                    endpoint = `${API_URL}/conductores/all`;
+                } else {
+                    endpoint = `${API_URL}/conductores/licencia/${empresaData.licencia}`;
                 }
-                return acc;
-            }, []);
-
-            uniqueConductors.sort((a, b) => 
-                a.nombre_apellidos.localeCompare(b.nombre_apellidos)
-            );
-
-            uniqueConductors.forEach(conductor => {
-                const option = document.createElement('option');
-                option.value = conductor.dni;
-                option.textContent = isAdmin ? 
-                    `${conductor.nombre_apellidos} (${conductor.licencia})` : 
-                    conductor.nombre_apellidos;
-                conductorSelect.appendChild(option);
-            });
+    
+                const response = await fetch(endpoint, {
+                    method: 'GET',
+                    headers: getAuthHeaders()
+                    // Removed credentials: 'include'
+                });
+    
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+    
+                const data = await response.json();
+                const conductorSelect = document.getElementById('conductorSelect');
+                conductorSelect.innerHTML = '<option value="">Seleccione un conductor...</option>';
+    
+                if (data && Array.isArray(data)) {
+                    const uniqueConductors = data.reduce((acc, conductor) => {
+                        if (conductor && conductor.nombre_apellidos && conductor.dni && 
+                            !acc.some(c => c.dni === conductor.dni)) {
+                            acc.push(conductor);
+                        }
+                        return acc;
+                    }, []);
+    
+                    uniqueConductors.sort((a, b) => 
+                        a.nombre_apellidos.localeCompare(b.nombre_apellidos)
+                    );
+    
+                    uniqueConductors.forEach(conductor => {
+                        const option = document.createElement('option');
+                        option.value = conductor.dni;
+                        option.textContent = isAdmin ? 
+                            `${conductor.nombre_apellidos} (${conductor.licencia})` : 
+                            conductor.nombre_apellidos;
+                        conductorSelect.appendChild(option);
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading conductores:', error);
+                await showAlert('Error al cargar los conductores. Por favor, intente nuevamente.', 'error');
+            }
         }
-    } catch (error) {
-        console.error('Error loading conductores:', error);
-        await showAlert('Error al cargar los conductores. Por favor, intente nuevamente.', 'error');
-    }
-}
     </script>
 </body>
 </html>
@@ -356,7 +355,7 @@ document.getElementById('conductorSelect').addEventListener('change', async func
     if (!e.target.value) {
         conductorInfo.classList.add('hidden');
         statsGrid.classList.add('hidden');
-        welcomeSection.classList.add('hidden');
+        if (isAdmin) welcomeSection.classList.add('hidden');
         return;
     }
     
