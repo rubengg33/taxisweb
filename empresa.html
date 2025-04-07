@@ -5,13 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestion de Jornada de Conductores</title>
     <script>
-        // Check authentication immediately
         const token = localStorage.getItem("token");
     const empresaEmail = localStorage.getItem("empresaEmail");
     const isEmpresa = localStorage.getItem("isEmpresa");
     const isAdmin = localStorage.getItem("isAdmin");
 
-    if (!token || (!empresaEmail && !isAdmin) || (isEmpresa !== "true" && isAdmin !== "true")) {
+    // Modified check to handle both admin and empresa cases
+    if (!token || (!isAdmin && !isEmpresa)) {
         window.location.replace("login-empresa.html");
     }
     </script>
@@ -196,45 +196,46 @@
     <script>
         // Update the DOMContentLoaded event handler
         document.addEventListener('DOMContentLoaded', async function() {
-            const loadingState = document.getElementById('loadingState');
-            const welcomeSection = document.querySelector('.welcome-section');
-            
-            try {
-                loadingState.classList.remove('hidden');
-                
-                const empresaDataRaw = localStorage.getItem('empresaData');
-                console.log('Raw empresaData:', empresaDataRaw); // Debug log
-                
-                if (!empresaDataRaw) {
-                    throw new Error('No empresa data found in localStorage');
-                }
-
-                const empresaData = JSON.parse(empresaDataRaw);
-                console.log('Parsed empresaData:', empresaData); // Debug log
-
-                if (!empresaData || !empresaData.licencia) {
-                    throw new Error('Invalid empresa data structure');
-                }
-
-                // Update empresa data fields
-                document.getElementById('empresaLicencia').textContent = empresaData.licencia;
-                document.getElementById('empresaMatricula').textContent = empresaData.matricula;
-                document.getElementById('empresaMarcaModelo').textContent = empresaData.marca_modelo;
-                document.getElementById('empresaDNI').textContent = empresaData.dni;
-                document.getElementById('empresaEmail').textContent = empresaData.email;
-                
-                // Initially hide the welcome section
-                welcomeSection.classList.add('hidden');
-
-                await loadConductores();
-                loadingState.classList.add('hidden');
-            } catch (error) {
-                console.error('Error in DOMContentLoaded:', error);
-                loadingState.classList.add('hidden');
-                await showAlert('Error al cargar los datos de la empresa. Por favor, inicie sesión nuevamente.', 'error');
-                window.location.href = 'login-empresa.html';
+    const loadingState = document.getElementById('loadingState');
+    const welcomeSection = document.querySelector('.welcome-section');
+    
+    try {
+        loadingState.classList.remove('hidden');
+        
+        const isAdmin = localStorage.getItem("isAdmin") === "true";
+        
+        if (!isAdmin) {
+            const empresaDataRaw = localStorage.getItem('empresaData');
+            if (!empresaDataRaw) {
+                throw new Error('No empresa data found in localStorage');
             }
-        });
+
+            const empresaData = JSON.parse(empresaDataRaw);
+            // Update empresa data fields
+            document.getElementById('empresaLicencia').textContent = empresaData.licencia;
+            document.getElementById('empresaMatricula').textContent = empresaData.matricula;
+            document.getElementById('empresaMarcaModelo').textContent = empresaData.marca_modelo;
+            document.getElementById('empresaDNI').textContent = empresaData.dni;
+            document.getElementById('empresaEmail').textContent = empresaData.email;
+        } else {
+            // For admin, show different welcome message
+            document.getElementById('empresaLicencia').textContent = "Admin View";
+            document.getElementById('empresaMatricula').textContent = "N/A";
+            document.getElementById('empresaMarcaModelo').textContent = "N/A";
+            document.getElementById('empresaDNI').textContent = "Admin";
+            document.getElementById('empresaEmail').textContent = localStorage.getItem("userEmail") || "Admin";
+        }
+        
+        welcomeSection.classList.remove('hidden');
+        await loadConductores();
+        loadingState.classList.add('hidden');
+    } catch (error) {
+        console.error('Error in DOMContentLoaded:', error);
+        loadingState.classList.add('hidden');
+        await showAlert('Error al cargar los datos. Por favor, inicie sesión nuevamente.', 'error');
+        window.location.href = 'login-empresa.html';
+    }
+});
         
         // Update loadConductores to only show names in dropdown
         async function loadConductores() {
