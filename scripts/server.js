@@ -146,6 +146,22 @@ app.get("/api/conductores", authenticateToken, validateApiKey, (req, res) => {
         res.json(result);
     });
 });
+// Add this new endpoint for getting all conductors (protected with authentication)
+app.get('/api/conductores/all', authenticateToken, validateApiKey, async (req, res) => {
+    try {
+        const query = `
+            SELECT c.*, l.licencia 
+            FROM conductores c 
+            LEFT JOIN licencias l ON c.licencia = l.licencia
+            ORDER BY c.nombre_apellidos`;
+            
+        const [conductores] = await db.promise().query(query);
+        res.json(conductores);
+    } catch (error) {
+        console.error('Error fetching all conductores:', error);
+        res.status(500).json({ message: 'Error fetching conductores data' });
+    }
+});
 // ... existing code ...
 
 // Add this new endpoint for getting conductor by DNI (place it before the /api/conductores/:id endpoint)

@@ -328,59 +328,42 @@
     }
 
     // Then update the login handler
-    document.getElementById("loginForm").addEventListener("submit", async function(event) {
-        event.preventDefault();
-        const email = document.getElementById("email").value;
-        const password = document.getElementById("password").value;
+    document.getElementById('loginForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
     
         try {
-            const response = await fetch(`${API_URL}/login-empresa`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
+            // First try admin login
+            const adminResponse = await fetch(`${API_URL}/login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
+    
+            if (adminResponse.ok) {
+                const adminData = await adminResponse.json();
+                localStorage.setItem('token', adminData.token);
+                localStorage.setItem('isAdmin', 'true');
+                window.location.href = 'empresa.html';
+                return;
+            }
+    
+            // If not admin, try empresa login
+            const empresaResponse = await fetch(`${API_URL}/login-empresa`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, dni: password })
             });
     
-            const data = await response.json();
-            console.log('Login response data:', data); // Debug log
-    
+            const data = await empresaResponse.json();
+            
             if (data.exists) {
-                // Extract empresaData from the response
-                const serverEmpresaData = data.empresaData;
-                
-                console.log('Server empresa data:', serverEmpresaData); // Debug log
-    
-                // First verify we have all required data
-                if (!serverEmpresaData || !serverEmpresaData.licencia || !serverEmpresaData.matricula || !serverEmpresaData.marca_modelo) {
-                    throw new Error('Missing empresa data from server');
-                }
-    
-                // Store basic auth data
-                localStorage.setItem("empresaEmail", email);
-                localStorage.setItem("isEmpresa", "true");
-                localStorage.setItem("token", data.token);
-                
-                // Create empresaData object with server data
-                const empresaData = {
-                    licencia: serverEmpresaData.licencia,
-                    matricula: serverEmpresaData.matricula,
-                    marca_modelo: serverEmpresaData.marca_modelo,
-                    dni: serverEmpresaData.dni || password, // Use the DNI from login if not in server response
-                    email: email,
-                    nombre: serverEmpresaData.nombre || ''
-                };
-                
-                console.log('Storing empresaData:', empresaData); // Debug log
-                localStorage.setItem("empresaData", JSON.stringify(empresaData));
-                
-                await Swal.fire({
-                    text: '¡Bienvenido! Sesión iniciada correctamente',
-                    icon: 'success',
-                    background: '#1a1a1a',
-                    color: '#ffffff',
-                    confirmButtonColor: '#3085d6'
-                });
-    
-                window.location.href = "empresa.html";
+                localStorage.setItem('token', data.token);
+                localStorage.setItem('empresaEmail', email);
+                localStorage.setItem('isEmpresa', 'true');
+                localStorage.setItem('empresaData', JSON.stringify(data.empresaData));
+                window.location.href = 'empresa.html';
             } else {
                 await Swal.fire({
                     icon: 'error',

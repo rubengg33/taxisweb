@@ -7,12 +7,13 @@
     <script>
         // Check authentication immediately
         const token = localStorage.getItem("token");
-        const empresaEmail = localStorage.getItem("empresaEmail");
-        const isEmpresa = localStorage.getItem("isEmpresa");
+    const empresaEmail = localStorage.getItem("empresaEmail");
+    const isEmpresa = localStorage.getItem("isEmpresa");
+    const isAdmin = localStorage.getItem("isAdmin");
 
-        if (!token || !empresaEmail || isEmpresa !== "true") {
-            window.location.replace("login-empresa.html");
-        }
+    if (!token || (!empresaEmail && !isAdmin) || (isEmpresa !== "true" && isAdmin !== "true")) {
+        window.location.replace("login-empresa.html");
+    }
     </script>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <!-- Agregar Material Icons -->
@@ -237,58 +238,53 @@
         
         // Update loadConductores to only show names in dropdown
         async function loadConductores() {
-            try {
-                const empresaData = JSON.parse(localStorage.getItem('empresaData'));
-                if (!empresaData || !empresaData.licencia) {
-                    throw new Error('No empresa data found');
-                }
+    try {
+        const isAdmin = localStorage.getItem("isAdmin") === "true";
+        const empresaData = !isAdmin ? JSON.parse(localStorage.getItem('empresaData')) : null;
 
-                // Change the endpoint to fetch conductors instead of events
-                const response = await fetch(`${API_URL}/conductores/licencia/${empresaData.licencia}`, {
-                    headers: getAuthHeaders()
-                });
-
-                if (!response.ok) {
-                    throw new Error('Error fetching conductores');
-                }
-
-                const data = await response.json();
-                console.log('Conductores data:', data); // Debug log
-
-                const conductorSelect = document.getElementById('conductorSelect');
-                conductorSelect.innerHTML = '<option value="">Seleccione un conductor...</option>';
-
-                // Add conductors to dropdown only if they have valid data
-                if (data && Array.isArray(data)) {
-                    // Filter out duplicates and invalid entries
-                    const uniqueConductors = data.reduce((acc, conductor) => {
-                        if (conductor && 
-                            conductor.nombre_conductor && 
-                            conductor.dni && 
-                            !acc.some(c => c.dni === conductor.dni)) {
-                            acc.push(conductor);
-                        }
-                        return acc;
-                    }, []);
-
-                    // Sort conductors by name
-                    uniqueConductors.sort((a, b) => 
-                        a.nombre_conductor.localeCompare(b.nombre_conductor)
-                    );
-
-                    // Add valid conductors to dropdown
-                    uniqueConductors.forEach(conductor => {
-                        const option = document.createElement('option');
-                        option.value = conductor.dni; // Use DNI as value
-                        option.textContent = conductor.nombre_conductor;
-                        conductorSelect.appendChild(option);
-                    });
-                }
-            } catch (error) {
-                console.error('Error loading conductores:', error);
-                await showAlert('Error al cargar los conductores', 'error');
-            }
+        let endpoint;
+        if (isAdmin) {
+            endpoint = `${API_URL}/conductores/all`; // New endpoint for admins
+        } else {
+            endpoint = `${API_URL}/conductores/licencia/${empresaData.licencia}`;
         }
+
+        const response = await fetch(endpoint, {
+            headers: getAuthHeaders()
+        });
+
+        if (!response.ok) throw new Error('Error fetching conductores');
+
+        const data = await response.json();
+        const conductorSelect = document.getElementById('conductorSelect');
+        conductorSelect.innerHTML = '<option value="">Seleccione un conductor...</option>';
+
+        if (data && Array.isArray(data)) {
+            const uniqueConductors = data.reduce((acc, conductor) => {
+                if (conductor && conductor.nombre_conductor && conductor.dni && 
+                    !acc.some(c => c.dni === conductor.dni)) {
+                    acc.push(conductor);
+                }
+                return acc;
+            }, []);
+
+            uniqueConductors.sort((a, b) => a.nombre_conductor.localeCompare(b.nombre_conductor));
+
+            uniqueConductors.forEach(conductor => {
+                const option = document.createElement('option');
+                option.value = conductor.dni;
+                // For admin, show empresa info in the dropdown
+                option.textContent = isAdmin ? 
+                    `${conductor.nombre_conductor} (${conductor.licencia})` : 
+                    conductor.nombre_conductor;
+                conductorSelect.appendChild(option);
+            });
+        }
+    } catch (error) {
+        console.error('Error loading conductores:', error);
+        await showAlert('Error al cargar los conductores', 'error');
+    }
+}
     </script>
 </body>
 </html>
