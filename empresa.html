@@ -250,8 +250,8 @@
                     if (!empresaData || !empresaData.licencia) {
                         throw new Error('No license found for empresa');
                     }
-                    // Fix the endpoint for empresa view
-                    endpoint = `${API_URL}/conductores/licencia/${empresaData.licencia}`;
+                    // Update endpoint for empresa view
+                    endpoint = `${API_URL}/conductores/${empresaData.licencia}`;
                 }
     
                 const response = await fetch(endpoint, {
@@ -275,6 +275,12 @@
                             conductorSelect.appendChild(option);
                         }
                     });
+                } else if (data && typeof data === 'object') {
+                    // Handle single conductor object
+                    const option = document.createElement('option');
+                    option.value = data.dni;
+                    option.textContent = data.nombre_apellidos;
+                    conductorSelect.appendChild(option);
                 }
             } catch (error) {
                 console.error('Error loading conductores:', error);
@@ -354,7 +360,7 @@ document.getElementById('conductorSelect').addEventListener('change', async func
         const conductorId = e.target.value;
         
         // Get conductor details
-        const response = await fetch(`${API_URL}/conductores/dni/${conductorId}`, {
+        const response = await fetch(`${API_URL}/conductores/${conductorId}`, {
             headers: getAuthHeaders()
         });
         
@@ -380,7 +386,7 @@ document.getElementById('conductorSelect').addEventListener('change', async func
             
             if (licenciaResponse.ok) {
                 const licenciaData = await licenciaResponse.json();
-                document.getElementById('empresaLicencia').textContent = conductor.licencia;
+                document.getElementById('empresaLicencia').textContent = conductor.licencia || 'N/A';
                 document.getElementById('empresaMatricula').textContent = licenciaData.matricula || 'N/A';
                 document.getElementById('empresaMarcaModelo').textContent = licenciaData.marca_modelo || 'N/A';
             }
