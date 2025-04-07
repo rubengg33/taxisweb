@@ -95,6 +95,59 @@
         .menu-icon.open {
             transform: rotate(180deg);
         }
+        
+        .animated-border {
+    position: relative;
+    z-index: 0;
+    border-radius: 1rem;
+    overflow: hidden;
+    background: linear-gradient(to bottom, #1f1f1f, #111827, black);
+}
+
+.animated-border > * {
+    position: relative;
+    z-index: 2;
+}
+
+.animated-border::before {
+    position: absolute;
+    content: '';
+    display: block;
+    width: 250px;
+    height: 200%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: linear-gradient(
+        90deg,
+        transparent,
+        #22d3ee,
+        #22d3ee,
+        #22d3ee,
+        #22d3ee,
+        transparent
+    );
+    animation: rotation_481 5000ms infinite linear;
+    z-index: 1;
+}
+
+.animated-border::after {
+    content: '';
+    position: absolute;
+    inset: 2px;
+    background: linear-gradient(to bottom, #1f1f1f, #111827, black);
+    border-radius: 14px;
+    z-index: 1;
+}
+
+@keyframes rotation_481 {
+    0% {
+        transform: translate(-50%, -50%) rotate(0deg);
+    }
+    100% {
+        transform: translate(-50%, -50%) rotate(360deg);
+    }
+}
     </style>
 </head>
 <body>
@@ -136,10 +189,8 @@
         </nav>
         <!-- Updated login container -->
         <div class="flex items-center justify-center min-h-[calc(100vh-4rem)]">
-            <div class="w-[19rem] p-6 flex flex-col gap-4 rounded-2xl 
-                        border border-cyan-500 
-                        bg-gradient-to-b from-[#1f1f1f] via-[#111827] to-black 
-                        shadow-[0_0_20px_2px_rgba(34,211,238,0.3)]">
+            <div class="w-[19rem] p-6 flex flex-col gap-4 rounded-2xl animated-border
+            shadow-[0_0_20px_2px_rgba(34,211,238,0.3)]">
                 
                 <!-- Header -->
                 <div class="text-center">
@@ -172,22 +223,17 @@
                             <button type="button" 
                                 class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-200" 
                                 onclick="togglePasswordVisibility()">
-                                <span class="material-icons text-sm" id="passwordToggleIcon">visibility_off</span>
+                                <span class="material-icons text-sm hover:cursor-pointer" id="passwordToggleIcon">visibility_off</span>
                             </button>
                         </div>
                     </div>
                     <button type="submit"
                         class="w-full py-2 text-white text-sm rounded-full 
                                bg-gradient-to-r from-cyan-400 to-cyan-600 
-                               shadow-inner hover:from-cyan-300 transition">
+                               shadow-inner hover:from-cyan-300 transition hover:cursor-pointer">
                         Ingresar
                     </button>
                 </form>
-
-                <p class="text-center text-sm text-gray-400">
-                    ¿Olvidaste tu contraseña?
-                    <a href="#" class="text-cyan-400 hover:underline">Recupérala aquí</a>
-                </p>
             </div>
         </div>
 
