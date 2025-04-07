@@ -237,6 +237,7 @@
         });
         
         // Update loadConductores to only show names in dropdown
+        // Update loadConductores function
         async function loadConductores() {
             try {
                 const isAdmin = localStorage.getItem("isAdmin") === "true";
@@ -244,12 +245,13 @@
     
                 let endpoint;
                 if (isAdmin) {
-                    endpoint = `${API_URL}/conductores`; // Base endpoint for all conductores
+                    endpoint = `${API_URL}/conductores`; 
                 } else {
                     if (!empresaData || !empresaData.licencia) {
                         throw new Error('No license found for empresa');
                     }
-                    endpoint = `${API_URL}/conductores/licencia/${empresaData.licencia}`; // Endpoint for specific license
+                    // Fix the endpoint for empresa view
+                    endpoint = `${API_URL}/conductores/licencia/${empresaData.licencia}`;
                 }
     
                 const response = await fetch(endpoint, {
@@ -265,28 +267,18 @@
                 conductorSelect.innerHTML = '<option value="">Seleccione un conductor...</option>';
     
                 if (data && Array.isArray(data)) {
-                    const uniqueConductors = data.reduce((acc, conductor) => {
-                        if (conductor && conductor.nombre_apellidos && conductor.dni && 
-                            !acc.some(c => c.dni === conductor.dni)) {
-                            acc.push(conductor);
+                    data.forEach(conductor => {
+                        if (conductor && conductor.dni && conductor.nombre_apellidos) {
+                            const option = document.createElement('option');
+                            option.value = conductor.dni;
+                            option.textContent = conductor.nombre_apellidos;
+                            conductorSelect.appendChild(option);
                         }
-                        return acc;
-                    }, []);
-    
-                    uniqueConductors.sort((a, b) => 
-                        a.nombre_apellidos.localeCompare(b.nombre_apellidos)
-                    );
-    
-                    uniqueConductors.forEach(conductor => {
-                        const option = document.createElement('option');
-                        option.value = conductor.dni;
-                        option.textContent = conductor.nombre_apellidos;
-                        conductorSelect.appendChild(option);
                     });
                 }
             } catch (error) {
                 console.error('Error loading conductores:', error);
-                await showAlert('Error al cargar los conductores. Por favor, intente nuevamente.', 'error');
+                await showAlert('Error al cargar los conductores', 'error');
             }
         }
     </script>
@@ -361,7 +353,7 @@ document.getElementById('conductorSelect').addEventListener('change', async func
     try {
         const conductorId = e.target.value;
         
-        // Use the dni endpoint to get conductor details
+        // Get conductor details
         const response = await fetch(`${API_URL}/conductores/dni/${conductorId}`, {
             headers: getAuthHeaders()
         });
@@ -381,10 +373,17 @@ document.getElementById('conductorSelect').addEventListener('change', async func
             document.getElementById('empresaMatricula').textContent = empresaData.matricula;
             document.getElementById('empresaMarcaModelo').textContent = empresaData.marca_modelo;
         } else {
-            // For admin view, show conductor's vehicle info
-            document.getElementById('empresaLicencia').textContent = conductor.licencia;
-            document.getElementById('empresaMatricula').textContent = conductor.matricula;
-            document.getElementById('empresaMarcaModelo').textContent = conductor.marca_modelo;
+            // For admin view, get vehicle info from the conductor's license
+            const licenciaResponse = await fetch(`${API_URL}/licencias/${conductor.licencia}`, {
+                headers: getAuthHeaders()
+            });
+            
+            if (licenciaResponse.ok) {
+                const licenciaData = await licenciaResponse.json();
+                document.getElementById('empresaLicencia').textContent = conductor.licencia;
+                document.getElementById('empresaMatricula').textContent = licenciaData.matricula || 'N/A';
+                document.getElementById('empresaMarcaModelo').textContent = licenciaData.marca_modelo || 'N/A';
+            }
         }
         
         // Show conductor info
