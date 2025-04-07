@@ -20,6 +20,8 @@ function getAuthHeaders() {
     };
 }
 
+console.log("API URL:", API_URL);
+
 // Example of protected API call
 async function fetchProtectedData(endpoint) {
     const response = await fetch(`${API_URL}${endpoint}`, {

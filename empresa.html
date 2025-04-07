@@ -245,16 +245,20 @@
 
         let endpoint;
         if (isAdmin) {
-            endpoint = `${API_URL}/conductores/all`; // New endpoint for admins
+            endpoint = `${API_URL}/conductores/all`;
         } else {
             endpoint = `${API_URL}/conductores/licencia/${empresaData.licencia}`;
         }
 
         const response = await fetch(endpoint, {
-            headers: getAuthHeaders()
+            method: 'GET',
+            headers: getAuthHeaders(),
+            credentials: 'include'
         });
 
-        if (!response.ok) throw new Error('Error fetching conductores');
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
 
         const data = await response.json();
         const conductorSelect = document.getElementById('conductorSelect');
@@ -262,28 +266,29 @@
 
         if (data && Array.isArray(data)) {
             const uniqueConductors = data.reduce((acc, conductor) => {
-                if (conductor && conductor.nombre_conductor && conductor.dni && 
+                if (conductor && conductor.nombre_apellidos && conductor.dni && 
                     !acc.some(c => c.dni === conductor.dni)) {
                     acc.push(conductor);
                 }
                 return acc;
             }, []);
 
-            uniqueConductors.sort((a, b) => a.nombre_conductor.localeCompare(b.nombre_conductor));
+            uniqueConductors.sort((a, b) => 
+                a.nombre_apellidos.localeCompare(b.nombre_apellidos)
+            );
 
             uniqueConductors.forEach(conductor => {
                 const option = document.createElement('option');
                 option.value = conductor.dni;
-                // For admin, show empresa info in the dropdown
                 option.textContent = isAdmin ? 
-                    `${conductor.nombre_conductor} (${conductor.licencia})` : 
-                    conductor.nombre_conductor;
+                    `${conductor.nombre_apellidos} (${conductor.licencia})` : 
+                    conductor.nombre_apellidos;
                 conductorSelect.appendChild(option);
             });
         }
     } catch (error) {
         console.error('Error loading conductores:', error);
-        await showAlert('Error al cargar los conductores', 'error');
+        await showAlert('Error al cargar los conductores. Por favor, intente nuevamente.', 'error');
     }
 }
     </script>
@@ -311,7 +316,8 @@ document.addEventListener('DOMContentLoaded', function() {
         try {
             const response = await fetch(`${API_URL}/logout`, {
                 method: "POST",
-                headers: getAuthHeaders()
+                headers: getAuthHeaders(),
+                credentials: 'include'
             });
 
             if (response.ok) {
@@ -319,6 +325,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 localStorage.removeItem("isEmpresa");
                 localStorage.removeItem("token");
                 localStorage.removeItem("empresaData");
+                localStorage.removeItem("isAdmin");
                 
                 await showAlert("Sesión cerrada correctamente", "success");
                 window.location.href = "login-empresa.html";

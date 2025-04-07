@@ -203,9 +203,10 @@ app.use(cors({
     origin: 'https://controldeconductores.com',
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'x-api-key'],
-    credentials: true
+    credentials: true,
+    exposedHeaders: ['Authorization']
 }));
-
+app.options('*', cors());
 // ... rest of your server code ...
 // Keep existing /api/conductores/:id endpoint as is
 // También proteger las demás rutas de conductores
