@@ -244,12 +244,12 @@
     
                 let endpoint;
                 if (isAdmin) {
-                    endpoint = `${API_URL}/conductores/all`;
+                    endpoint = `${API_URL}/conductores`; // Base endpoint for all conductores
                 } else {
                     if (!empresaData || !empresaData.licencia) {
                         throw new Error('No license found for empresa');
                     }
-                    endpoint = `${API_URL}/conductores/licencia/${empresaData.licencia}`;
+                    endpoint = `${API_URL}/conductores/licencia/${empresaData.licencia}`; // Endpoint for specific license
                 }
     
                 const response = await fetch(endpoint, {
@@ -361,7 +361,7 @@ document.getElementById('conductorSelect').addEventListener('change', async func
     try {
         const conductorId = e.target.value;
         
-        // Get conductor data
+        // Use the dni endpoint to get conductor details
         const response = await fetch(`${API_URL}/conductores/dni/${conductorId}`, {
             headers: getAuthHeaders()
         });
@@ -381,12 +381,10 @@ document.getElementById('conductorSelect').addEventListener('change', async func
             document.getElementById('empresaMatricula').textContent = empresaData.matricula;
             document.getElementById('empresaMarcaModelo').textContent = empresaData.marca_modelo;
         } else {
-            // For admin view, show conductor's vehicle details
-            document.getElementById('empresaLicencia').textContent = conductor.licencia || 'N/A';
-            document.getElementById('empresaMatricula').textContent = conductor.matricula || 'N/A';
-            document.getElementById('empresaMarcaModelo').textContent = conductor.marca_modelo || 'N/A';
-            document.getElementById('empresaDNI').textContent = conductor.dni || 'N/A';
-            document.getElementById('empresaEmail').textContent = conductor.email || 'N/A';
+            // For admin view, show conductor's vehicle info
+            document.getElementById('empresaLicencia').textContent = conductor.licencia;
+            document.getElementById('empresaMatricula').textContent = conductor.matricula;
+            document.getElementById('empresaMarcaModelo').textContent = conductor.marca_modelo;
         }
         
         // Show conductor info
