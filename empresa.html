@@ -252,8 +252,8 @@
 
         const response = await fetch(endpoint, {
             method: 'GET',
-            headers: getAuthHeaders(),
-            credentials: 'include'
+            headers: getAuthHeaders()
+            // Removed credentials: 'include'
         });
 
         if (!response.ok) {
