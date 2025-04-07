@@ -380,9 +380,10 @@
             await Swal.fire({
                 icon: 'error',
                 title: 'Error',
-                text: 'Credenciales inválidas',
+                text: error.message || 'Error al conectar con el servidor',
                 background: '#1a1a1a',
-                color: '#ffffff'
+                color: '#ffffff',
+                confirmButtonColor: '#3085d6'
             });
         }
     });
