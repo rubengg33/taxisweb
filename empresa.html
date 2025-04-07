@@ -312,29 +312,30 @@ document.addEventListener('DOMContentLoaded', function() {
     const logoutButton = document.getElementById('logoutButton');
     const logoutButtonMobile = document.getElementById('logoutButtonMobile');
 
+    // Update the logout handler
     async function handleLogout() {
         try {
             const response = await fetch(`${API_URL}/logout`, {
                 method: "POST",
-                headers: getAuthHeaders(),
-                credentials: 'include'
+                headers: getAuthHeaders()
+                // Remove credentials: 'include'
             });
-
-            if (response.ok) {
-                localStorage.removeItem("empresaEmail");
-                localStorage.removeItem("isEmpresa");
-                localStorage.removeItem("token");
-                localStorage.removeItem("empresaData");
-                localStorage.removeItem("isAdmin");
-                
-                await showAlert("Sesión cerrada correctamente", "success");
-                window.location.href = "login-empresa.html";
-            } else {
-                await showAlert("Error al cerrar sesión", "error");
-            }
+    
+            // Even if the server request fails, we'll clear local storage
+            localStorage.removeItem("empresaEmail");
+            localStorage.removeItem("isEmpresa");
+            localStorage.removeItem("token");
+            localStorage.removeItem("empresaData");
+            localStorage.removeItem("isAdmin");
+            localStorage.removeItem("userEmail");
+            
+            await showAlert("Sesión cerrada correctamente", "success");
+            window.location.href = "login-empresa.html";
         } catch (error) {
             console.error("Error al cerrar sesión:", error);
-            await showAlert("Hubo un problema con la conexión al servidor", "error");
+            // Still clear localStorage and redirect even if there's an error
+            localStorage.clear(); // Clear all localStorage items
+            window.location.href = "login-empresa.html";
         }
     }
 

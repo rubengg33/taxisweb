@@ -203,7 +203,7 @@ app.use(cors({
     origin: 'https://controldeconductores.com',
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'x-api-key'],
-    credentials: true,
+    credentials: false // Change to false since we're not using credentials
 }));
 app.options('*', cors());
 // ... rest of your server code ...
