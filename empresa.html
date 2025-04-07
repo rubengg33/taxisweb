@@ -239,54 +239,52 @@
         // Update loadConductores to only show names in dropdown
         // Update loadConductores function
         async function loadConductores() {
-            try {
-                const isAdmin = localStorage.getItem("isAdmin") === "true";
-                const empresaData = !isAdmin ? JSON.parse(localStorage.getItem('empresaData')) : null;
-    
-                let endpoint;
-                if (isAdmin) {
-                    endpoint = `${API_URL}/conductores`; 
-                } else {
-                    if (!empresaData || !empresaData.licencia) {
-                        throw new Error('No license found for empresa');
-                    }
-                    // Fix: Use the correct endpoint for getting conductores by licencia
-                    endpoint = `${API_URL}/conductores/licencia/${empresaData.licencia}`;
-                }
-    
-                const response = await fetch(endpoint, {
-                    headers: getAuthHeaders()
-                });
-    
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-    
-                const data = await response.json();
-                const conductorSelect = document.getElementById('conductorSelect');
-                conductorSelect.innerHTML = '<option value="">Seleccione un conductor...</option>';
-    
-                if (data && Array.isArray(data)) {
-                    data.forEach(conductor => {
-                        if (conductor && conductor.dni && conductor.nombre_apellidos) {
-                            const option = document.createElement('option');
-                            option.value = conductor.dni;
-                            option.textContent = conductor.nombre_apellidos;
-                            conductorSelect.appendChild(option);
-                        }
-                    });
-                } else if (data && typeof data === 'object') {
-                    // Handle single conductor object
+    try {
+        const isAdmin = localStorage.getItem("isAdmin") === "true";
+        const empresaData = !isAdmin ? JSON.parse(localStorage.getItem('empresaData')) : null;
+
+        let endpoint;
+        if (isAdmin) {
+            endpoint = `${API_URL}/conductores`; 
+        } else {
+            if (!empresaData || !empresaData.licencia) {
+                throw new Error('No license found for empresa');
+            }
+            endpoint = `${API_URL}/conductores/licencia/${empresaData.licencia}`;
+        }
+
+        const response = await fetch(endpoint, {
+            headers: getAuthHeaders()
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        const conductorSelect = document.getElementById('conductorSelect');
+        conductorSelect.innerHTML = '<option value="">Seleccione un conductor...</option>';
+
+        if (Array.isArray(data)) {
+            data.forEach(conductor => {
+                if (conductor && conductor.dni && conductor.nombre_apellidos) {
                     const option = document.createElement('option');
-                    option.value = data.dni;
-                    option.textContent = data.nombre_apellidos;
+                    option.value = conductor.dni;
+                    option.textContent = conductor.nombre_apellidos;
                     conductorSelect.appendChild(option);
                 }
-            } catch (error) {
-                console.error('Error loading conductores:', error);
-                await showAlert('Error al cargar los conductores', 'error');
-            }
+            });
+        } else if (data && data.dni && data.nombre_apellidos) {
+            const option = document.createElement('option');
+            option.value = data.dni;
+            option.textContent = data.nombre_apellidos;
+            conductorSelect.appendChild(option);
         }
+    } catch (error) {
+        console.error('Error loading conductores:', error);
+        await showAlert('Error al cargar los conductores', 'error');
+    }
+}
     </script>
 </body>
 </html>
@@ -352,15 +350,14 @@ document.getElementById('conductorSelect').addEventListener('change', async func
     if (!e.target.value) {
         conductorInfo.classList.add('hidden');
         statsGrid.classList.add('hidden');
-        if (isAdmin) welcomeSection.classList.add('hidden');
         return;
     }
     
     try {
         const conductorId = e.target.value;
         
-        // Get conductor details
-        const response = await fetch(`${API_URL}/conductores/${conductorId}`, {
+        // Fix: Update the endpoint to use dni
+        const response = await fetch(`${API_URL}/conductores/dni/${conductorId}`, {
             headers: getAuthHeaders()
         });
         
@@ -396,9 +393,9 @@ document.getElementById('conductorSelect').addEventListener('change', async func
         conductorInfo.classList.remove('hidden');
         statsGrid.classList.remove('hidden');
         
-        document.getElementById('conductorNombre').textContent = conductor.nombre_apellidos;
-        document.getElementById('conductorDNI').textContent = conductor.dni;
-        document.getElementById('conductorEmail').textContent = conductor.email;
+        document.getElementById('conductorNombre').textContent = conductor.nombre_apellidos || 'N/A';
+        document.getElementById('conductorDNI').textContent = conductor.dni || 'N/A';
+        document.getElementById('conductorEmail').textContent = conductor.email || 'N/A';
         
         await calculateHours(conductor.nombre_apellidos);
     } catch (error) {
@@ -406,6 +403,8 @@ document.getElementById('conductorSelect').addEventListener('change', async func
         await showAlert('Error al cargar los datos del conductor', 'error');
     }
 });
+
+
 
 // Also in calculateHours function
 async function calculateHours(conductorNombre) {
