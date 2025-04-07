@@ -345,11 +345,12 @@ document.addEventListener('DOMContentLoaded', function() {
 <script>
 
 
-// Update the conductor selection handler to show empresa data
+// Update the conductor selection handler
 document.getElementById('conductorSelect').addEventListener('change', async function(e) {
     const conductorInfo = document.getElementById('conductorInfo');
     const statsGrid = document.getElementById('statsGrid');
     const welcomeSection = document.querySelector('.welcome-section');
+    const isAdmin = localStorage.getItem("isAdmin") === "true";
     
     if (!e.target.value) {
         conductorInfo.classList.add('hidden');
@@ -360,8 +361,7 @@ document.getElementById('conductorSelect').addEventListener('change', async func
     
     try {
         const conductorId = e.target.value;
-        const empresaData = JSON.parse(localStorage.getItem('empresaData'));
-         
+        
         // Updated to use the new dni endpoint
         const response = await fetch(`${API_URL}/conductores/dni/${conductorId}`, {
             headers: getAuthHeaders()
@@ -375,15 +375,23 @@ document.getElementById('conductorSelect').addEventListener('change', async func
         
         // Show empresa data
         welcomeSection.classList.remove('hidden');
-        document.getElementById('empresaLicencia').textContent = empresaData.licencia;
-        document.getElementById('empresaMatricula').textContent = empresaData.matricula;
-        document.getElementById('empresaMarcaModelo').textContent = empresaData.marca_modelo;
+        
+        if (!isAdmin) {
+            const empresaData = JSON.parse(localStorage.getItem('empresaData'));
+            document.getElementById('empresaLicencia').textContent = empresaData.licencia;
+            document.getElementById('empresaMatricula').textContent = empresaData.matricula;
+            document.getElementById('empresaMarcaModelo').textContent = empresaData.marca_modelo;
+        } else {
+            // For admin view, show conductor's license
+            document.getElementById('empresaLicencia').textContent = conductor.licencia || 'N/A';
+            document.getElementById('empresaMatricula').textContent = 'N/A';
+            document.getElementById('empresaMarcaModelo').textContent = 'N/A';
+        }
         
         // Show conductor info
         conductorInfo.classList.remove('hidden');
         statsGrid.classList.remove('hidden');
         
-        // Updated to use nombre_apellidos instead of nombre_conductor
         document.getElementById('conductorNombre').textContent = conductor.nombre_apellidos;
         document.getElementById('conductorDNI').textContent = conductor.dni;
         document.getElementById('conductorEmail').textContent = conductor.email;
