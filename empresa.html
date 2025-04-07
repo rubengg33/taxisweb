@@ -246,13 +246,14 @@
                 if (isAdmin) {
                     endpoint = `${API_URL}/conductores/all`;
                 } else {
+                    if (!empresaData || !empresaData.licencia) {
+                        throw new Error('No license found for empresa');
+                    }
                     endpoint = `${API_URL}/conductores/licencia/${empresaData.licencia}`;
                 }
     
                 const response = await fetch(endpoint, {
-                    method: 'GET',
                     headers: getAuthHeaders()
-                    // Removed credentials: 'include'
                 });
     
                 if (!response.ok) {
@@ -279,9 +280,7 @@
                     uniqueConductors.forEach(conductor => {
                         const option = document.createElement('option');
                         option.value = conductor.dni;
-                        option.textContent = isAdmin ? 
-                            `${conductor.nombre_apellidos} (${conductor.licencia})` : 
-                            conductor.nombre_apellidos;
+                        option.textContent = conductor.nombre_apellidos;
                         conductorSelect.appendChild(option);
                     });
                 }
@@ -362,7 +361,7 @@ document.getElementById('conductorSelect').addEventListener('change', async func
     try {
         const conductorId = e.target.value;
         
-        // Updated to use the new dni endpoint
+        // Get conductor data
         const response = await fetch(`${API_URL}/conductores/dni/${conductorId}`, {
             headers: getAuthHeaders()
         });
@@ -382,10 +381,12 @@ document.getElementById('conductorSelect').addEventListener('change', async func
             document.getElementById('empresaMatricula').textContent = empresaData.matricula;
             document.getElementById('empresaMarcaModelo').textContent = empresaData.marca_modelo;
         } else {
-            // For admin view, show conductor's license
+            // For admin view, show conductor's vehicle details
             document.getElementById('empresaLicencia').textContent = conductor.licencia || 'N/A';
-            document.getElementById('empresaMatricula').textContent = 'N/A';
-            document.getElementById('empresaMarcaModelo').textContent = 'N/A';
+            document.getElementById('empresaMatricula').textContent = conductor.matricula || 'N/A';
+            document.getElementById('empresaMarcaModelo').textContent = conductor.marca_modelo || 'N/A';
+            document.getElementById('empresaDNI').textContent = conductor.dni || 'N/A';
+            document.getElementById('empresaEmail').textContent = conductor.email || 'N/A';
         }
         
         // Show conductor info
