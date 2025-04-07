@@ -134,7 +134,7 @@
 }
     </style>
 </head>
-<body class="bg-gradient-to-br from-purple-600 via-indigo-500 to-sky-400 min-h-screen">
+<body class="bg-[#0f172a] min-h-screen">
     <!-- Add navbar -->
     <nav class="bg-gradient-to-r from-gray-900 to-gray-800 shadow-lg">
         <div class="w-full">
@@ -172,42 +172,60 @@
     </nav>
     <!-- Wrap existing content in a container -->
     <div class="flex items-center justify-center min-h-[calc(100vh-4rem)]">
-        <div class="w-full max-w-md bg-black p-6 rounded-lg shadow-lg">
-            <h2 class="text-2xl font-bold text-center mb-4 text-white">Iniciar Sesión</h2>
+        <div class="w-[19rem] p-6 flex flex-col gap-4 rounded-2xl animated-border
+        shadow-[0_0_20px_2px_rgba(34,211,238,0.3)]">
+        <div class="text-center">
+            <span class="material-icons text-blue-500">admin_panel_settings</span>
+            <h1 class="text-xl font-bold text-white">Administrador</h1>
+            <p class="text-sm text-gray-300">Iniciar sesión</p>
+        </div>
+
+        <hr class="border-gray-700" />
 
             <form id="loginForm" class="space-y-4"> 
                 <div>
-                    <label for="email" class="block text-sm font-medium text-blue-500">Correo Electrónico</label>
-                    <input type="email" id="email" class="mt-1 block w-full p-2 border border-gray-300 rounded-md text-white bg-black" required>
+                    <label for="email" class="block text-sm text-white mb-1">Correo Electrónico</label>
+                    <input type="email" id="email" placeholder="ejemplo@email.com" class="w-full px-4 py-2 rounded-lg bg-gray-800 border border-gray-600 
+                    text-white placeholder-gray-400 
+                    focus:outline-none focus:ring-2 focus:ring-cyan-500 transition" required>
                 </div>
                 <div>
-                    <label for="password" class="block text-sm font-medium text-blue-500">Contraseña</label>
+                    <label for="password" class="block text-sm text-white mb-1">Contraseña</label>
                     <div class="relative">
-                        <input type="password" id="password" class="mt-1 block w-full p-2 border border-gray-300 rounded-md text-white bg-black" required>
+                        <input type="password" id="password" placeholder="contraseña123" class="w-full px-4 py-2 rounded-lg bg-gray-800 border border-gray-600 
+                        text-white placeholder-gray-400 
+                        focus:outline-none focus:ring-2 focus:ring-cyan-500 transition" required>
                         <button type="button" class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-200" onclick="togglePasswordVisibility()">
-                            <span class="material-icons" id="passwordToggleIcon">visibility_off</span>
+                            <span class="material-icons hover:cursor-pointer" id="passwordToggleIcon">visibility_off</span>
                         </button>
                     </div>
                 </div>
-                <button type="submit" class="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600">Ingresar</button>
+                <button type="submit" class="w-full py-2 text-white text-sm rounded-full 
+                bg-gradient-to-r from-cyan-400 to-cyan-600 
+                shadow-inner hover:from-cyan-300 transition hover:cursor-pointer">Ingresar</button>
                 <!-- Add forgot password link -->
-                <div class="text-center">
-                    <a href="#" onclick="showResetPasswordForm()" class="text-sm text-blue-500 hover:text-blue-700">¿Olvidaste tu contraseña?</a>
-                </div>
+                <p class="text-center text-sm text-gray-400">
+                    ¿Olvidaste tu contraseña?
+                    <a href="#" onclick="showResetPasswordForm()" class="text-cyan-400 hover:underline">Recupérala aquí</a>
+                </p>
             </form>
 
             <!-- Add this after your login form -->
             <div id="resetPasswordForm" class="hidden space-y-4">
                 <h3 class="text-xl font-bold text-center mb-4 text-white">Restablecer Contraseña</h3>
                 <div>
-                    <label for="resetEmail" class="block text-sm font-medium text-blue-500  ">Correo Electrónico</label>
-                    <input type="email" id="resetEmail" class="mt-1 block w-full p-2 border border-gray-300 rounded-md" required>
+                    <label for="resetEmail" class="block text-sm text-white mb-1">Correo Electrónico</label>
+                    <input type="email" id="resetEmail" placeholder="ejemplo@email.com" class="w-full px-4 py-2 rounded-lg bg-gray-800 border border-gray-600 
+                    text-white placeholder-gray-400 
+                    focus:outline-none focus:ring-2 focus:ring-cyan-500 transition" required>
                 </div>
-                <button onclick="requestPasswordReset()" class="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600">
+                <button onclick="requestPasswordReset()" class="w-full py-2 text-white rounded-full 
+                bg-gradient-to-r from-cyan-400 to-cyan-600 
+                shadow-inner hover:from-cyan-300 transition hover:cursor-pointer">
                     Enviar correo de recuperación
                 </button>
                 <div class="text-center">
-                    <a href="#" onclick="showLoginForm()" class="text-sm text-blue-500 hover:text-blue-700">Volver al inicio de sesión</a>
+                    <a href="#" onclick="showLoginForm()" class="text-sm text-cyan-400 hover:underline">Volver al inicio de sesión</a>
                 </div>
             </div>
 
