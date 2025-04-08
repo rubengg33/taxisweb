@@ -407,7 +407,9 @@ app.post("/api/login-empresa", async (req, res) => {
                         nombre: result[0].NOMBRE_APELLIDOS,
                         licencia: result[0].LICENCIA,
                         matricula: result[0].MATRICULA,
-                        marca_modelo: result[0].MARCA_MODELO
+                        marca_modelo: result[0].MARCA_MODELO,
+                        email: result[0].EMAIL,
+                        dni: result[0].DNI,
                     }
                 });
             } else {
