@@ -383,22 +383,22 @@ document.getElementById('conductorSelect').addEventListener('change', async func
             
             if (empresaResponse.ok) {
                 const empresaData = await empresaResponse.json();
-                console.log('Empresa Data received:', empresaData); // Debug empresa data
+                console.log('Empresa Data received:', empresaData);
                 
                 // Update empresa info in the welcome section with all available data
                 document.getElementById('empresaLicencia').textContent = conductor.licencia || 'N/A';
-                document.getElementById('empresaMatricula').textContent = empresaData.matricula || 'N/A';
-                document.getElementById('empresaMarcaModelo').textContent = empresaData.marca_modelo || 'N/A';
-                document.getElementById('empresaDNI').textContent = empresaData.dni || 'N/A';
-                document.getElementById('empresaEmail').textContent = empresaData.email || 'N/A';
+                document.getElementById('empresaMatricula').textContent = empresaData.MATRICULA || 'N/A';
+                document.getElementById('empresaMarcaModelo').textContent = empresaData.MARCA_MODELO || 'N/A';
+                document.getElementById('empresaDNI').textContent = empresaData.DNI || 'N/A';
+                document.getElementById('empresaEmail').textContent = empresaData.EMAIL || 'N/A';
                 
                 // Debug the values being set
                 console.log('Setting values:', {
                     licencia: conductor.licencia,
-                    matricula: empresaData.matricula,
-                    marca_modelo: empresaData.marca_modelo,
-                    dni: empresaData.dni,
-                    email: empresaData.email
+                    matricula: empresaData.MATRICULA,
+                    marca_modelo: empresaData.MARCA_MODELO,
+                    dni: empresaData.DNI,
+                    email: empresaData.EMAIL
                 });
             } else {
                 console.error('Error fetching empresa data:', empresaResponse.status);
