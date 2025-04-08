@@ -217,12 +217,12 @@
                     document.getElementById('empresaDNI').textContent = empresaData.dni || 'N/A';
                     document.getElementById('empresaEmail').textContent = empresaData.email || empresaData.empresaEmail || 'N/A';
                 } else {
-                    // For admin, show different welcome message
-                    document.getElementById('empresaLicencia').textContent = "Admin View";
-                    document.getElementById('empresaMatricula').textContent = "N/A";
-                    document.getElementById('empresaMarcaModelo').textContent = "N/A";
-                    document.getElementById('empresaDNI').textContent = "Admin";
-                    document.getElementById('empresaEmail').textContent = localStorage.getItem("userEmail") || "Admin";
+                    // For admin, initially show placeholder text
+                    document.getElementById('empresaLicencia').textContent = "Seleccione un conductor";
+                    document.getElementById('empresaMatricula').textContent = "Pendiente";
+                    document.getElementById('empresaMarcaModelo').textContent = "Pendiente";
+                    document.getElementById('empresaDNI').textContent = "Pendiente";
+                    document.getElementById('empresaEmail').textContent = "Pendiente";
                 }
                 
                 welcomeSection.classList.remove('hidden');
@@ -359,36 +359,31 @@ document.getElementById('conductorSelect').addEventListener('change', async func
     try {
         const conductorId = e.target.value;
         
-        // Fix: Update the endpoint to use dni
-        const response = await fetch(`${API_URL}/conductores/dni/${conductorId}`, {
-            headers: getAuthHeaders()
-        });
-        
-        if (!response.ok) {
-            throw new Error('Error fetching conductor data');   
-        }
-        
-        const conductor = await response.json();
-        
-        // Show empresa data
-        welcomeSection.classList.remove('hidden');
-        
-        if (!isAdmin) {
-            const empresaData = JSON.parse(localStorage.getItem('empresaData'));
-            document.getElementById('empresaLicencia').textContent = empresaData.licencia;
-            document.getElementById('empresaMatricula').textContent = empresaData.matricula;
-            document.getElementById('empresaMarcaModelo').textContent = empresaData.marca_modelo;
-        } else {
-            // For admin view, get vehicle info from the conductor's license
-            const licenciaResponse = await fetch(`${API_URL}/licencias/${conductor.licencia}`, {
+        if (isAdmin && conductorId) {
+            // Fetch conductor details
+            const conductorResponse = await fetch(`${API_URL}/conductores/dni/${conductorId}`, {
                 headers: getAuthHeaders()
             });
             
-            if (licenciaResponse.ok) {
-                const licenciaData = await licenciaResponse.json();
+            if (!conductorResponse.ok) {
+                throw new Error('Error fetching conductor data');
+            }
+            
+            const conductor = await conductorResponse.json();
+            
+            // Fetch empresa details using conductor's license
+            const empresaResponse = await fetch(`${API_URL}/licencias/${conductor.licencia}`, {
+                headers: getAuthHeaders()
+            });
+            
+            if (empresaResponse.ok) {
+                const empresaData = await empresaResponse.json();
+                // Update empresa info in the welcome section
                 document.getElementById('empresaLicencia').textContent = conductor.licencia || 'N/A';
-                document.getElementById('empresaMatricula').textContent = licenciaData.matricula || 'N/A';
-                document.getElementById('empresaMarcaModelo').textContent = licenciaData.marca_modelo || 'N/A';
+                document.getElementById('empresaMatricula').textContent = empresaData.matricula || 'N/A';
+                document.getElementById('empresaMarcaModelo').textContent = empresaData.marca_modelo || 'N/A';
+                document.getElementById('empresaDNI').textContent = empresaData.dni || 'N/A';
+                document.getElementById('empresaEmail').textContent = empresaData.email || 'N/A';
             }
         }
         
