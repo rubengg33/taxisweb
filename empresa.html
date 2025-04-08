@@ -358,19 +358,20 @@ document.getElementById('conductorSelect').addEventListener('change', async func
     
     try {
         const conductorId = e.target.value;
+        let conductor;
         
-        if (isAdmin && conductorId) {
-            // Fetch conductor details
-            const conductorResponse = await fetch(`${API_URL}/conductores/dni/${conductorId}`, {
-                headers: getAuthHeaders()
-            });
-            
-            if (!conductorResponse.ok) {
-                throw new Error('Error fetching conductor data');
-            }
-            
-            const conductor = await conductorResponse.json();
-            
+        // Fetch conductor details
+        const conductorResponse = await fetch(`${API_URL}/conductores/dni/${conductorId}`, {
+            headers: getAuthHeaders()
+        });
+        
+        if (!conductorResponse.ok) {
+            throw new Error('Error fetching conductor data');
+        }
+        
+        conductor = await conductorResponse.json();
+        
+        if (isAdmin && conductor) {
             // Fetch empresa details using conductor's license
             const empresaResponse = await fetch(`${API_URL}/licencias/${conductor.licencia}`, {
                 headers: getAuthHeaders()
@@ -391,6 +392,7 @@ document.getElementById('conductorSelect').addEventListener('change', async func
         conductorInfo.classList.remove('hidden');
         statsGrid.classList.remove('hidden');
         
+        // Update conductor info
         document.getElementById('conductorNombre').textContent = conductor.nombre_apellidos || 'N/A';
         document.getElementById('conductorDNI').textContent = conductor.dni || 'N/A';
         document.getElementById('conductorEmail').textContent = conductor.email || 'N/A';
