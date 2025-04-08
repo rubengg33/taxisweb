@@ -373,18 +373,21 @@ document.getElementById('conductorSelect').addEventListener('change', async func
         
         if (isAdmin && conductor) {
             // Fetch empresa details using conductor's license
-            const empresaResponse = await fetch(`${API_URL}/licencias/${conductor.licencia}`, {
+            const empresaResponse = await fetch(`${API_URL}/licencias/empresa/${conductor.licencia}`, {
                 headers: getAuthHeaders()
             });
             
             if (empresaResponse.ok) {
                 const empresaData = await empresaResponse.json();
-                // Update empresa info in the welcome section
+                // Update empresa info in the welcome section with all available data
                 document.getElementById('empresaLicencia').textContent = conductor.licencia || 'N/A';
                 document.getElementById('empresaMatricula').textContent = empresaData.matricula || 'N/A';
                 document.getElementById('empresaMarcaModelo').textContent = empresaData.marca_modelo || 'N/A';
                 document.getElementById('empresaDNI').textContent = empresaData.dni || 'N/A';
-                document.getElementById('empresaEmail').textContent = empresaData.email || 'N/A';
+                document.getElementById('empresaEmail').textContent = empresaData.email || empresaData.empresaEmail || 'N/A';
+            } else {
+                console.error('Error fetching empresa data:', empresaResponse.status);
+                throw new Error('Error fetching empresa data');
             }
         }
         

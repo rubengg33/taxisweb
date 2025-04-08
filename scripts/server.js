@@ -146,6 +146,22 @@ app.get("/api/conductores", authenticateToken, validateApiKey, (req, res) => {
         res.json(result);
     });
 });
+
+// Add this new endpoint after your other licencias endpoints
+app.get("/api/licencias/empresa/:licencia", authenticateToken, validateApiKey, (req, res) => {
+    const licencia = req.params.licencia;
+    db.query("SELECT * FROM licencias WHERE licencia = ?", [licencia], (err, result) => {
+        if (err) {
+            console.error("Error fetching empresa data:", err);
+            return res.status(500).json({ error: "Error en el servidor" });
+        }
+        if (result.length === 0) {
+            return res.status(404).json({ error: "Empresa no encontrada" });
+        }
+        res.json(result[0]);
+    });
+});
+
 // Add this new endpoint for getting all conductors (protected with authentication)
 app.get('/api/conductores/all', authenticateToken, validateApiKey, async (req, res) => {
     try {
