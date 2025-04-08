@@ -372,19 +372,34 @@ document.getElementById('conductorSelect').addEventListener('change', async func
         conductor = await conductorResponse.json();
         
         if (isAdmin && conductor) {
+            console.log('Conductor license:', conductor.licencia); // Debug conductor license
+            
             // Fetch empresa details using conductor's license
             const empresaResponse = await fetch(`${API_URL}/licencias/${conductor.licencia}`, {
                 headers: getAuthHeaders()
             });
             
+            console.log('Empresa Response status:', empresaResponse.status); // Debug response status
+            
             if (empresaResponse.ok) {
                 const empresaData = await empresaResponse.json();
+                console.log('Empresa Data received:', empresaData); // Debug empresa data
+                
                 // Update empresa info in the welcome section with all available data
                 document.getElementById('empresaLicencia').textContent = conductor.licencia || 'N/A';
                 document.getElementById('empresaMatricula').textContent = empresaData.matricula || 'N/A';
                 document.getElementById('empresaMarcaModelo').textContent = empresaData.marca_modelo || 'N/A';
                 document.getElementById('empresaDNI').textContent = empresaData.dni || 'N/A';
                 document.getElementById('empresaEmail').textContent = empresaData.email || 'N/A';
+                
+                // Debug the values being set
+                console.log('Setting values:', {
+                    licencia: conductor.licencia,
+                    matricula: empresaData.matricula,
+                    marca_modelo: empresaData.marca_modelo,
+                    dni: empresaData.dni,
+                    email: empresaData.email
+                });
             } else {
                 console.error('Error fetching empresa data:', empresaResponse.status);
                 throw new Error('Error fetching empresa data');
