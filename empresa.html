@@ -250,8 +250,11 @@
             if (!empresaData || !empresaData.licencia) {
                 throw new Error('No license found for empresa');
             }
+            // Make sure this matches your server endpoint
             endpoint = `${API_URL}/conductores/licencia/${empresaData.licencia}`;
         }
+
+        console.log('Fetching conductores from:', endpoint); // Debug log
 
         const response = await fetch(endpoint, {
             headers: getAuthHeaders()
@@ -262,10 +265,12 @@
         }
 
         const data = await response.json();
+        console.log('Received conductores data:', data); // Debug log
+
         const conductorSelect = document.getElementById('conductorSelect');
         conductorSelect.innerHTML = '<option value="">Seleccione un conductor...</option>';
 
-        if (Array.isArray(data)) {
+        if (Array.isArray(data) && data.length > 0) {
             data.forEach(conductor => {
                 if (conductor && conductor.dni && conductor.nombre_apellidos) {
                     const option = document.createElement('option');
@@ -274,11 +279,9 @@
                     conductorSelect.appendChild(option);
                 }
             });
-        } else if (data && data.dni && data.nombre_apellidos) {
-            const option = document.createElement('option');
-            option.value = data.dni;
-            option.textContent = data.nombre_apellidos;
-            conductorSelect.appendChild(option);
+        } else {
+            console.log('No conductores found for this license'); // Debug log
+            await showAlert('No se encontraron conductores para esta licencia', 'info');
         }
     } catch (error) {
         console.error('Error loading conductores:', error);

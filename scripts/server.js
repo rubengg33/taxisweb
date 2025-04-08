@@ -479,20 +479,21 @@ app.post("/api/reset-password", async (req, res) => {
     }
 });
 
-// Add this new endpoint after your other routes
+// Update the conductores by licencia endpoint
 app.get("/api/conductores/licencia/:licencia", authenticateToken, async (req, res) => {
     try {
         const licencia = req.params.licencia;
         
-        // Simplified query to get conductors by license
+        // Updated query to match the expected structure
         const query = `
-            SELECT 
-                nombre_apellidos as nombre_conductor,
-                dni,
-                email
-            FROM conductores 
-            WHERE licencia = ?
-            ORDER BY nombre_apellidos`;
+            SELECT DISTINCT
+                c.dni,
+                c.nombre_apellidos,
+                c.email,
+                c.licencia
+            FROM conductores c
+            WHERE c.licencia = ?
+            ORDER BY c.nombre_apellidos`;
 
         db.query(query, [licencia], (error, results) => {
             if (error) {
