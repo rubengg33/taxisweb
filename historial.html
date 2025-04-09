@@ -179,17 +179,20 @@
         
         // Enrich eventos with conductor info
         // Update the eventos mapping to use the exact field names from the database
+        // In cargarEventos function, update the eventos mapping
         eventosMostrados = eventos.map(ev => ({
-            ...ev, // Keep all original fields from the eventos table
-            // Only override fields if conductorInfo has them
-            nombre_conductor: conductorInfo.nombre_apellidos || ev.nombre_conductor || '-',
-            dni: conductorInfo.dni || ev.dni || '-',
-            licencia: conductorInfo.licencia || ev.licencia || '-',
-            vehiculo_modelo: conductorInfo.marca_modelo || ev.vehiculo_modelo || '-', // Note: might be MARCA_MODELO in DB
-            matricula: conductorInfo.matricula || ev.matricula || '-',
-            email: conductorInfo.email || ev.email || '-',
+            ...ev, // Keep all original fields from eventos table
+            nombre_conductor: conductorInfo.NOMBRE_APELLIDOS || conductorInfo.nombre_apellidos || ev.nombre_conductor || '-',
+            dni: conductorInfo.DNI || conductorInfo.dni || ev.dni || '-',
+            licencia: conductorInfo.LICENCIA || conductorInfo.licencia || ev.licencia || '-',
+            // For vehiculo_modelo/MARCA_MODELO
+            vehiculo_modelo: conductorInfo.MARCA_MODELO || ev.vehiculo_modelo || '-',
+            // For matricula/MATRICULA
+            matricula: conductorInfo.MATRICULA || ev.matricula || '-',
+            email: conductorInfo.EMAIL || conductorInfo.email || ev.email || '-',
             num_seguridad_social: conductorInfo.numero_seguridad_social || ev.num_seguridad_social || '-',
-            empresa: conductorInfo.empresa || ev.empresa || '-',
+            // For empresa field (NOMBRE_APELLIDOS from licencias or empresa from eventos)
+            empresa: conductorInfo.NOMBRE_APELLIDOS || ev.empresa || '-',
             evento: ev.evento || '-',
             fecha_hora: ev.fecha_hora || '-'
         }));
