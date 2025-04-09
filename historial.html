@@ -3,8 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Vista Conductor</title>
+  <title>Historial de Conductor</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="scripts/config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <style>
     @keyframes rotate {
       0% { transform: rotate(0deg); }
@@ -89,20 +92,59 @@
   </div>
 
 <script>
-  function cerrarSesion() {
-    localStorage.clear();
-    alert("Sesión cerrada.");
-    window.location.href = "/";
+  async function showAlert(message, type = 'info') {
+    return Swal.fire({
+      text: message,
+      icon: type,
+      background: '#1a1a1a',
+      color: '#ffffff',
+      confirmButtonColor: '#3085d6'
+    });
+  }
+
+  async function cerrarSesion() {
+    try {
+      const response = await fetch(`${API_URL}/logout`, {
+        method: "POST",
+        headers: getAuthHeaders()
+      });
+
+      localStorage.removeItem("empresaEmail");
+      localStorage.removeItem("isEmpresa");
+      localStorage.removeItem("token");
+      localStorage.removeItem("empresaData");
+      localStorage.removeItem("isAdmin");
+      localStorage.removeItem("userEmail");
+      
+      await showAlert("Sesión cerrada correctamente", "success");
+      window.location.href = "login-empresa.html";
+    } catch (error) {
+      console.error("Error al cerrar sesión:", error);
+      localStorage.clear();
+      window.location.href = "login-empresa.html";
+    }
   }
 
   async function cargarEventos() {
-    const usuario = JSON.parse(localStorage.getItem("usuario"));
-    if (!usuario || !usuario.licencia) return;
+    const isAdmin = localStorage.getItem("isAdmin") === "true";
+    const empresaData = !isAdmin ? JSON.parse(localStorage.getItem('empresaData')) : null;
+    
+    if (!empresaData && !isAdmin) {
+      await showAlert("No se encontraron datos de la empresa", "error");
+      window.location.href = "login-empresa.html";
+      return;
+    }
 
     try {
-      const response = await fetch(`http://localhost:3000/api/eventos/${usuario.licencia}`);
-      const eventos = await response.json();
+      const licencia = isAdmin ? document.getElementById('empresaLicencia').textContent : empresaData.licencia;
+      
+      const response = await fetch(`${API_URL}/eventos/${licencia}`, {
+        headers: getAuthHeaders()
+      });
 
+      if (!response.ok) throw new Error('Error fetching data');
+
+      const eventos = await response.json();
       const tipoSeleccionado = document.getElementById("filtroEvento").value;
       const fechaDesde = document.getElementById("fechaInicio").value;
       const fechaHasta = document.getElementById("fechaFin").value;
@@ -133,12 +175,13 @@
       }
 
     } catch (error) {
-      console.error("❌ Error al cargar eventos:", error);
+      console.error("Error al cargar eventos:", error);
+      await showAlert("Error al cargar los eventos", "error");
     }
   }
 
   function pantallaRegistro() {
-    window.location.href = "/index.html";
+    window.location.href = "empresa.html";
   }
 
   function exportarCSV(eventos) {
@@ -164,12 +207,15 @@
     URL.revokeObjectURL(url);
   }
 
-  document.addEventListener("DOMContentLoaded", cargarEventos);
-  document.getElementById("filtroEvento").addEventListener("change", cargarEventos);
-  document.getElementById("btnDescargar").addEventListener("click", () => {
-    exportarCSV(eventosMostrados);
+  document.addEventListener("DOMContentLoaded", () => {
+    cargarEventos();
+    document.getElementById("filtroEvento").addEventListener("change", cargarEventos);
+    document.getElementById("fechaInicio").addEventListener("change", cargarEventos);
+    document.getElementById("fechaFin").addEventListener("change", cargarEventos);
+    document.getElementById("btnDescargar").addEventListener("click", () => {
+      exportarCSV(eventosMostrados);
+    });
   });
 </script>
-
 </body>
 </html>
