@@ -146,23 +146,29 @@
 
     try {
         let licencia;
-        // Show conductor info for both admin and empresa
-        document.getElementById('conductorInfo').classList.remove('hidden');
+        let conductorInfo = {};
         
         if (isAdmin && conductorData) {
             licencia = conductorData.licencia;
-            document.getElementById('conductorNombre').textContent = conductorData.nombre_apellidos || '-';
-            document.getElementById('empresaLicencia').textContent = conductorData.licencia || '-';
-            document.getElementById('conductorDNI').textContent = conductorData.dni || '-';
+            // Fetch complete conductor info for admin
+            const conductorResponse = await fetch(`${API_URL}/conductores/dni/${conductorData.dni}`, {
+                headers: getAuthHeaders()
+            });
+            if (conductorResponse.ok) {
+                conductorInfo = await conductorResponse.json();
+            }
+            
+            document.getElementById('conductorNombre').textContent = conductorInfo.nombre_apellidos || conductorData.nombre_apellidos || '-';
+            document.getElementById('empresaLicencia').textContent = conductorInfo.licencia || conductorData.licencia || '-';
+            document.getElementById('conductorDNI').textContent = conductorInfo.dni || conductorData.dni || '-';
         } else if (!isAdmin && empresaData) {
             licencia = empresaData.licencia;
+            conductorInfo = empresaData;
             document.getElementById('conductorNombre').textContent = empresaData.nombre_apellidos || '-';
             document.getElementById('empresaLicencia').textContent = empresaData.licencia || '-';
             document.getElementById('conductorDNI').textContent = empresaData.dni || '-';
-        } else {
-            throw new Error('No se encontró la licencia necesaria');
         }
-        
+
         const response = await fetch(`${API_URL}/eventos/${licencia}`, {
             headers: getAuthHeaders()
         });
@@ -170,12 +176,27 @@
         if (!response.ok) throw new Error('Error fetching data');
 
         const eventos = await response.json();
-        const tipoSeleccionado = document.getElementById("filtroEvento").value;
-        const fechaDesde = document.getElementById("fechaInicio").value;
-        const fechaHasta = document.getElementById("fechaFin").value;
+        
+        // Enrich eventos with conductor info
+        eventosMostrados = eventos.map(ev => ({
+            ...ev,
+            nombre_conductor: conductorInfo.nombre_apellidos || ev.nombre_conductor,
+            dni: conductorInfo.dni || ev.dni,
+            licencia: conductorInfo.licencia || ev.licencia,
+            vehiculo_modelo: conductorInfo.vehiculo_modelo || ev.vehiculo_modelo,
+            matricula: conductorInfo.matricula || ev.matricula,
+            email: conductorInfo.email || ev.email,
+            num_seguridad_social: conductorInfo.num_seguridad_social || ev.num_seguridad_social,
+            empresa: conductorInfo.empresa || ev.empresa
+        }));
 
-        eventosMostrados = eventos.filter(ev => {
+        // Apply filters
+        eventosMostrados = eventosMostrados.filter(ev => {
             const fechaEvento = new Date(ev.fecha_hora);
+            const fechaDesde = document.getElementById("fechaInicio").value;
+            const fechaHasta = document.getElementById("fechaFin").value;
+            const tipoSeleccionado = document.getElementById("filtroEvento").value;
+
             const desde = fechaDesde ? new Date(fechaDesde) : null;
             const hasta = fechaHasta ? new Date(fechaHasta + "T23:59:59") : null;
 
@@ -185,6 +206,7 @@
             return filtraTipo && filtraFecha;
         });
 
+        // Update display
         const lista = document.getElementById("listaEventos");
         lista.innerHTML = "";
 
@@ -193,7 +215,7 @@
                 const li = document.createElement("li");
                 li.className = "px-4";
                 li.innerHTML = `
-                    <span class="text-cyan-400 font-semibold">${ev.nombre_conductor || '-'}</span> — 
+                    <span class="text-cyan-400 font-semibold">${ev.nombre_conductor}</span> — 
                     ${ev.evento} 🕒 
                     <span class="text-gray-400">${new Date(ev.fecha_hora).toLocaleString()}</span>
                 `;
@@ -236,7 +258,7 @@
     const encabezado = columnas.map(col => {
         switch(col) {
             case 'nombre_conductor': return 'Nombre del Conductor';
-            case 'dni': return 'DNI';
+            case 'dni': return 'DNI'; 
             case 'licencia': return 'Licencia';
             case 'vehiculo_modelo': return 'Vehículo';
             case 'matricula': return 'Matrícula';
