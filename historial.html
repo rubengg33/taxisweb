@@ -192,14 +192,16 @@
         // In cargarEventos function, update the eventos mapping
         eventosMostrados = eventos.map(ev => ({
             ...ev, // Keep all original fields from eventos table
-            nombre_conductor: conductorInfo.NOMBRE_APELLIDOS || conductorInfo.nombre_apellidos || ev.nombre_conductor || '-',
-            dni: conductorInfo.DNI || conductorInfo.dni || ev.dni || '-',
+            // For conductor info, prioritize conductor data over licencia data
+            nombre_conductor: conductorInfo.nombre_apellidos || ev.nombre_conductor || '-',
+            dni: conductorInfo.dni || ev.dni || '-',
             licencia: conductorInfo.LICENCIA || conductorInfo.licencia || ev.licencia || '-',
             vehiculo_modelo: conductorInfo.MARCA_MODELO || ev.vehiculo_modelo || '-',
             matricula: conductorInfo.MATRICULA || ev.matricula || '-',
-            email: conductorInfo.EMAIL || conductorInfo.email || ev.email || '-',
+            email: conductorInfo.email || ev.email || '-',
             num_seguridad_social: conductorInfo.numero_seguridad_social || ev.num_seguridad_social || '-',
-            empresa: conductorInfo.NOMBRE_APELLIDOS || ev.empresa || '-',
+            // For empresa, use only NOMBRE_APELLIDOS from licencia data
+            empresa: conductorInfo.NOMBRE_APELLIDOS || '-',
             evento: ev.evento || '-',
             fecha_hora: ev.fecha_hora || '-'
         }));
