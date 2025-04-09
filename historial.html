@@ -35,11 +35,15 @@
       <div data-card>
         <h1 class="text-3xl font-bold text-center text-white">Historial del conductor</h1>
 
-        <div class="text-white text-center space-y-2">
-          <p><strong>Nombre:</strong> {{ nombre }}</p>
-          <p><strong>Licencia:</strong> {{ licencia }}</p>
-          <p><strong>DNI:</strong> {{ dni }}</p>
-        </div>
+        <!-- Add this after the title but before the filters -->
+<div class="text-white text-center space-y-2 mb-6">
+  <p id="conductorInfo" class="hidden">
+      <strong>Conductor:</strong> <span id="conductorNombre">-</span>
+  </p>
+  <p id="licenciaInfo">
+      <strong>Licencia:</strong> <span id="empresaLicencia">-</span>
+  </p>
+</div>
 
         <!-- Filtros -->
         <div class="space-y-4">
@@ -128,19 +132,31 @@
   async function cargarEventos() {
     const isAdmin = localStorage.getItem("isAdmin") === "true";
     const empresaData = !isAdmin ? JSON.parse(localStorage.getItem('empresaData')) : null;
+    const conductorData = localStorage.getItem('selectedConductor') ? JSON.parse(localStorage.getItem('selectedConductor')) : null;
     
-    if (!empresaData && !isAdmin) {
-      await showAlert("No se encontraron datos de la empresa", "error");
-      window.location.href = "login-empresa.html";
-      return;
+    if (!empresaData && !isAdmin && !conductorData) {
+        await showAlert("No se encontraron datos necesarios", "error");
+        window.location.href = "login-empresa.html";
+        return;
     }
 
     try {
-      const licencia = isAdmin ? document.getElementById('empresaLicencia').textContent : empresaData.licencia;
-      
-      const response = await fetch(`${API_URL}/eventos/${licencia}`, {
-        headers: getAuthHeaders()
-      });
+        let licencia;
+        if (isAdmin && conductorData) {
+            licencia = conductorData.licencia;
+            document.getElementById('conductorInfo').classList.remove('hidden');
+            document.getElementById('conductorNombre').textContent = conductorData.nombre_apellidos;
+            document.getElementById('empresaLicencia').textContent = conductorData.licencia;
+        } else if (!isAdmin && empresaData) {
+            licencia = empresaData.licencia;
+            document.getElementById('empresaLicencia').textContent = empresaData.licencia;
+        } else {
+            throw new Error('No se encontró la licencia necesaria');
+        }
+        
+        const response = await fetch(`${API_URL}/eventos/${licencia}`, {
+            headers: getAuthHeaders()
+        });
 
       if (!response.ok) throw new Error('Error fetching data');
 
@@ -176,7 +192,7 @@
 
     } catch (error) {
       console.error("Error al cargar eventos:", error);
-      await showAlert("Error al cargar los eventos", "error");
+      await showAlert("Error al cargar los eventos: " + error.message, "error");
     }
   }
 

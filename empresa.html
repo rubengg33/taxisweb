@@ -160,16 +160,40 @@
                 </div>
             </div>
         </div>
-        <!-- Replace the plain button with this styled version -->
-<div class="flex justify-center mb-8">
-    <a href="historial.html" 
-       class="button-hover bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-8 py-4 
-              rounded-xl flex items-center gap-3 justify-center hover:from-purple-700 
-              hover:to-indigo-700 shadow-lg transform transition-all duration-200">
-        <span class="material-icons">history</span>
-        <span class="font-semibold">Ver Historial</span>
-    </a>
-</div>
+        <!-- Replace the existing Ver Historial button with this -->
+        <div class="flex justify-center mb-8">
+            <button onclick="irAHistorial()" 
+               class="button-hover bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-8 py-4 
+                      rounded-xl flex items-center gap-3 justify-center hover:from-purple-700 
+                      hover:to-indigo-700 shadow-lg transform transition-all duration-200">
+                <span class="material-icons">history</span>
+                <span class="font-semibold">Ver Historial</span>
+            </button>
+        </div>
+        
+        <!-- Add this function to your scripts -->
+        <script>
+        function irAHistorial() {
+            const isAdmin = localStorage.getItem("isAdmin") === "true";
+            if (isAdmin) {
+                const conductorSelect = document.getElementById('conductorSelect');
+                if (!conductorSelect.value) {
+                    showAlert('Por favor, seleccione un conductor primero', 'warning');
+                    return;
+                }
+                // Store selected conductor data
+                const selectedOption = conductorSelect.options[conductorSelect.selectedIndex];
+                const conductorData = {
+                    nombre_apellidos: selectedOption.text,
+                    dni: selectedOption.value,
+                    licencia: document.getElementById('empresaLicencia').textContent
+                };
+                localStorage.setItem('selectedConductor', JSON.stringify(conductorData));
+            }
+            window.location.href = 'historial.html';
+        }
+        </script>
+        
         <!--Filtrar fecha-->
         <div class="bg-gray-900 rounded-lg shadow-xl p-6 md:p-8 mb-8">
             <div class="flex flex-col md:flex-row gap-6 justify-center items-end">
