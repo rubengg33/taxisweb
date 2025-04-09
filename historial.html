@@ -36,14 +36,18 @@
         <h1 class="text-3xl font-bold text-center text-white">Historial del conductor</h1>
 
         <!-- Add this after the title but before the filters -->
-<div class="text-white text-center space-y-2 mb-6">
-  <p id="conductorInfo" class="hidden">
-      <strong>Conductor:</strong> <span id="conductorNombre">-</span>
-  </p>
-  <p id="licenciaInfo">
-      <strong>Licencia:</strong> <span id="empresaLicencia">-</span>
-  </p>
-</div>
+        <div class="text-white text-center space-y-2 mb-6">
+          <p id="conductorInfo">
+              <strong>Conductor:</strong> <span id="conductorNombre">-</span>
+          </p>
+          <p id="licenciaInfo">
+              <strong>Licencia:</strong> <span id="empresaLicencia">-</span>
+          </p>
+          <p id="dniInfo">
+              <strong>DNI:</strong> <span id="conductorDNI">-</span>
+          </p>
+      </div>
+      
 
         <!-- Filtros -->
         <div class="space-y-4">
@@ -142,14 +146,19 @@
 
     try {
         let licencia;
+        // Show conductor info for both admin and empresa
+        document.getElementById('conductorInfo').classList.remove('hidden');
+        
         if (isAdmin && conductorData) {
             licencia = conductorData.licencia;
-            document.getElementById('conductorInfo').classList.remove('hidden');
-            document.getElementById('conductorNombre').textContent = conductorData.nombre_apellidos;
-            document.getElementById('empresaLicencia').textContent = conductorData.licencia;
+            document.getElementById('conductorNombre').textContent = conductorData.nombre_apellidos || '-';
+            document.getElementById('empresaLicencia').textContent = conductorData.licencia || '-';
+            document.getElementById('conductorDNI').textContent = conductorData.dni || '-';
         } else if (!isAdmin && empresaData) {
             licencia = empresaData.licencia;
-            document.getElementById('empresaLicencia').textContent = empresaData.licencia;
+            document.getElementById('conductorNombre').textContent = empresaData.nombre_apellidos || '-';
+            document.getElementById('empresaLicencia').textContent = empresaData.licencia || '-';
+            document.getElementById('conductorDNI').textContent = empresaData.dni || '-';
         } else {
             throw new Error('No se encontró la licencia necesaria');
         }
@@ -158,43 +167,47 @@
             headers: getAuthHeaders()
         });
 
-      if (!response.ok) throw new Error('Error fetching data');
+        if (!response.ok) throw new Error('Error fetching data');
 
-      const eventos = await response.json();
-      const tipoSeleccionado = document.getElementById("filtroEvento").value;
-      const fechaDesde = document.getElementById("fechaInicio").value;
-      const fechaHasta = document.getElementById("fechaFin").value;
+        const eventos = await response.json();
+        const tipoSeleccionado = document.getElementById("filtroEvento").value;
+        const fechaDesde = document.getElementById("fechaInicio").value;
+        const fechaHasta = document.getElementById("fechaFin").value;
 
-      eventosMostrados = eventos.filter(ev => {
-        const fechaEvento = new Date(ev.fecha_hora);
-        const desde = fechaDesde ? new Date(fechaDesde) : null;
-        const hasta = fechaHasta ? new Date(fechaHasta + "T23:59:59") : null;
+        eventosMostrados = eventos.filter(ev => {
+            const fechaEvento = new Date(ev.fecha_hora);
+            const desde = fechaDesde ? new Date(fechaDesde) : null;
+            const hasta = fechaHasta ? new Date(fechaHasta + "T23:59:59") : null;
 
-        const filtraTipo = !tipoSeleccionado || ev.evento === tipoSeleccionado;
-        const filtraFecha = (!desde || fechaEvento >= desde) && (!hasta || fechaEvento <= hasta);
+            const filtraTipo = !tipoSeleccionado || ev.evento === tipoSeleccionado;
+            const filtraFecha = (!desde || fechaEvento >= desde) && (!hasta || fechaEvento <= hasta);
 
-        return filtraTipo && filtraFecha;
-      });
-
-      const lista = document.getElementById("listaEventos");
-      lista.innerHTML = "";
-
-      if (eventosMostrados.length > 0) {
-        eventosMostrados.forEach(ev => {
-          const li = document.createElement("li");
-          li.className = "px-4";
-          li.innerHTML = `<span class="text-cyan-400 font-semibold">${ev.nombre_conductor}</span> — ${ev.evento} 🕒 <span class="text-gray-400">${new Date(ev.fecha_hora).toLocaleString()}</span>`;
-          lista.appendChild(li);
+            return filtraTipo && filtraFecha;
         });
-      } else {
-        lista.innerHTML = "<li class='px-4'>No hay eventos registrados</li>";
-      }
+
+        const lista = document.getElementById("listaEventos");
+        lista.innerHTML = "";
+
+        if (eventosMostrados.length > 0) {
+            eventosMostrados.forEach(ev => {
+                const li = document.createElement("li");
+                li.className = "px-4";
+                li.innerHTML = `
+                    <span class="text-cyan-400 font-semibold">${ev.nombre_conductor || '-'}</span> — 
+                    ${ev.evento} 🕒 
+                    <span class="text-gray-400">${new Date(ev.fecha_hora).toLocaleString()}</span>
+                `;
+                lista.appendChild(li);
+            });
+        } else {
+            lista.innerHTML = "<li class='px-4'>No hay eventos registrados</li>";
+        }
 
     } catch (error) {
-      console.error("Error al cargar eventos:", error);
-      await showAlert("Error al cargar los eventos: " + error.message, "error");
+        console.error("Error al cargar eventos:", error);
+        await showAlert("Error al cargar los eventos: " + error.message, "error");
     }
-  }
+}
 
   function pantallaRegistro() {
     window.location.href = "empresa.html";
@@ -202,26 +215,55 @@
 
   function exportarCSV(eventos) {
     if (!eventos.length) {
-      alert("No hay eventos para exportar.");
-      return;
+        showAlert("No hay eventos para exportar.", "warning");
+        return;
     }
 
-    const columnas = ["nombre_conductor", "dni", "licencia", "vehiculo_modelo", "matricula", "email", "num_seguridad_social", "empresa", "evento", "fecha_hora"];
+    const columnas = [
+        "nombre_conductor",
+        "dni",
+        "licencia",
+        "vehiculo_modelo",
+        "matricula",
+        "email",
+        "num_seguridad_social",
+        "empresa",
+        "evento",
+        "fecha_hora"
+    ];
+    
     const separador = ";";
-    const encabezado = columnas.join(separador);
-    const filas = eventos.map(ev => columnas.map(col => `"${(ev[col] ?? "").toString().replace(/"/g, '""')}"`).join(separador));
-    const contenido = [encabezado, ...filas].join("\n");
+    const encabezado = columnas.map(col => {
+        switch(col) {
+            case 'nombre_conductor': return 'Nombre del Conductor';
+            case 'dni': return 'DNI';
+            case 'licencia': return 'Licencia';
+            case 'vehiculo_modelo': return 'Vehículo';
+            case 'matricula': return 'Matrícula';
+            case 'email': return 'Email';
+            case 'num_seguridad_social': return 'Nº Seguridad Social';
+            case 'empresa': return 'Empresa';
+            case 'evento': return 'Tipo de Evento';
+            case 'fecha_hora': return 'Fecha y Hora';
+            default: return col;
+        }
+    }).join(separador);
 
-    const blob = new Blob([contenido], { type: 'text/csv;charset=utf-8;' });
+    const filas = eventos.map(ev => 
+        columnas.map(col => `"${(ev[col] || '-').toString().replace(/"/g, '""')}"`).join(separador)
+    );
+
+    const contenido = [encabezado, ...filas].join("\n");
+    const blob = new Blob(["\ufeff" + contenido], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "eventos_filtrados.csv";
+    a.download = `eventos_${new Date().toISOString().split('T')[0]}.csv`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-  }
+}
 
   document.addEventListener("DOMContentLoaded", () => {
     cargarEventos();
