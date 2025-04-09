@@ -156,6 +156,16 @@
             });
             if (conductorResponse.ok) {
                 conductorInfo = await conductorResponse.json();
+                
+                // Also fetch licencia data to get MARCA_MODELO and MATRICULA
+                const licenciaResponse = await fetch(`${API_URL}/licencias/${conductorInfo.licencia}`, {
+                    headers: getAuthHeaders()
+                });
+                if (licenciaResponse.ok) {
+                    const licenciaData = await licenciaResponse.json();
+                    // Merge licencia data with conductorInfo
+                    conductorInfo = { ...conductorInfo, ...licenciaData };
+                }
             }
             
             document.getElementById('conductorNombre').textContent = conductorInfo.nombre_apellidos || conductorData.nombre_apellidos || '-';
@@ -185,13 +195,10 @@
             nombre_conductor: conductorInfo.NOMBRE_APELLIDOS || conductorInfo.nombre_apellidos || ev.nombre_conductor || '-',
             dni: conductorInfo.DNI || conductorInfo.dni || ev.dni || '-',
             licencia: conductorInfo.LICENCIA || conductorInfo.licencia || ev.licencia || '-',
-            // For vehiculo_modelo/MARCA_MODELO
             vehiculo_modelo: conductorInfo.MARCA_MODELO || ev.vehiculo_modelo || '-',
-            // For matricula/MATRICULA
             matricula: conductorInfo.MATRICULA || ev.matricula || '-',
             email: conductorInfo.EMAIL || conductorInfo.email || ev.email || '-',
             num_seguridad_social: conductorInfo.numero_seguridad_social || ev.num_seguridad_social || '-',
-            // For empresa field (NOMBRE_APELLIDOS from licencias or empresa from eventos)
             empresa: conductorInfo.NOMBRE_APELLIDOS || ev.empresa || '-',
             evento: ev.evento || '-',
             fecha_hora: ev.fecha_hora || '-'
