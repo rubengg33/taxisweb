@@ -18,13 +18,26 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <title>Document</title>
     <script>
+        function checkAuthAndRedirect() {
         const token = localStorage.getItem("token");
+        const isAdmin = localStorage.getItem("isAdmin") === "true";
+        const isEmpresa = localStorage.getItem("isEmpresa") === "true";
         const empresaEmail = localStorage.getItem("empresaEmail");
-        const isEmpresa = localStorage.getItem("isEmpresa");
 
-        if (token && empresaEmail && isEmpresa === "true") {
-            window.location.replace = ("empresa.html");
+        // If user is authenticated (either as admin or empresa)
+        if (token && (isAdmin || (isEmpresa && empresaEmail))) {
+            window.location.href = "empresa.html";
+            return true;
         }
+        return false;
+    }
+      // Check immediately when the script loads
+      checkAuthAndRedirect();
+
+// Also check when the document is fully loaded
+document.addEventListener('DOMContentLoaded', function() {
+    checkAuthAndRedirect();
+});
    
     </script>
     <style>
