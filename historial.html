@@ -138,47 +138,52 @@
     const empresaData = !isAdmin ? JSON.parse(localStorage.getItem('empresaData')) : null;
     const conductorData = localStorage.getItem('selectedConductor') ? JSON.parse(localStorage.getItem('selectedConductor')) : null;
     
-    if (!empresaData && !isAdmin && !conductorData) {
-        await showAlert("No se encontraron datos necesarios", "error");
-        window.location.href = "login-empresa.html";
-        return;
-    }
-
     try {
         let licencia;
         let conductorInfo = {};
+
+        // Clear previous data
+        eventosMostrados = [];
+        document.getElementById('listaEventos').innerHTML = '';
         
-        if (isAdmin && conductorData) {
-            licencia = conductorData.licencia;
-            // Fetch complete conductor info for admin
-            const conductorResponse = await fetch(`${API_URL}/conductores/dni/${conductorData.dni}`, {
-                headers: getAuthHeaders()
-            });
-            if (conductorResponse.ok) {
-                conductorInfo = await conductorResponse.json();
-                
-                // Also fetch licencia data to get MARCA_MODELO and MATRICULA
-                const licenciaResponse = await fetch(`${API_URL}/licencias/${conductorInfo.licencia}`, {
-                    headers: getAuthHeaders()
-                });
-                if (licenciaResponse.ok) {
-                    const licenciaData = await licenciaResponse.json();
-                    // Merge licencia data with conductorInfo
-                    conductorInfo = { ...conductorInfo, ...licenciaData };
-                }
-            }
-            
-            document.getElementById('conductorNombre').textContent = conductorInfo.nombre_apellidos || conductorData.nombre_apellidos || '-';
-            document.getElementById('empresaLicencia').textContent = conductorInfo.licencia || conductorData.licencia || '-';
-            document.getElementById('conductorDNI').textContent = conductorInfo.dni || conductorData.dni || '-';
-        } else if (!isAdmin && empresaData) {
-            licencia = empresaData.licencia;
-            conductorInfo = empresaData;
-            document.getElementById('conductorNombre').textContent = empresaData.nombre_apellidos || '-';
-            document.getElementById('empresaLicencia').textContent = empresaData.licencia || '-';
-            document.getElementById('conductorDNI').textContent = empresaData.dni || '-';
+        if (!conductorData) {
+            await showAlert("No se encontraron datos del conductor", "error");
+            window.location.href = "empresa.html";
+            return;
         }
 
+        licencia = conductorData.licencia;
+
+        // First get conductor data
+        const conductorResponse = await fetch(`${API_URL}/conductores/dni/${conductorData.dni}`, {
+            headers: getAuthHeaders()
+        });
+        
+        if (conductorResponse.ok) {
+            conductorInfo = await conductorResponse.json();
+        }
+
+        // Then get licencia data
+        const licenciaResponse = await fetch(`${API_URL}/licencias/${licencia}`, {
+            headers: getAuthHeaders()
+        });
+        
+        if (licenciaResponse.ok) {
+            const licenciaData = await licenciaResponse.json();
+            conductorInfo = {
+                ...conductorInfo,
+                MARCA_MODELO: licenciaData.MARCA_MODELO,
+                MATRICULA: licenciaData.MATRICULA,
+                NOMBRE_APELLIDOS_EMPRESA: licenciaData.NOMBRE_APELLIDOS
+            };
+        }
+
+        // Update header info with conductor data
+        document.getElementById('conductorNombre').textContent = conductorInfo.nombre_apellidos || conductorData.nombre_apellidos || '-';
+        document.getElementById('empresaLicencia').textContent = conductorInfo.licencia || conductorData.licencia || '-';
+        document.getElementById('conductorDNI').textContent = conductorInfo.dni || conductorData.dni || '-';
+
+        // Fetch eventos
         const response = await fetch(`${API_URL}/eventos/${licencia}`, {
             headers: getAuthHeaders()
         });
@@ -187,21 +192,23 @@
 
         const eventos = await response.json();
         
-        // Enrich eventos with conductor info
-        // Update the eventos mapping to use the exact field names from the database
-        // In cargarEventos function, update the eventos mapping
+        if (!eventos || eventos.length === 0) {
+            document.getElementById('listaEventos').innerHTML = '<li class="px-4 text-center">No hay eventos registrados para este conductor</li>';
+            eventosMostrados = [];
+            return;
+        }
+        
+        // Map eventos with correct field mappings
         eventosMostrados = eventos.map(ev => ({
-            ...ev, // Keep all original fields from eventos table
-            // For conductor info, prioritize conductor data over licencia data
-            nombre_conductor: conductorInfo.nombre_apellidos || ev.nombre_conductor || '-',
-            dni: conductorInfo.dni || ev.dni || '-',
-            licencia: conductorInfo.LICENCIA || conductorInfo.licencia || ev.licencia || '-',
-            vehiculo_modelo: conductorInfo.MARCA_MODELO || ev.vehiculo_modelo || '-',
-            matricula: conductorInfo.MATRICULA || ev.matricula || '-',
-            email: conductorInfo.email || ev.email || '-',
-            num_seguridad_social: conductorInfo.numero_seguridad_social || ev.num_seguridad_social || '-',
-            // For empresa, use only NOMBRE_APELLIDOS from licencia data
-            empresa: conductorInfo.NOMBRE_APELLIDOS || '-',
+            ...ev,
+            nombre_conductor: conductorInfo.nombre_apellidos || conductorData.nombre_apellidos || '-',
+            dni: conductorInfo.dni || conductorData.dni || '-',
+            licencia: conductorInfo.licencia || conductorData.licencia || '-',
+            vehiculo_modelo: conductorInfo.MARCA_MODELO || '-',
+            matricula: conductorInfo.MATRICULA || '-',
+            email: conductorInfo.email || '-',
+            num_seguridad_social: conductorInfo.numero_seguridad_social || '-',
+            empresa: conductorInfo.NOMBRE_APELLIDOS_EMPRESA || '-',
             evento: ev.evento || '-',
             fecha_hora: ev.fecha_hora || '-'
         }));

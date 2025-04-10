@@ -173,24 +173,40 @@
         
         <!-- Add this function to your scripts -->
         <script>
-        function irAHistorial() {
-            const isAdmin = localStorage.getItem("isAdmin") === "true";
-            if (isAdmin) {
-                const conductorSelect = document.getElementById('conductorSelect');
-                if (!conductorSelect.value) {
-                    showAlert('Por favor, seleccione un conductor primero', 'warning');
-                    return;
-                }
-                // Store selected conductor data
-                const selectedOption = conductorSelect.options[conductorSelect.selectedIndex];
-                const conductorData = {
-                    nombre_apellidos: selectedOption.text,
-                    dni: selectedOption.value,
-                    licencia: document.getElementById('empresaLicencia').textContent
-                };
-                localStorage.setItem('selectedConductor', JSON.stringify(conductorData));
+        async function irAHistorial() {
+            const conductorSelect = document.getElementById('conductorSelect');
+            
+            if (!conductorSelect.value) {
+                await showAlert('Por favor, seleccione un conductor primero', 'warning');
+                return;
             }
-            window.location.href = 'historial.html';
+        
+            try {
+                // Get conductor data from the API
+                const conductorResponse = await fetch(`${API_URL}/conductores/dni/${conductorSelect.value}`, {
+                    headers: getAuthHeaders()
+                });
+                
+                if (conductorResponse.ok) {
+                    const conductor = await conductorResponse.json();
+                    
+                    // Store complete conductor data
+                    localStorage.setItem('selectedConductor', JSON.stringify({
+                        nombre_apellidos: conductor.nombre_apellidos,
+                        dni: conductor.dni,
+                        licencia: conductor.licencia,
+                        email: conductor.email,
+                        numero_seguridad_social: conductor.numero_seguridad_social
+                    }));
+                    
+                    window.location.href = 'historial.html';
+                } else {
+                    throw new Error('Error fetching conductor data');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                await showAlert('Error al cargar los datos del conductor', 'error');
+            }
         }
         </script>
         
