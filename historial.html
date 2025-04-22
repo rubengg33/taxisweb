@@ -161,6 +161,9 @@
         
         if (conductorResponse.ok) {
             conductorInfo = await conductorResponse.json();
+        } else {
+            document.getElementById('listaEventos').innerHTML = '<li class="px-4 text-center">Error al cargar datos del conductor</li>';
+            return;
         }
 
         // Then get licencia data
@@ -190,7 +193,6 @@
 
         if (!response.ok) {
             document.getElementById('listaEventos').innerHTML = '<li class="px-4 text-center">No hay eventos registrados para este conductor</li>';
-            eventosMostrados = [];
             return;
         }
 
@@ -198,10 +200,9 @@
         
         if (!eventos || eventos.length === 0) {
             document.getElementById('listaEventos').innerHTML = '<li class="px-4 text-center">No hay eventos registrados para este conductor</li>';
-            eventosMostrados = [];
             return;
         }
-        
+
         // Map eventos with correct field mappings
         eventosMostrados = eventos.map(ev => ({
             ...ev,
