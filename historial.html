@@ -139,38 +139,54 @@
     const conductorData = localStorage.getItem('selectedConductor') ? JSON.parse(localStorage.getItem('selectedConductor')) : null;
     
     try {
-        // Clear previous data
+        // Limpiar datos previos
         eventosMostrados = [];
         document.getElementById('listaEventos').innerHTML = '';
         
-        if (!conductorData) {
-            await showAlert("No se encontraron datos del conductor", "error");
+        if (!conductorData || !conductorData.dni || !conductorData.licencia) {
+            await showAlert("No se encontraron datos válidos del conductor", "error");
             window.location.href = "empresa.html";
             return;
         }
 
-        // Update header info with conductor data first
-        document.getElementById('conductorNombre').textContent = conductorData.nombre_apellidos || '-';
-        document.getElementById('empresaLicencia').textContent = conductorData.licencia || '-';
-        document.getElementById('conductorDNI').textContent = conductorData.dni || '-';
-
-        // Verificar que el conductor pertenece a la empresa correcta
-        if (!isAdmin && empresaData) {
-            const conductorResponse = await fetch(`${API_URL}/conductores/dni/${conductorData.dni}`, {
-                headers: getAuthHeaders()
-            });
-            
-            if (conductorResponse.ok) {
-                const conductorInfo = await conductorResponse.json();
-                if (conductorInfo.empresa_id !== empresaData.id) {
-                    await showAlert("No tienes acceso a los eventos de este conductor", "error");
-                    window.location.href = "empresa.html";
-                    return;
-                }
-            }
+        // Primero verificar que el conductor existe y pertenece a la empresa correcta
+        const conductorResponse = await fetch(`${API_URL}/conductores/dni/${conductorData.dni}`, {
+            headers: getAuthHeaders()
+        });
+        
+        if (!conductorResponse.ok) {
+            await showAlert("No se encontró el conductor especificado", "error");
+            window.location.href = "empresa.html";
+            return;
         }
 
-        // Fetch eventos
+        const conductorInfo = await conductorResponse.json();
+
+        // Verificar pertenencia a la empresa si no es admin
+        if (!isAdmin && empresaData && conductorInfo.empresa_id !== empresaData.id) {
+            await showAlert("No tienes acceso a los eventos de este conductor", "error");
+            window.location.href = "empresa.html";
+            return;
+        }
+
+        // Actualizar información básica del conductor
+        document.getElementById('conductorNombre').textContent = conductorInfo.nombre_apellidos || conductorData.nombre_apellidos || '-';
+        document.getElementById('empresaLicencia').textContent = conductorInfo.licencia || conductorData.licencia || '-';
+        document.getElementById('conductorDNI').textContent = conductorInfo.dni || conductorData.dni || '-';
+
+        // Obtener datos de la licencia
+        const licenciaResponse = await fetch(`${API_URL}/licencias/${conductorData.licencia}`, {
+            headers: getAuthHeaders()
+        });
+        
+        if (licenciaResponse.ok) {
+            const licenciaData = await licenciaResponse.json();
+            conductorInfo.MARCA_MODELO = licenciaData.MARCA_MODELO;
+            conductorInfo.MATRICULA = licenciaData.MATRICULA;
+            conductorInfo.NOMBRE_APELLIDOS_EMPRESA = licenciaData.NOMBRE_APELLIDOS;
+        }
+
+        // Obtener eventos específicos del conductor
         const eventosResponse = await fetch(`${API_URL}/eventos/${conductorData.licencia}`, {
             headers: getAuthHeaders()
         });
@@ -189,32 +205,7 @@
             return;
         }
 
-        // Only if we have eventos, fetch additional data
-        let conductorInfo = {};
-        const conductorResponse = await fetch(`${API_URL}/conductores/dni/${conductorData.dni}`, {
-            headers: getAuthHeaders()
-        });
-        
-        if (conductorResponse.ok) {
-            conductorInfo = await conductorResponse.json();
-        }
-
-        // Then get licencia data
-        const licenciaResponse = await fetch(`${API_URL}/licencias/${conductorData.licencia}`, {
-            headers: getAuthHeaders()
-        });
-        
-        if (licenciaResponse.ok) {
-            const licenciaData = await licenciaResponse.json();
-            conductorInfo = {
-                ...conductorInfo,
-                MARCA_MODELO: licenciaData.MARCA_MODELO,
-                MATRICULA: licenciaData.MATRICULA,
-                NOMBRE_APELLIDOS_EMPRESA: licenciaData.NOMBRE_APELLIDOS
-            };
-        }
-
-        // Map eventos with correct field mappings
+        // Mapear eventos con la información correcta del conductor
         eventosMostrados = eventos.map(ev => ({
             ...ev,
             nombre_conductor: conductorInfo.nombre_apellidos || conductorData.nombre_apellidos || '-',
