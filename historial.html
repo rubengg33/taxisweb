@@ -154,13 +154,30 @@
         document.getElementById('empresaLicencia').textContent = conductorData.licencia || '-';
         document.getElementById('conductorDNI').textContent = conductorData.dni || '-';
 
-        // Fetch eventos first
+        // Verificar que el conductor pertenece a la empresa correcta
+        if (!isAdmin && empresaData) {
+            const conductorResponse = await fetch(`${API_URL}/conductores/dni/${conductorData.dni}`, {
+                headers: getAuthHeaders()
+            });
+            
+            if (conductorResponse.ok) {
+                const conductorInfo = await conductorResponse.json();
+                if (conductorInfo.empresa_id !== empresaData.id) {
+                    await showAlert("No tienes acceso a los eventos de este conductor", "error");
+                    window.location.href = "empresa.html";
+                    return;
+                }
+            }
+        }
+
+        // Fetch eventos
         const eventosResponse = await fetch(`${API_URL}/eventos/${conductorData.licencia}`, {
             headers: getAuthHeaders()
         });
 
         if (!eventosResponse.ok) {
             document.getElementById('listaEventos').innerHTML = '<li class="px-4 text-center">No hay eventos registrados para este conductor</li>';
+            eventosMostrados = [];
             return;
         }
 
@@ -168,6 +185,7 @@
         
         if (!eventos || eventos.length === 0) {
             document.getElementById('listaEventos').innerHTML = '<li class="px-4 text-center">No hay eventos registrados para este conductor</li>';
+            eventosMostrados = [];
             return;
         }
 
@@ -195,11 +213,6 @@
                 NOMBRE_APELLIDOS_EMPRESA: licenciaData.NOMBRE_APELLIDOS
             };
         }
-
-        // Update header info with conductor data
-        document.getElementById('conductorNombre').textContent = conductorInfo.nombre_apellidos || conductorData.nombre_apellidos || '-';
-        document.getElementById('empresaLicencia').textContent = conductorInfo.licencia || conductorData.licencia || '-';
-        document.getElementById('conductorDNI').textContent = conductorInfo.dni || conductorData.dni || '-';
 
         // Map eventos with correct field mappings
         eventosMostrados = eventos.map(ev => ({
