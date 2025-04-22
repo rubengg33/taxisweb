@@ -139,9 +139,6 @@
     const conductorData = localStorage.getItem('selectedConductor') ? JSON.parse(localStorage.getItem('selectedConductor')) : null;
     
     try {
-        let licencia;
-        let conductorInfo = {};
-
         // Clear previous data
         eventosMostrados = [];
         document.getElementById('listaEventos').innerHTML = '';
@@ -152,22 +149,42 @@
             return;
         }
 
-        licencia = conductorData.licencia;
+        // Update header info with conductor data first
+        document.getElementById('conductorNombre').textContent = conductorData.nombre_apellidos || '-';
+        document.getElementById('empresaLicencia').textContent = conductorData.licencia || '-';
+        document.getElementById('conductorDNI').textContent = conductorData.dni || '-';
 
-        // First get conductor data
+        // Fetch eventos first
+        const Eventosresponse = await fetch(`${API_URL}/eventos/${conductorData.licencia}`, {
+            headers: getAuthHeaders()
+        });
+
+        if (!response.ok) {
+            document.getElementById('listaEventos').innerHTML = '<li class="px-4 text-center">No hay eventos registrados para este conductor</li>';
+            return;
+        }
+
+        const eventosc = await Eventosresponse.json();
+        
+        if (!eventosc || eventosc.length === 0) {
+            document.getElementById('listaEventos').innerHTML = '<li class="px-4 text-center">No hay eventos registrados para este conductor</li>';
+            return;
+        }
+
+        // Only if we have eventos, fetch additional data
+        let conductorInfo = {};
         const conductorResponse = await fetch(`${API_URL}/conductores/dni/${conductorData.dni}`, {
             headers: getAuthHeaders()
         });
         
         if (conductorResponse.ok) {
             conductorInfo = await conductorResponse.json();
-        } else {
-            document.getElementById('listaEventos').innerHTML = '<li class="px-4 text-center">Error al cargar datos del conductor</li>';
-            return;
+            // Update header with more detailed info if available
+            document.getElementById('conductorNombre').textContent = conductorInfo.nombre_apellidos || conductorData.nombre_apellidos || '-';
         }
 
         // Then get licencia data
-        const licenciaResponse = await fetch(`${API_URL}/licencias/${licencia}`, {
+        const licenciaResponse = await fetch(`${API_URL}/licencias/${conductorData.licencia}`, {
             headers: getAuthHeaders()
         });
         
