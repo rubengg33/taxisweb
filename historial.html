@@ -155,18 +155,18 @@
         document.getElementById('conductorDNI').textContent = conductorData.dni || '-';
 
         // Fetch eventos first
-        const Eventosresponse = await fetch(`${API_URL}/eventos/${conductorData.licencia}`, {
+        const eventosResponse = await fetch(`${API_URL}/eventos/${conductorData.licencia}`, {
             headers: getAuthHeaders()
         });
 
-        if (!response.ok) {
+        if (!eventosResponse.ok) {
             document.getElementById('listaEventos').innerHTML = '<li class="px-4 text-center">No hay eventos registrados para este conductor</li>';
             return;
         }
 
-        const eventosc = await Eventosresponse.json();
+        const eventos = await eventosResponse.json();
         
-        if (!eventosc || eventosc.length === 0) {
+        if (!eventos || eventos.length === 0) {
             document.getElementById('listaEventos').innerHTML = '<li class="px-4 text-center">No hay eventos registrados para este conductor</li>';
             return;
         }
@@ -179,8 +179,6 @@
         
         if (conductorResponse.ok) {
             conductorInfo = await conductorResponse.json();
-            // Update header with more detailed info if available
-            document.getElementById('conductorNombre').textContent = conductorInfo.nombre_apellidos || conductorData.nombre_apellidos || '-';
         }
 
         // Then get licencia data
@@ -202,23 +200,6 @@
         document.getElementById('conductorNombre').textContent = conductorInfo.nombre_apellidos || conductorData.nombre_apellidos || '-';
         document.getElementById('empresaLicencia').textContent = conductorInfo.licencia || conductorData.licencia || '-';
         document.getElementById('conductorDNI').textContent = conductorInfo.dni || conductorData.dni || '-';
-
-        // Fetch eventos
-        const response = await fetch(`${API_URL}/eventos/${licencia}`, {
-            headers: getAuthHeaders()
-        });
-
-        if (!response.ok) {
-            document.getElementById('listaEventos').innerHTML = '<li class="px-4 text-center">No hay eventos registrados para este conductor</li>';
-            return;
-        }
-
-        const eventos = await response.json();
-        
-        if (!eventos || eventos.length === 0) {
-            document.getElementById('listaEventos').innerHTML = '<li class="px-4 text-center">No hay eventos registrados para este conductor</li>';
-            return;
-        }
 
         // Map eventos with correct field mappings
         eventosMostrados = eventos.map(ev => ({
