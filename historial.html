@@ -205,8 +205,11 @@
             return;
         }
 
+        // Filtrar eventos para mostrar solo los del conductor seleccionado
+        const eventosFiltrados = eventos.filter(ev => ev.dni === conductorData.dni);
+        
         // Mapear eventos con la información correcta del conductor
-        eventosMostrados = eventos.map(ev => ({
+        eventosMostrados = eventosFiltrados.map(ev => ({
             ...ev,
             nombre_conductor: conductorInfo.nombre_apellidos || conductorData.nombre_apellidos || '-',
             dni: conductorInfo.dni || conductorData.dni || '-',
