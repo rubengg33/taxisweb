@@ -188,7 +188,11 @@
             headers: getAuthHeaders()
         });
 
-        if (!response.ok) throw new Error('Error fetching data');
+        if (!response.ok) {
+            document.getElementById('listaEventos').innerHTML = '<li class="px-4 text-center">No hay eventos registrados para este conductor</li>';
+            eventosMostrados = [];
+            return;
+        }
 
         const eventos = await response.json();
         
