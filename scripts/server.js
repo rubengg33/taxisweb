@@ -370,7 +370,7 @@ app.get('/api/eventos/:licencia?', authenticateToken, async (req, res) => {
         }
 
         const query = `
-            SELECT e.evento, e.fecha_hora, e.nombre_conductor
+            SELECT e.evento, e.fecha_hora, e.nombre_conductor, e.dni
             FROM eventos e
             WHERE e.licencia = ?
             ${conductorNombre ? 'AND e.nombre_conductor = ?' : ''}
