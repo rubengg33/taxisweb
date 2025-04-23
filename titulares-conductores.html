@@ -12,6 +12,38 @@
     <script src="scripts/config.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
+        .group {
+ display: flex;
+ line-height: 28px;
+ align-items: center;
+ position: relative;
+ max-width: 190px;
+}
+
+.input {
+ width: 100%;
+ height: 40px;
+ line-height: 28px;
+ padding: 0 1rem;
+ padding-left: 2.5rem;
+ border: 2px solid transparent;
+ border-radius: 8px;
+ outline: none;
+ background-color: #f3f3f4;
+ color: #0d0c22;
+ transition: .3s ease;
+}
+
+.input::placeholder {
+ color: #9e9ea7;
+}
+
+.input:focus, input:hover {
+ outline: none;
+ border-color: rgba(234,76,137,0.4);
+ background-color: #fff;
+ box-shadow: 0 0 0 4px rgb(234 76 137 / 10%);
+}
        @layer utilities {
         /* Force white text for autofilled inputs */
         input:-webkit-autofill,
@@ -194,13 +226,8 @@
                     <span class="material-icons text-sm mr-1">add</span>
                     Agregar Titular
                 </button>
-                <div class="flex-1 relative">
-                    <input type="text" id="buscarLicencia" placeholder="Buscar en cualquier campo..." 
-                        class="w-full p-2 border border-gray-300 rounded pr-8 bg-black text-white">
-                    <button onclick="limpiarBusqueda('licencias')" 
-                        class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700">
-                        <span class="material-icons text-sm">close</span>
-                    </button>
+                <div class="flex-1 relative group">
+                    <input type="search" id="buscarLicencia" placeholder="Buscar en cualquier campo...">
                 </div>
             </div>
             <table class="w-full table-auto border border-gray-300 text-white">
@@ -226,13 +253,8 @@
                     <span class="material-icons text-sm mr-1">add</span>
                     Agregar Conductor
                 </button>
-                <div class="flex-1 relative">
-                    <input type="text" id="buscarConductor" placeholder="Buscar en cualquier campo..." 
-                        class="w-full p-2 border border-gray-300 rounded pr-8 bg-black text-white">
-                    <button onclick="limpiarBusqueda('conductores')" 
-                        class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700">
-                        <span class="material-icons text-sm">close</span>
-                    </button>
+                <div class="flex-1 relative group">
+                    <input type="search" id="buscarConductor" placeholder="Buscar en cualquier campo...">
                 </div>
             </div>
             <table class="w-full table-auto border border-gray-300 text-white">
@@ -380,29 +402,43 @@
                 }, 10);
             }
         });
-    let tipoFormulario = '';
+        let tipoFormulario = '';
+
+// Actualizamos los inputs para que trabajen dinámicamente
 document.getElementById('buscarLicencia').addEventListener('input', function(e) {
-    buscar('licencias');
+    const value = e.target.value.trim();
+    if (value === '') {
+        localStorage.removeItem('busquedaLicencia'); // Si el input está vacío, limpia el localStorage
+    } else {
+        localStorage.setItem('busquedaLicencia', value); // Si hay algo, guarda el término de búsqueda
+    }
+    buscar('licencias'); // Ejecuta la búsqueda
 });
 
 document.getElementById('buscarConductor').addEventListener('input', function(e) {
+    const value = e.target.value.trim();
+    if (value === '') {
+        localStorage.removeItem('busquedaConductor');
+    } else {
+        localStorage.setItem('busquedaConductor', value);
+    }
     buscar('conductores');
 });
 
-    document.addEventListener("DOMContentLoaded", function () {
-         // Recuperar términos de búsqueda guardados
-        const busquedaLicencia = localStorage.getItem("busquedaLicencia");
-        const busquedaConductor = localStorage.getItem("busquedaConductor");
-        
-        if (busquedaLicencia) {
-            document.getElementById('buscarLicencia').value = busquedaLicencia;
-            buscar('licencias');
-        }
-        if (busquedaConductor) {
-            document.getElementById('buscarConductor').value = busquedaConductor;
-            buscar('conductores');
-        }
-    });
+// Al cargar la página, recuperamos el término de búsqueda guardado (si hay alguno)
+document.addEventListener("DOMContentLoaded", function () {
+    const busquedaLicencia = localStorage.getItem("busquedaLicencia");
+    const busquedaConductor = localStorage.getItem("busquedaConductor");
+
+    if (busquedaLicencia) {
+        document.getElementById('buscarLicencia').value = busquedaLicencia;
+        buscar('licencias');
+    }
+    if (busquedaConductor) {
+        document.getElementById('buscarConductor').value = busquedaConductor;
+        buscar('conductores');
+    }
+});
  // Replace logout alert
  document.getElementById("logoutButton").addEventListener("click", async () => {
                 try {
@@ -482,22 +518,7 @@ async function buscar(tipo) {
         console.error("Error en la búsqueda:", error);
         await showAlert("Error al realizar la búsqueda", "error");
     }
-}
-
-// Add event listeners for Enter key in search inputs
-document.getElementById('buscarLicencia').addEventListener('keypress', function(e) {
-    if (e.key === 'Enter') buscar('licencias');
-});
-
-document.getElementById('buscarConductor').addEventListener('keypress', function(e) {
-    if (e.key === 'Enter') buscar('conductores');
-}); 
-function limpiarBusqueda(tipo) {
-    const input = document.getElementById(tipo === 'licencias' ? 'buscarLicencia' : 'buscarConductor');
-    input.value = '';
-    localStorage.removeItem(tipo === 'licencias' ? 'busquedaLicencia' : 'busquedaConductor');
-    buscar(tipo);
-}     
+}  
     function abrirFormulario(tipo, datos = null) {
         tipoFormulario = tipo; // Guardamos el tipo seleccionado
         if(tipo === 'conductores'){
