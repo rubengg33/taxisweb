@@ -214,12 +214,12 @@
 
         <div class="flex justify-center gap-4 mb-4">
             <button onclick="mostrarTabla('licencias')" 
-                    class="button-hover bg-gradient-to-r from-sky-600 to-blue-700 text-white px-8 py-4 rounded-xl flex items-center gap-3 w-full md:w-64 justify-center hover:from-sky-700 hover:to-blue-800 mt-4">
+                    class="button-hover cursor-pointer bg-gradient-to-r from-sky-600 to-blue-700 text-white px-8 py-4 rounded-xl flex items-center gap-3 w-full md:w-64 justify-center hover:from-sky-700 hover:to-blue-800 mt-4">
                 <span class="material-icons">assignment</span>
                 Ver Titulares
             </button>
             <button onclick="mostrarTabla('conductores')" 
-                    class="button-hover bg-gradient-to-r from-emerald-500 to-green-600 text-white px-8 py-4 rounded-xl flex items-center gap-3 w-full md:w-64 justify-center hover:from-emerald-600 hover:to-green-700 mt-4">
+                    class="button-hover cursor-pointer bg-gradient-to-r from-emerald-500 to-green-600 text-white px-8 py-4 rounded-xl flex items-center gap-3 w-full md:w-64 justify-center hover:from-emerald-600 hover:to-green-700 mt-4">
                 <span class="material-icons">groups</span>
                 Ver Conductores
             </button>
@@ -230,7 +230,7 @@
             <div class="flex  gap-25 mb-6 ml-5">
                 <button onclick="abrirFormulario('licencias')" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-800 flex items-center justify-center">
                     <span class="material-icons text-sm mr-1 flex items-center">add</span>
-                    <span class="flex items-center">Agregar Titular</span>
+                    <span class="flex items-center cursor-pointer">Agregar Titular</span>
                 </button>
                 <div class="relative w-full max-w-lg p-2 pr-8">
                     <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-6 h-6 pointer-events-none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="black" stroke="white" stroke-width="2">
@@ -266,7 +266,7 @@
             <div class="flex  gap-25 mb-6 ml-5">
                 <button onclick="abrirFormulario('conductores')" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-800 flex items-center justify-center">
                     <span class="material-icons text-sm mr-1 flex items-center">add</span>
-                    <span class="flex items-center">Agregar Conductor</span>
+                    <span class="flex items-center cursor-pointer">Agregar Conductor</span>
                 </button>
                 <div class="relative w-full max-w-lg p-2 pr-8">
                     <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-6 h-6 pointer-events-none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="black" stroke="white" stroke-width="2">
@@ -512,12 +512,12 @@ async function buscar(tipo) {
             row.innerHTML = Object.values(item).map(valor =>`<td class='border border-gray-400 p-2 text-center'>${valor || '-'}</td>`).join('') +
                 `<td class='border border-gray-400 p-2 text-center flex justify-center gap-2'>
                     <button onclick="editar('${tipo}', '${item[tipo === 'licencias' ? 'LICENCIA' : 'id']}')" 
-                        class='bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-700 flex items-center gap-1'>
+                        class='bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-700 flex items-center gap-1 cursor-pointer'>
                         <span class="material-icons text-sm">edit</span>
                         <span>Editar</span>
                     </button>
                     <button onclick="eliminar('${tipo}', '${item[tipo === 'licencias' ? 'LICENCIA' : 'id']}')" 
-                        class='bg-red-500 text-white px-3 py-1 rounded hover:bg-red-700 flex items-center gap-1'>
+                        class='bg-red-500 text-white px-3 py-1 rounded hover:bg-red-700 flex items-center gap-1 cursor-pointer'>
                         <span class="material-icons text-sm">delete</span>
                         <span>Eliminar</span>
                     </button>
@@ -705,12 +705,12 @@ async function buscar(tipo) {
             row.innerHTML = Object.values(item).map(valor => `<td class='border border-gray-400 p-2 text-center'>${valor || '-'}</td>`).join('') +
                 `<td class='border border-gray-400 p-2 text-center flex justify-center gap-2'>
                     <button onclick="editar('${tipo}', '${item[tipo === 'licencias' ? 'LICENCIA' : 'id']}')" 
-                        class='bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-700 flex items-center gap-1'>
+                        class='bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-700 flex items-center gap-1 cursor-pointer'>
                         <span class="material-icons text-sm">edit</span>
                         <span>Editar</span>
                     </button>
                     <button onclick="eliminar('${tipo}', '${item[tipo === 'licencias' ? 'LICENCIA' : 'id']}')" 
-                        class='bg-red-500 text-white px-3 py-1 rounded hover:bg-red-700 flex items-center gap-1'>
+                        class='bg-red-500 text-white px-3 py-1 rounded hover:bg-red-700 flex items-center gap-1 cursor-pointer'>
                         <span class="material-icons text-sm">delete</span>
                         <span>Eliminar</span>
                     </button>
