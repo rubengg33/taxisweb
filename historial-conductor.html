@@ -102,7 +102,7 @@
     if (!usuario || !usuario.licencia) return;
 
     try {
-      const response = await fetch(`${API_URL}/eventos/${usuario.licencia}`);
+      const response = await fetch(`${API_URL}/eventos/detalles/${usuario.licencia}`);
       const eventos = await response.json();
 
       const tipoSeleccionado = document.getElementById("filtroEvento").value;

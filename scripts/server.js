@@ -209,15 +209,13 @@ app.get("/api/conductores/dni/:dni", authenticateToken, async (req, res) => {
 // ... existing code ...
 
 // Update CORS configuration
-const corsOptions = {
+app.use(cors({
     origin: 'https://controldeconductores.com',
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'x-api-key'],
-    credentials: true // debe ser true si usas credentials en fetch
-};
-
-app.use(cors(corsOptions));
-app.options('*', cors(corsOptions)); 
+    credentials: false // Change to false since we're not using credentials
+}));
+app.options('*', cors());
 // ... rest of your server code ...
 // Keep existing /api/conductores/:id endpoint as is
 // También proteger las demás rutas de conductores
@@ -358,33 +356,53 @@ app.post("/api/login", async (req, res) => {
 // Update the eventos endpoint
 app.get('/api/eventos/:licencia?', authenticateToken, async (req, res) => {
     try {
-      const licencia = req.params.licencia;
-      const conductorNombre = req.query.conductor;
-  
-      if (!licencia) {
-        return res.status(400).json({ error: 'No se encontró la licencia asociada' });
-      }
-  
-      let query = `
+        const licencia = req.params.licencia;
+        const conductorNombre = req.query.conductor; // Add this line
+
+        if (!licencia) {
+            return res.status(400).json({ error: 'No se encontró la licencia asociada' });
+        }
+
+        const query = `
+            SELECT e.evento, e.fecha_hora, e.nombre_conductor, e.dni
+            FROM eventos e
+            WHERE e.licencia = ?
+            ${conductorNombre ? 'AND e.nombre_conductor = ?' : ''}
+            ORDER BY e.fecha_hora ASC`;
+        
+        const queryParams = conductorNombre ? [licencia, conductorNombre] : [licencia];
+        
+        db.query(query, queryParams, (err, result) => {
+            if (err) {
+                console.error('Database error:', err);
+                return res.status(500).json({ error: 'Error en la base de datos' });
+            }
+            res.json(result || []);
+        });
+    } catch (error) {
+        console.error('Unexpected error:', error);
+        res.status(500).json({ error: 'Error interno del servidor' });
+    }
+});
+
+// Endpoint para obtener los eventos por licencia
+app.get('/api/eventos/detalles/:licencia', async (req, res) => {
+    const { licencia } = req.params;
+    
+    try {
+      const [eventos] = await connection.execute(`
         SELECT nombre_conductor, dni, licencia, vehiculo_modelo, matricula, email, 
                num_seguridad_social, empresa, evento, fecha_hora
         FROM eventos
-        WHERE licencia = ?`;
-      
-      const queryParams = [licencia];
+        WHERE licencia = ?
+        ORDER BY fecha_hora DESC
+        LIMIT 50
+      `, [licencia]);
   
-      if (conductorNombre) {
-        query += ' AND nombre_conductor = ?';
-        queryParams.push(conductorNombre);
-      }
-  
-      query += ' ORDER BY fecha_hora DESC LIMIT 50';
-  
-      const [eventos] = await connection.execute(query, queryParams);
-      res.json(eventos || []);
-    } catch (error) {
-      console.error('❌ Error al obtener eventos:', error);
-      res.status(500).json({ error: 'Error al obtener eventos' });
+      res.json(eventos);
+    } catch (e) {
+      console.error('❌ Error al obtener eventos por licencia:', e);
+      res.status(500).json({ message: 'Error al obtener eventos' });
     }
   });
   
