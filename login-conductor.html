@@ -124,11 +124,9 @@
       loginButton.disabled = true;
   
       try {
-        const API_HOST = window.location.hostname;
         const response = await fetch(`${API_URL}/login-conductor`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          credentials: "include",
           body: JSON.stringify({ email, dni })
         });
   

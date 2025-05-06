@@ -454,29 +454,41 @@ app.post("/login-empresa", async (req, res) => {
     }
 });
 
-// Login conductor
 app.post('/login-conductor', async (req, res) => {
     const { email, dni } = req.body;
     if (!email || !dni) return res.status(400).json({ message: 'Faltan datos' });
-  
+
     try {
-      const [rows] = await connection.execute(`
-        SELECT c.nombre_apellidos AS nombre, c.licencia, c.dni, c.email, 
-               c.numero_seguridad_social, l.marca_modelo AS vehiculo_modelo, 
-               l.nombre_apellidos AS empresa, l.matricula
-        FROM conductores c
-        JOIN licencias l ON c.licencia = l.licencia
-        WHERE c.email = ? AND c.dni = ?`, [email, dni]);
-  
-      if (rows.length === 0) return res.status(401).json({ message: '❌ Usuario no encontrado' });
-  
-      rows[0].token = 'token_de_ejemplo';
-      res.json(rows[0]);
+        const [rows] = await connection.execute(`
+            SELECT c.nombre_apellidos AS nombre, c.licencia, c.dni, c.email, 
+                   c.numero_seguridad_social, l.marca_modelo AS vehiculo_modelo, 
+                   l.nombre_apellidos AS empresa, l.matricula
+            FROM conductores c
+            JOIN licencias l ON c.licencia = l.licencia
+            WHERE c.email = ? AND c.dni = ?`, [email, dni]);
+
+        if (rows.length === 0) return res.status(401).json({ message: '❌ Usuario no encontrado' });
+
+        // Crear el token JWT
+        const token = jwt.sign(
+            {
+                email,
+                isConductor: true,
+                licencia: rows[0].licencia
+            },
+            process.env.JWT_SECRET, // Asegúrate de tener el JWT_SECRET en tu archivo .env
+            { expiresIn: '24h' }
+        );
+
+        // Agregar el token a la respuesta
+        rows[0].token = token;
+        res.json(rows[0]);
+
     } catch (e) {
-      console.error('❌ Error en /login:', e);
-      res.status(500).json({ message: 'Error interno del servidor' });
+        console.error('❌ Error en /login-conductor:', e);
+        res.status(500).json({ message: 'Error interno del servidor' });
     }
-  });
+});
 // Registrar evento
   app.post('/api/registrar-fecha', async (req, res) => {
     const { accion, licencia, fecha_hora } = req.body;
