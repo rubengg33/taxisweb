@@ -34,7 +34,15 @@ const validateApiKey = (req, res, next) => {
 };
 
 const app = express();
-app.use(cors());
+// Configuración CORS específica para controldeconductores.com
+app.use(cors({
+    origin: 'https://controldeconductores.com',
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'x-api-key'],
+    credentials: false
+}));
+app.options('*', cors());
+
 app.use(express.json());
 
 const db = mysql.createConnection(process.env.DATABASE_URL);
@@ -206,17 +214,6 @@ app.get("/api/conductores/dni/:dni", authenticateToken, async (req, res) => {
         res.status(500).json({ message: "Error interno del servidor" });
     }
 });
-// ... existing code ...
-
-// Update CORS configuration
-app.use(cors({
-    origin: 'https://controldeconductores.com',
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'x-api-key'],
-    credentials: false // Change to false since we're not using credentials
-}));
-app.options('*', cors());
-// ... rest of your server code ...
 // Keep existing /api/conductores/:id endpoint as is
 // También proteger las demás rutas de conductores
 app.get("/api/conductores/:id", authenticateToken, validateApiKey, (req, res) => {
