@@ -408,7 +408,7 @@ app.get('/api/eventos/detalles/:licencia', async (req, res) => {
   
 
 // Login endpoint for empresa
-app.post("/api/login-empresa", async (req, res) => {
+app.post("/login-empresa", async (req, res) => {
     const { email, dni } = req.body;
 
     try {
