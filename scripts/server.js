@@ -209,13 +209,15 @@ app.get("/api/conductores/dni/:dni", authenticateToken, async (req, res) => {
 // ... existing code ...
 
 // Update CORS configuration
-app.use(cors({
+const corsOptions = {
     origin: 'https://controldeconductores.com',
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'x-api-key'],
-    credentials: false // Change to false since we're not using credentials
-}));
-app.options('*', cors());
+    credentials: true // debe ser true si usas credentials en fetch
+};
+
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions)); 
 // ... rest of your server code ...
 // Keep existing /api/conductores/:id endpoint as is
 // También proteger las demás rutas de conductores
