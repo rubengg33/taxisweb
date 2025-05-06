@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vista Conductor</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @keyframes rotate {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body class="min-h-screen flex items-center justify-center "style="background-image: url('./img/fondo3.png');">
+
+  <!-- Contenedor principal animado -->
+  <div class="relative w-[800px] p-6 rounded-[20px] overflow-hidden">
+
+    <div class="absolute -inset-[2px] z-0 animate-[rotate_6s_linear_infinite] bg-gradient-to-tr from-pink-500 to-cyan-400 rounded-[22px]"></div>
+    <div class="absolute inset-[2px] bg-[#0f172a] rounded-[18px] z-10"></div>
+
+    <div class="relative z-20 space-y-6 bg-gradient-to-b from-[#1f1f1f] via-[#111827] to-black p-6 rounded-[18px] shadow-[0_0_20px_2px_rgba(34,211,238,0.3)] border border-cyan-400">
+
+      <!-- Botones estilo macOS -->
+      <div class="flex space-x-2 absolute top-4 left-4 z-30">
+        <button onclick="cerrarSesion()" class="w-3 h-3 bg-red-500 rounded-full"></button>
+        <button onclick="document.querySelector('[data-card]').classList.add('hidden')" class="w-3 h-3 bg-yellow-400 rounded-full"></button>
+        <button onclick="location.reload()" class="w-3 h-3 bg-green-500 rounded-full"></button>
+      </div>
+
+      <div data-card>
+        <h1 class="text-3xl font-bold text-center text-white">Historial del conductor</h1>
+
+        <div class="text-white text-center space-y-2 my-4">
+          <p><strong>Nombre:</strong> {{ nombre }}</p>
+          <p><strong>DNI:</strong> {{ dni }}</p>
+          <p><strong>Licencia:</strong> {{ licencia }}</p>
+          <p><strong>Vehículo:</strong> {{ vehiculo }}</p>
+        </div>
+
+        <!-- Filtros -->
+        <div class="space-y-4">
+          
+          <div class="grid grid-cols-2 gap-4 mt-2">
+            <div class="flex flex-col">
+              <label for="fechaInicio" class="text-sm font-medium text-white mb-1">Desde</label>
+              <input id="fechaInicio" type="date" class="w-full rounded border border-cyan-400 bg-[#1f1f1f] text-white px-3 py-2" />
+            </div>
+            <div class="flex flex-col">
+              <label for="fechaFin" class="text-sm font-medium text-white mb-1">Hasta</label>
+              <input id="fechaFin" type="date" class="w-full rounded border border-cyan-400 bg-[#1f1f1f] text-white px-3 py-2" />
+            </div>
+          </div>
+          
+         
+
+          <label class="block text-sm font-medium text-white mt-2">Selecciona una opción</label>
+          <select id="filtroEvento" class="w-full rounded border border-cyan-400 bg-gradient-to-b from-[#1f1f1f] via-[#111827] to-black text-white text-sm shadow-[0_0_10px_rgba(34,211,238,0.3)] focus:ring-2 focus:ring-cyan-400">
+            <option class="text-black" value="">Todos</option>
+            <option class="text-black" value="inicio_jornada">Inicio de jornada</option>
+            <option class="text-black" value="inicio_descanso">Descanso</option>
+            <option class="text-black" value="fin_descanso">Fin de descanso</option>
+            <option class="text-black" value="fin_jornada">Fin de jornada</option>
+          </select>
+        </div>
+
+        <!-- Lista de eventos -->
+        <div class="w-full h-48 overflow-y-auto bg-gradient-to-b from-[#1f1f1f] via-[#111827] to-black border border-cyan-400 rounded-sm shadow-inner shadow-[0_0_10px_rgba(34,211,238,0.3)] p-2 text-sm text-white font-mono">
+          <ul id="listaEventos" class="space-y-1"></ul>
+        </div>
+
+        <!-- Botones -->
+        <div class="flex items-center justify-center gap-4 mt-4">
+          <button id="btnDescargar" type="button" class="relative w-[150px] h-[40px] cursor-pointer flex items-center border border-cyan-400 bg-gradient-to-b from-[#1f1f1f] via-[#111827] to-black overflow-hidden group transition-all duration-300 shadow-[0_0_20px_2px_rgba(34,211,238,0.3)]">
+            <span class="text-white font-semibold transform translate-x-[22px] transition-all duration-300 group-hover:text-transparent">Descargar</span>
+            <span class="absolute h-full w-[39px] bg-cyan-600 flex items-center justify-center transform translate-x-[109px] transition-all duration-300 group-hover:w-[148px] group-hover:translate-x-0 group-active:bg-cyan-700">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 35 35" class="w-[20px] fill-white">
+                <path d="M17.5,22.131a1.249,1.249,0,0,1-1.25-1.25V2.187a1.25,1.25,0,0,1,2.5,0V20.881A1.25,1.25,0,0,1,17.5,22.131Z" />
+                <path d="M17.5,22.693a3.189,3.189,0,0,1-2.262-.936L8.487,15.006a1.249,1.249,0,0,1,1.767-1.767l6.751,6.751a.7.7,0,0,0,.99,0l6.751-6.751a1.25,1.25,0,0,1,1.768,1.767l-6.752,6.751A3.191,3.191,0,0,1,17.5,22.693Z" />
+                <path d="M31.436,34.063H3.564A3.318,3.318,0,0,1,.25,30.749V22.011a1.25,1.25,0,0,1,2.5,0v8.738a.815.815,0,0,0,.814.814H31.436a.815.815,0,0,0,.814-.814V22.011a1.25,1.25,0,1,1,2.5,0v8.738A3.318,3.318,0,0,1,31.436,34.063Z" />
+              </svg>
+            </span>
+          </button>
+
+          
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+  function cerrarSesion() {
+    localStorage.clear();
+    alert("Sesión cerrada.");
+    window.location.href = "/";
+  }
+
+  async function cargarEventos() {
+    const usuario = JSON.parse(localStorage.getItem("usuario"));
+    if (!usuario || !usuario.licencia) return;
+
+    try {
+      const response = await fetch(`${API_URL}/eventos/${usuario.licencia}`);
+      const eventos = await response.json();
+
+      const tipoSeleccionado = document.getElementById("filtroEvento").value;
+      const fechaDesde = document.getElementById("fechaInicio").value;
+      const fechaHasta = document.getElementById("fechaFin").value;
+
+      eventosMostrados = eventos.filter(ev => {
+        const fechaEvento = new Date(ev.fecha_hora);
+        const desde = fechaDesde ? new Date(fechaDesde) : null;
+        const hasta = fechaHasta ? new Date(fechaHasta + "T23:59:59") : null;
+
+        const filtraTipo = !tipoSeleccionado || ev.evento === tipoSeleccionado;
+        const filtraFecha = (!desde || fechaEvento >= desde) && (!hasta || fechaEvento <= hasta);
+
+        return filtraTipo && filtraFecha;
+      });
+
+      const lista = document.getElementById("listaEventos");
+      lista.innerHTML = "";
+
+      if (eventosMostrados.length > 0) {
+        eventosMostrados.forEach(ev => {
+          const li = document.createElement("li");
+          li.className = "px-4";
+          li.innerHTML = `<span class="text-cyan-400 font-semibold">${ev.nombre_conductor}</span> — ${ev.evento} 🕒 <span class="text-gray-400">${new Date(ev.fecha_hora).toLocaleString()}</span>`;
+          lista.appendChild(li);
+        });
+      } else {
+        lista.innerHTML = "<li class='px-4'>No hay eventos registrados</li>";
+      }
+
+    } catch (error) {
+      console.error("❌ Error al cargar eventos:", error);
+    }
+  }
+
+  function pantallaRegistro() {
+    window.location.href = "/conductores.html";
+  }
+
+  function exportarCSV(eventos) {
+    if (!eventos.length) {
+      alert("No hay eventos para exportar.");
+      return;
+    }
+
+    const columnas = ["nombre_conductor", "dni", "licencia", "vehiculo_modelo", "matricula", "email", "num_seguridad_social", "empresa", "evento", "fecha_hora"];
+    const separador = ";";
+    const encabezado = columnas.join(separador);
+    const filas = eventos.map(ev => columnas.map(col => `"${(ev[col] ?? "").toString().replace(/"/g, '""')}"`).join(separador));
+    const contenido = [encabezado, ...filas].join("\n");
+
+    const blob = new Blob([contenido], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "eventos_filtrados.csv";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  document.addEventListener("DOMContentLoaded", cargarEventos);
+  document.getElementById("filtroEvento").addEventListener("change", cargarEventos);
+  document.getElementById("btnDescargar").addEventListener("click", () => {
+    exportarCSV(eventosMostrados);
+  });
+</script>
+
+</body>
+</html>

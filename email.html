@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+  <body>
+    <h2>¡Hola!</h2>
+    <p>Se ha producido un evento: <strong>{{ evento }}</strong></p>
+
+    {% if datos %}
+      <ul>
+        {% for clave, valor in datos.items() %}
+          <li><strong>{{ clave }}:</strong> {{ valor }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+    
+    <p>Gracias por usar nuestro servicio.</p>
+  </body>
+</html>
