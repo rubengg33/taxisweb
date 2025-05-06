@@ -362,34 +362,36 @@ app.post("/api/login", async (req, res) => {
 // Update the eventos endpoint
 app.get('/api/eventos/:licencia?', authenticateToken, async (req, res) => {
     try {
-        const licencia = req.params.licencia;
-        const conductorNombre = req.query.conductor; // Add this line
-
-        if (!licencia) {
-            return res.status(400).json({ error: 'No se encontró la licencia asociada' });
-        }
-
-        const query = `
-            SELECT e.evento, e.fecha_hora, e.nombre_conductor, e.dni
-            FROM eventos e
-            WHERE e.licencia = ?
-            ${conductorNombre ? 'AND e.nombre_conductor = ?' : ''}
-            ORDER BY e.fecha_hora ASC`;
-        
-        const queryParams = conductorNombre ? [licencia, conductorNombre] : [licencia];
-        
-        db.query(query, queryParams, (err, result) => {
-            if (err) {
-                console.error('Database error:', err);
-                return res.status(500).json({ error: 'Error en la base de datos' });
-            }
-            res.json(result || []);
-        });
+      const licencia = req.params.licencia;
+      const conductorNombre = req.query.conductor;
+  
+      if (!licencia) {
+        return res.status(400).json({ error: 'No se encontró la licencia asociada' });
+      }
+  
+      let query = `
+        SELECT nombre_conductor, dni, licencia, vehiculo_modelo, matricula, email, 
+               num_seguridad_social, empresa, evento, fecha_hora
+        FROM eventos
+        WHERE licencia = ?`;
+      
+      const queryParams = [licencia];
+  
+      if (conductorNombre) {
+        query += ' AND nombre_conductor = ?';
+        queryParams.push(conductorNombre);
+      }
+  
+      query += ' ORDER BY fecha_hora DESC LIMIT 50';
+  
+      const [eventos] = await connection.execute(query, queryParams);
+      res.json(eventos || []);
     } catch (error) {
-        console.error('Unexpected error:', error);
-        res.status(500).json({ error: 'Error interno del servidor' });
+      console.error('❌ Error al obtener eventos:', error);
+      res.status(500).json({ error: 'Error al obtener eventos' });
     }
-});
+  });
+  
 
 // Login endpoint for empresa
 app.post("/api/login-empresa", async (req, res) => {
@@ -438,6 +440,104 @@ app.post("/api/login-empresa", async (req, res) => {
     }
 });
 
+// Login conductor
+app.post('/login-conductor', async (req, res) => {
+    const { email, dni } = req.body;
+    if (!email || !dni) return res.status(400).json({ message: 'Faltan datos' });
+  
+    try {
+      const [rows] = await connection.execute(`
+        SELECT c.nombre_apellidos AS nombre, c.licencia, c.dni, c.email, 
+               c.numero_seguridad_social, l.marca_modelo AS vehiculo_modelo, 
+               l.nombre_apellidos AS empresa, l.matricula
+        FROM conductores c
+        JOIN licencias l ON c.licencia = l.licencia
+        WHERE c.email = ? AND c.dni = ?`, [email, dni]);
+  
+      if (rows.length === 0) return res.status(401).json({ message: '❌ Usuario no encontrado' });
+  
+      rows[0].token = 'token_de_ejemplo';
+      res.json(rows[0]);
+    } catch (e) {
+      console.error('❌ Error en /login:', e);
+      res.status(500).json({ message: 'Error interno del servidor' });
+    }
+  });
+// Registrar evento
+  app.post('/api/registrar-fecha', async (req, res) => {
+    const { accion, licencia, fecha_hora } = req.body;
+    if (!accion || !licencia) return res.status(400).json({ message: 'Faltan datos (licencia o acción)' });
+  
+    const fechaLocal = DateTime.fromISO(fecha_hora, { zone: 'utc' }).setZone('Europe/Madrid');
+    const fechaStr = fechaLocal.toFormat('yyyy-MM-dd HH:mm:ss');
+    const fechaDia = fechaLocal.toISODate();
+  
+    try {
+      const validaciones = {
+        inicio_jornada: `SELECT COUNT(*) as total FROM eventos WHERE licencia = ? AND evento = 'inicio_jornada' AND DATE(fecha_hora) = ?`,
+        fin_jornada: `SELECT COUNT(*) as total FROM eventos WHERE licencia = ? AND evento = 'fin_descanso' AND DATE(fecha_hora) = ?`,
+        inicio_descanso: `SELECT COUNT(*) as total FROM eventos WHERE licencia = ? AND evento = 'inicio_jornada' AND DATE(fecha_hora) = ?`,
+        fin_descanso: `SELECT COUNT(*) as total FROM eventos WHERE licencia = ? AND evento = 'inicio_descanso' AND DATE(fecha_hora) = ?`,
+      };
+  
+      if (validaciones[accion]) {
+        const [valid] = await connection.execute(validaciones[accion], [licencia, fechaDia]);
+        if (valid[0].total === 0) {
+          return res.status(400).json({ message: `⛔ Acción '${accion}' no permitida aún.` });
+        }
+      }
+  
+      const [conductor] = await connection.execute(`
+        SELECT c.nombre_apellidos AS nombre_conductor, c.dni, c.licencia, 
+               l.marca_modelo AS vehiculo_modelo, l.matricula, 
+               c.email, c.numero_seguridad_social AS num_seguridad_social, 
+               l.nombre_apellidos AS empresa
+        FROM conductores c
+        JOIN licencias l ON c.licencia = l.licencia
+        WHERE c.licencia = ?`, [licencia]);
+  
+      if (!conductor.length) return res.status(404).json({ message: 'Conductor no encontrado' });
+  
+      const c = conductor[0];
+      await connection.execute(`
+        INSERT INTO eventos 
+        (nombre_conductor, dni, licencia, vehiculo_modelo, matricula, email, 
+         num_seguridad_social, empresa, evento, fecha_hora)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [c.nombre_conductor, c.dni, c.licencia, c.vehiculo_modelo, c.matricula,
+         c.email, c.num_seguridad_social, c.empresa, accion, fechaStr]);
+  
+      res.json({ message: `✅ Evento "${accion}" registrado a las ${fechaStr}` });
+  
+    } catch (e) {
+      console.error('❌ Error en /api/registrar-fecha:', e);
+      res.status(500).json({ message: 'Error interno del servidor' });
+    }
+  });  
+ // Enviar correo
+app.post('/api/send-email', async (req, res) => {
+    const { email, evento } = req.body;
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: 'tucorreo@gmail.com',
+        pass: 'tu_contraseña_o_app_password'
+      }
+    });
+  
+    try {
+      await transporter.sendMail({
+        from: '"Notificación" <tucorreo@gmail.com>',
+        to: email,
+        subject: "Notificación de evento",
+        text: `Hola, se ha registrado un nuevo evento: ${evento}`
+      });
+      res.json({ status: 'Correo enviado' });
+    } catch (e) {
+      console.error('❌ Error al enviar correo:', e);
+      res.status(500).json({ message: 'Error al enviar correo' });
+    }
+  }); 
 // Password reset request endpoint
 app.post("/api/request-password-reset", async (req, res) => {
     const { email } = req.body;
