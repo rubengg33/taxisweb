@@ -407,7 +407,7 @@ app.get('/api/eventos/detalles/:licencia', async (req, res) => {
   
 
 // Login endpoint for empresa
-app.post("/login-empresa", async (req, res) => {
+app.post("/api/login-empresa", async (req, res) => {
     const { email, dni } = req.body;
 
     try {
@@ -453,7 +453,7 @@ app.post("/login-empresa", async (req, res) => {
     }
 });
 
-app.post('/login-conductor', async (req, res) => {
+app.post('/api/login-conductor', async (req, res) => {
     const { email, dni } = req.body;
     if (!email || !dni) return res.status(400).json({ message: 'Faltan datos' });
 
