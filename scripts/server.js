@@ -629,7 +629,31 @@ app.post("/api/reset-password", async (req, res) => {
         res.status(500).json({ message: "Error al actualizar la contraseña" });
     }
 });
-
+// Obtener info del conductor por licencia
+app.get('/api/conductor/:licencia', (req, res) => {
+    const { licencia } = req.params;
+  
+    if (!licencia) return res.status(400).json({ message: 'Falta la licencia' });
+  
+    db.query(
+      `SELECT c.nombre_apellidos AS nombre, c.dni, c.licencia FROM conductores c WHERE licencia = ?`,
+      [licencia],
+      (err, results) => {
+        if (err) {
+          console.error('❌ Error en /api/conductor/:licencia:', err);
+          return res.status(500).json({ message: 'Error al obtener el conductor' });
+        }
+  
+        if (results.length === 0) {
+          return res.status(404).json({ message: 'Conductor no encontrado' });
+        }
+  
+        res.json(results[0]);
+      }
+    );
+  });
+  
+  
 // Update the conductores by licencia endpoint
 app.get("/api/conductores/licencia/:licencia", authenticateToken, async (req, res) => {
     try {

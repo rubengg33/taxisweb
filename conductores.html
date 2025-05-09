@@ -55,9 +55,9 @@
 
       <!-- Información del usuario -->
       <div class="text-white text-center space-y-2">
-        <p><strong>Nombre:</strong> {{ nombre }}</p>
-        <p><strong>Licencia:</strong> {{ licencia }}</p>
-        <p><strong>DNI:</strong> {{ dni }}</p>
+        <p><strong>Nombre:</strong> <span id="nombre"></span></p>
+        <p><strong>Licencia:</strong><span id="licencia"></span></p>
+        <p><strong>DNI:</strong> <span id="dni"></span></p>
       </div>
 
       <!-- Controles de jornada -->
@@ -271,6 +271,26 @@
         
 </script>
 <script>
+    // Obtener la licencia desde los parámetros de la URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const licencia = urlParams.get('licencia');
+
+  if (licencia) {
+    fetch(`${API_URL}/conductor/${licencia}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.nombre) {
+          document.getElementById('nombre').textContent = data.nombre;
+          document.getElementById('licencia').textContent = data.licencia;
+          document.getElementById('dni').textContent = data.dni;
+        } else {
+          alert('❌ Conductor no encontrado');
+        }
+      })
+      .catch(err => console.error('Error al obtener datos del conductor:', err));
+  } else {
+    alert('⚠️ No se proporcionó la licencia en la URL');
+  }
   function registrarEvento(accion) {
     const licencia = "{{ licencia }}";
     
