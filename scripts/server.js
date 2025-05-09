@@ -39,7 +39,7 @@ const corsOptions = {
     origin: process.env.FRONTEND_URL, // Esto usará 'https://controldeconductores.com'
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization', 'x-api-key'],
-    credentials: false
+    credentials: true
   };
   
   // Aplicar CORS como middleware

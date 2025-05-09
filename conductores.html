@@ -154,6 +154,26 @@
 
   <!-- Scripts -->
   <script>
+       // Obtener la licencia desde los parámetros de la URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const licencia = urlParams.get('licencia');
+
+  if (licencia) {
+    fetch(`${API_URL}/conductor/${licencia}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.nombre) {
+          document.getElementById('nombre').textContent = data.nombre;
+          document.getElementById('licencia').textContent = data.licencia;
+          document.getElementById('dni').textContent = data.dni;
+        } else {
+          alert('❌ Conductor no encontrado');
+        }
+      })
+      .catch(err => console.error('Error al obtener datos del conductor:', err));
+  } else {
+    alert('⚠️ No se proporcionó la licencia en la URL');
+  }
     function cerrarSesion() {
       localStorage.clear();
       window.location.href = "/";
@@ -249,7 +269,6 @@
       }
       
       function validarLicenciaPorDia() {
-        const licencia = "{{ licencia }}"; // ← Flask debe inyectar esto
         const ultimoDigito = licencia.slice(-1);
         const diaSemana = new Date().getDay(); // 0=Dom, 1=Lun, ..., 6=Sáb
       
@@ -271,29 +290,9 @@
         
 </script>
 <script>
-    // Obtener la licencia desde los parámetros de la URL
-  const urlParams = new URLSearchParams(window.location.search);
-  const licencia = urlParams.get('licencia');
-
-  if (licencia) {
-    fetch(`${API_URL}/conductor/${licencia}`)
-      .then(res => res.json())
-      .then(data => {
-        if (data.nombre) {
-          document.getElementById('nombre').textContent = data.nombre;
-          document.getElementById('licencia').textContent = data.licencia;
-          document.getElementById('dni').textContent = data.dni;
-        } else {
-          alert('❌ Conductor no encontrado');
-        }
-      })
-      .catch(err => console.error('Error al obtener datos del conductor:', err));
-  } else {
-    alert('⚠️ No se proporcionó la licencia en la URL');
-  }
+ 
   function registrarEvento(accion) {
-    const licencia = "{{ licencia }}";
-    
+
     // ⚠️ Validar antes de continuar
     if (!validarLicenciaPorDia()) {
       console.warn("⛔ Registro bloqueado por restricciones de día/licencia");
