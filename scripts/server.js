@@ -34,14 +34,16 @@ const validateApiKey = (req, res, next) => {
 };
 
 const app = express();
-// Configuración CORS específica para controldeconductores.com
-app.use(cors({
-    origin: 'https://controldeconductores.com',
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+// Configuración de CORS
+const corsOptions = {
+    origin: process.env.FRONTEND_URL, // Esto usará 'https://controldeconductores.com'
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization', 'x-api-key'],
-    credentials: false
-}));
-app.options('*', cors());
+    credentials: true
+  };
+  
+  // Aplicar CORS como middleware
+  app.use(cors(corsOptions));
 
 app.use(express.json());
 
