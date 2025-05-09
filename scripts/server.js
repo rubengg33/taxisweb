@@ -497,7 +497,7 @@ app.post('/api/login-conductor', async (req, res) => {
     }
 });
 // Registrar evento
-  app.post('/api/registrar-fecha', async (req, res) => {
+app.post('/api/registrar-fecha', async (req, res) => {
     const { accion, licencia, fecha_hora } = req.body;
     if (!accion || !licencia) return res.status(400).json({ message: 'Faltan datos (licencia o acción)' });
   
@@ -506,78 +506,106 @@ app.post('/api/login-conductor', async (req, res) => {
     const fechaDia = fechaLocal.toISODate();
   
     try {
-      const validaciones = {
-        inicio_jornada: `SELECT COUNT(*) as total FROM eventos WHERE licencia = ? AND evento = 'inicio_jornada' AND DATE(fecha_hora) = ?`,
-        fin_jornada: `SELECT COUNT(*) as total FROM eventos WHERE licencia = ? AND evento = 'fin_descanso' AND DATE(fecha_hora) = ?`,
-        inicio_descanso: `SELECT COUNT(*) as total FROM eventos WHERE licencia = ? AND evento = 'inicio_jornada' AND DATE(fecha_hora) = ?`,
-        fin_descanso: `SELECT COUNT(*) as total FROM eventos WHERE licencia = ? AND evento = 'inicio_descanso' AND DATE(fecha_hora) = ?`,
-      };
+      // Verificar si ya se registró ese tipo de evento hoy
+      if (accion === 'inicio_jornada' || accion === 'fin_jornada') {
+        const [rows] = await db.promise().query(
+          "SELECT COUNT(*) AS total FROM eventos WHERE licencia = ? AND evento = ? AND DATE(fecha_hora) = ?",
+          [licencia, accion, fechaDia]
+        );
   
-      if (validaciones[accion]) {
-        db.query(validaciones[accion], [licencia, fechaDia], (err, result) => {
-          if (err) throw err;
-          if (result[0].total === 0) {
-            return res.status(400).json({ message: `⛔ Acción '${accion}' no permitida aún.` });
-          }
-          
-          // Continuar con la consulta del conductor
-          db.query(`
-            SELECT c.nombre_apellidos AS nombre_conductor, c.dni, c.licencia, 
-                  l.marca_modelo AS vehiculo_modelo, l.matricula, 
-                  c.email, c.numero_seguridad_social AS num_seguridad_social, 
-                  l.nombre_apellidos AS empresa 
-            FROM conductores c 
-            JOIN licencias l ON c.licencia = l.licencia 
-            WHERE c.licencia = ?`, [licencia], (err, conductores) => {
-              if (err) throw err;
-              
-              if (!conductores.length) return res.status(404).json({ message: 'Conductor no encontrado' });
-              
-              const c = conductores[0];
-              db.query(`
-                INSERT INTO eventos 
-                (nombre_conductor, dni, licencia, vehiculo_modelo, matricula, email, 
-                num_seguridad_social, empresa, evento, fecha_hora)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, 
-                [c.nombre_conductor, c.dni, c.licencia, c.vehiculo_modelo, c.matricula,
-                c.email, c.num_seguridad_social, c.empresa, accion, fechaStr], (err) => {
-                  if (err) throw err;
-                  res.json({ message: `✅ Evento "${accion}" registrado a las ${fechaStr}` });
-                });
-            });
-        });
-      } else {
-        // Si no hay validación para esta acción, continuar directamente con la consulta del conductor
-        db.query(`
-          SELECT c.nombre_apellidos AS nombre_conductor, c.dni, c.licencia, 
-                l.marca_modelo AS vehiculo_modelo, l.matricula, 
-                c.email, c.numero_seguridad_social AS num_seguridad_social, 
-                l.nombre_apellidos AS empresa 
-          FROM conductores c 
-          JOIN licencias l ON c.licencia = l.licencia 
-          WHERE c.licencia = ?`, [licencia], (err, conductores) => {
-            if (err) throw err;
-            
-            if (!conductores.length) return res.status(404).json({ message: 'Conductor no encontrado' });
-            
-            const c = conductores[0];
-            db.query(`
-              INSERT INTO eventos 
-              (nombre_conductor, dni, licencia, vehiculo_modelo, matricula, email, 
-              num_seguridad_social, empresa, evento, fecha_hora)
-              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, 
-              [c.nombre_conductor, c.dni, c.licencia, c.vehiculo_modelo, c.matricula,
-              c.email, c.num_seguridad_social, c.empresa, accion, fechaStr], (err) => {
-                if (err) throw err;
-                res.json({ message: `✅ Evento "${accion}" registrado a las ${fechaStr}` });
-              });
+        if (rows[0].total > 0) {
+          return res.status(400).json({
+            message: `⚠️ Ya registraste '${accion.replace('_', ' ')}' hoy.`
           });
+        }
       }
+  
+      // Validación: 'inicio_descanso' requiere 'inicio_jornada' previo
+      if (accion === "inicio_descanso") {
+        const [rows] = await db.promise().query(
+          "SELECT COUNT(*) AS total FROM eventos WHERE licencia = ? AND evento = 'inicio_jornada' AND DATE(fecha_hora) = ?",
+          [licencia, fechaDia]
+        );
+  
+        if (rows[0].total === 0) {
+          return res.status(400).json({
+            message: "⛔ No puedes iniciar un descanso sin haber iniciado la jornada."
+          });
+        }
+      }
+  
+      // Validación: 'fin_descanso' requiere 'inicio_descanso' previo
+      if (accion === "fin_descanso") {
+        const [rows] = await db.promise().query(
+          "SELECT COUNT(*) AS total FROM eventos WHERE licencia = ? AND evento = 'inicio_descanso' AND DATE(fecha_hora) = ?",
+          [licencia, fechaDia]
+        );
+  
+        if (rows[0].total === 0) {
+          return res.status(400).json({
+            message: "⛔ No puedes finalizar un descanso sin haberlo iniciado."
+          });
+        }
+      }
+  
+      // Validación: 'fin_jornada' requiere 'fin_descanso' previo
+      if (accion === "fin_jornada") {
+        const [rows] = await db.promise().query(
+          "SELECT COUNT(*) AS total FROM eventos WHERE licencia = ? AND evento = 'fin_descanso' AND DATE(fecha_hora) = ?",
+          [licencia, fechaDia]
+        );
+  
+        if (rows[0].total === 0) {
+          return res.status(400).json({
+            message: "⛔ No puedes finalizar la jornada sin haber finalizado el descanso."
+          });
+        }
+      }
+  
+      // Buscar datos del conductor
+      const [conductores] = await db.promise().query(`
+        SELECT c.nombre_apellidos AS nombre_conductor, c.dni, c.licencia,
+               l.marca_modelo AS vehiculo_modelo, l.matricula,
+               c.email, c.numero_seguridad_social AS num_seguridad_social,
+               l.nombre_apellidos AS empresa
+        FROM conductores c
+        JOIN licencias l ON c.licencia = l.licencia
+        WHERE c.licencia = ?
+      `, [licencia]);
+  
+      if (conductores.length === 0) {
+        return res.status(404).json({ message: 'Conductor no encontrado' });
+      }
+  
+      const conductor = conductores[0];
+  
+      // Insertar evento
+      await db.promise().query(`
+        INSERT INTO eventos
+        (nombre_conductor, dni, licencia, vehiculo_modelo, matricula, email,
+         num_seguridad_social, empresa, evento, fecha_hora)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `, [
+        conductor.nombre_conductor,
+        conductor.dni,
+        conductor.licencia,
+        conductor.vehiculo_modelo,
+        conductor.matricula,
+        conductor.email,
+        conductor.num_seguridad_social,
+        conductor.empresa,
+        accion,
+        fechaStr
+      ]);
+  
+      console.log(`✅ Evento '${accion}' registrado con éxito.`);
+      return res.json({ message: `✅ Evento "${accion}" registrado a las ${fechaStr}` });
+  
     } catch (e) {
-      console.error('❌ Error en /api/registrar-fecha:', e);
-      res.status(500).json({ message: 'Error interno del servidor' });
+      console.error(`❌ Error en /api/registrar-fecha: ${e}`);
+      return res.status(500).json({ message: 'Error interno del servidor' });
     }
-  });  
+  });
  // Enviar correo
 app.post('/api/send-email', async (req, res) => {
     const { email, evento } = req.body;
