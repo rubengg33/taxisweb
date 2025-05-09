@@ -514,34 +514,65 @@ app.post('/api/login-conductor', async (req, res) => {
       };
   
       if (validaciones[accion]) {
-        const [valid] = await connection.execute(validaciones[accion], [licencia, fechaDia]);
-        if (valid[0].total === 0) {
-          return res.status(400).json({ message: `⛔ Acción '${accion}' no permitida aún.` });
-        }
+        db.query(validaciones[accion], [licencia, fechaDia], (err, result) => {
+          if (err) throw err;
+          if (result[0].total === 0) {
+            return res.status(400).json({ message: `⛔ Acción '${accion}' no permitida aún.` });
+          }
+          
+          // Continuar con la consulta del conductor
+          db.query(`
+            SELECT c.nombre_apellidos AS nombre_conductor, c.dni, c.licencia, 
+                  l.marca_modelo AS vehiculo_modelo, l.matricula, 
+                  c.email, c.numero_seguridad_social AS num_seguridad_social, 
+                  l.nombre_apellidos AS empresa 
+            FROM conductores c 
+            JOIN licencias l ON c.licencia = l.licencia 
+            WHERE c.licencia = ?`, [licencia], (err, conductores) => {
+              if (err) throw err;
+              
+              if (!conductores.length) return res.status(404).json({ message: 'Conductor no encontrado' });
+              
+              const c = conductores[0];
+              db.query(`
+                INSERT INTO eventos 
+                (nombre_conductor, dni, licencia, vehiculo_modelo, matricula, email, 
+                num_seguridad_social, empresa, evento, fecha_hora)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, 
+                [c.nombre_conductor, c.dni, c.licencia, c.vehiculo_modelo, c.matricula,
+                c.email, c.num_seguridad_social, c.empresa, accion, fechaStr], (err) => {
+                  if (err) throw err;
+                  res.json({ message: `✅ Evento "${accion}" registrado a las ${fechaStr}` });
+                });
+            });
+        });
+      } else {
+        // Si no hay validación para esta acción, continuar directamente con la consulta del conductor
+        db.query(`
+          SELECT c.nombre_apellidos AS nombre_conductor, c.dni, c.licencia, 
+                l.marca_modelo AS vehiculo_modelo, l.matricula, 
+                c.email, c.numero_seguridad_social AS num_seguridad_social, 
+                l.nombre_apellidos AS empresa 
+          FROM conductores c 
+          JOIN licencias l ON c.licencia = l.licencia 
+          WHERE c.licencia = ?`, [licencia], (err, conductores) => {
+            if (err) throw err;
+            
+            if (!conductores.length) return res.status(404).json({ message: 'Conductor no encontrado' });
+            
+            const c = conductores[0];
+            db.query(`
+              INSERT INTO eventos 
+              (nombre_conductor, dni, licencia, vehiculo_modelo, matricula, email, 
+              num_seguridad_social, empresa, evento, fecha_hora)
+              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, 
+              [c.nombre_conductor, c.dni, c.licencia, c.vehiculo_modelo, c.matricula,
+              c.email, c.num_seguridad_social, c.empresa, accion, fechaStr], (err) => {
+                if (err) throw err;
+                res.json({ message: `✅ Evento "${accion}" registrado a las ${fechaStr}` });
+              });
+          });
       }
-  
-      const [conductor] = await connection.execute(`
-        SELECT c.nombre_apellidos AS nombre_conductor, c.dni, c.licencia, 
-               l.marca_modelo AS vehiculo_modelo, l.matricula, 
-               c.email, c.numero_seguridad_social AS num_seguridad_social, 
-               l.nombre_apellidos AS empresa
-        FROM conductores c
-        JOIN licencias l ON c.licencia = l.licencia
-        WHERE c.licencia = ?`, [licencia]);
-  
-      if (!conductor.length) return res.status(404).json({ message: 'Conductor no encontrado' });
-  
-      const c = conductor[0];
-      await connection.execute(`
-        INSERT INTO eventos 
-        (nombre_conductor, dni, licencia, vehiculo_modelo, matricula, email, 
-         num_seguridad_social, empresa, evento, fecha_hora)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-        [c.nombre_conductor, c.dni, c.licencia, c.vehiculo_modelo, c.matricula,
-         c.email, c.num_seguridad_social, c.empresa, accion, fechaStr]);
-  
-      res.json({ message: `✅ Evento "${accion}" registrado a las ${fechaStr}` });
-  
     } catch (e) {
       console.error('❌ Error en /api/registrar-fecha:', e);
       res.status(500).json({ message: 'Error interno del servidor' });
