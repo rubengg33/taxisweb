@@ -182,7 +182,6 @@ app.get('/api/conductores/all', authenticateToken, validateApiKey, async (req, r
         res.status(500).json({ message: 'Error fetching conductores data' });
     }
 });
-// ... existing code ...
 
 // Add this new endpoint for getting conductor by DNI (place it before the /api/conductores/:id endpoint)
 app.get("/api/conductores/dni/:dni", authenticateToken, async (req, res) => {
@@ -389,22 +388,25 @@ app.get('/api/eventos/detalles/:licencia', async (req, res) => {
     const { licencia } = req.params;
     
     try {
-      const [eventos] = await connection.execute(`
+      db.query(`
         SELECT nombre_conductor, dni, licencia, vehiculo_modelo, matricula, email, 
                num_seguridad_social, empresa, evento, fecha_hora
         FROM eventos
         WHERE licencia = ?
         ORDER BY fecha_hora DESC
         LIMIT 50
-      `, [licencia]);
-  
-      res.json(eventos);
+      `, [licencia], (err, eventos) => {
+        if (err) {
+          console.error('❌ Error al obtener eventos por licencia:', err);
+          return res.status(500).json({ message: 'Error al obtener eventos' });
+        }
+        res.json(eventos);
+      });
     } catch (e) {
       console.error('❌ Error al obtener eventos por licencia:', e);
       res.status(500).json({ message: 'Error al obtener eventos' });
     }
-  });
-  
+});
 
 // Login endpoint for empresa
 app.post("/api/login-empresa", async (req, res) => {
@@ -458,30 +460,36 @@ app.post('/api/login-conductor', async (req, res) => {
     if (!email || !dni) return res.status(400).json({ message: 'Faltan datos' });
 
     try {
-        const [rows] = await connection.execute(`
+        db.query(`
             SELECT c.nombre_apellidos AS nombre, c.licencia, c.dni, c.email, 
                    c.numero_seguridad_social, l.marca_modelo AS vehiculo_modelo, 
                    l.nombre_apellidos AS empresa, l.matricula
             FROM conductores c
             JOIN licencias l ON c.licencia = l.licencia
-            WHERE c.email = ? AND c.dni = ?`, [email, dni]);
-
-        if (rows.length === 0) return res.status(401).json({ message: '❌ Usuario no encontrado' });
-
-        // Crear el token JWT
-        const token = jwt.sign(
-            {
-                email,
-                isConductor: true,
-                licencia: rows[0].licencia
-            },
-            process.env.JWT_SECRET, // Asegúrate de tener el JWT_SECRET en tu archivo .env
-            { expiresIn: '24h' }
-        );
-
-        // Agregar el token a la respuesta
-        rows[0].token = token;
-        res.json(rows[0]);
+            WHERE c.email = ? AND c.dni = ?`, [email, dni], (err, rows) => {
+            
+            if (err) {
+                console.error('❌ Error en /login-conductor:', err);
+                return res.status(500).json({ message: 'Error interno del servidor' });
+            }
+            
+            if (rows.length === 0) return res.status(401).json({ message: '❌ Usuario no encontrado' });
+            
+            // Crear el token JWT
+            const token = jwt.sign(
+                {
+                    email,
+                    isConductor: true,
+                    licencia: rows[0].licencia
+                },
+                process.env.JWT_SECRET, // Asegúrate de tener el JWT_SECRET en tu archivo .env
+                { expiresIn: '24h' }
+            );
+            
+            // Agregar el token a la respuesta
+            rows[0].token = token;
+            res.json(rows[0]);
+        });
 
     } catch (e) {
         console.error('❌ Error en /login-conductor:', e);
