@@ -383,6 +383,31 @@ function showAlert(message, type = 'info') {
 document.addEventListener('DOMContentLoaded', function() {
     const logoutButton = document.getElementById('logoutButton');
     const logoutButtonMobile = document.getElementById('logoutButtonMobile');
+    
+    // Implementación del menú móvil
+    const mobileMenuButton = document.querySelector('.mobile-menu-button');
+    const mobileMenu = document.querySelector('.mobile-menu');
+    const menuIcon = document.querySelector('.menu-icon');
+
+    if (mobileMenuButton && mobileMenu && menuIcon) {
+        mobileMenuButton.addEventListener('click', () => {
+            if (mobileMenu.classList.contains('show')) {
+                mobileMenu.classList.remove('show');
+                menuIcon.style.transform = 'rotate(0deg)';
+                setTimeout(() => {
+                    menuIcon.textContent = 'menu';
+                    mobileMenu.classList.add('hidden');
+                }, 150);
+            } else {
+                mobileMenu.classList.remove('hidden');
+                setTimeout(() => {
+                    mobileMenu.classList.add('show');
+                    menuIcon.textContent = 'close';
+                    menuIcon.style.transform = 'rotate(180deg)';
+                }, 10);
+            }
+        });
+    }
 
     // Update the logout handler
     async function handleLogout() {
