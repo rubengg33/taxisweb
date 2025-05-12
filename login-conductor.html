@@ -77,6 +77,33 @@
     .menu-icon.open {
       transform: rotate(180deg);
     }
+    
+    /* Estilos para autocompletado */
+    @layer utilities {
+      /* Force white text for autofilled inputs */
+      input:-webkit-autofill,
+      input:-webkit-autofill:hover,
+      input:-webkit-autofill:focus,
+      input:-webkit-autofill:active {
+          -webkit-text-fill-color: white !important;
+          -webkit-box-shadow: 0 0 0 30px black inset !important;
+          box-shadow: 0 0 0 30px black inset !important;
+          transition: background-color 5000s ease-in-out 0s;
+          background-clip: content-box !important;
+      }
+
+      /* Additional styles for Firefox and other browsers */
+      input.input-autofill {
+          background-color: black !important;
+          color: white !important;
+      }
+
+      /* Remove menulist button appearance */
+      input:-webkit-autofill {
+          -webkit-appearance: none;
+          appearance: none;
+      }
+    }
   </style>
 
 </head>
@@ -155,24 +182,32 @@
           <div>
             <label for="email" class="block text-gray-300 text-sm mb-1">Correo Electrónico</label>
             <input type="email" id="email" placeholder="ejemplo@email.com"
-              class="w-full border border-gray-600 text-white bg-gray-800 px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300">
+              class="w-full border border-gray-600 text-white bg-gray-800 px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 transition duration-300">
           </div>
 
           <div>
             <label for="dni" class="block text-gray-300 text-sm mb-1">DNI</label>
-            <input type="text" id="dni" placeholder="12345678X"
-              class="w-full border border-gray-600 text-white bg-gray-800 px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300">
+            <div class="relative">
+              <input type="password" id="dni" placeholder="12345678X"
+                class="w-full border border-gray-600 text-white bg-gray-800 px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 transition duration-300">
+              <button type="button"
+                class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-200"
+                onclick="togglePasswordVisibility()">
+                <span class="material-icons text-sm hover:cursor-pointer"
+                  id="passwordToggleIcon">visibility_off</span>
+              </button>
+            </div>
           </div>
 
           <button id="loginButton" type="submit"
-            class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition duration-300">
+            class="w-full bg-gradient-to-r from-cyan-400 to-cyan-600 text-white py-2 rounded-lg hover:from-cyan-300 transition duration-300">
             Ingresar
           </button>
         </form>
 
         <p class="text-center text-gray-400 text-sm">
           ¿Olvidaste tu contraseña?
-          <a href="#" class="text-blue-400 hover:underline">Recupérala aquí</a>
+          <a href="#" class="text-cyan-400 hover:underline">Recupérala aquí</a>
         </p>
       </div>
     </div>
@@ -229,6 +264,60 @@
       localStorage.clear();
       alert("Sesión cerrada.");
       window.location.href = "/";
+    }
+    
+    // Función para alternar la visibilidad de la contraseña
+    function togglePasswordVisibility() {
+      const passwordInput = document.getElementById('dni');
+      const passwordToggleIcon = document.getElementById('passwordToggleIcon');
+
+      if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        passwordToggleIcon.textContent = 'visibility';
+      } else {
+        passwordInput.type = 'password';
+        passwordToggleIcon.textContent = 'visibility_off';
+      }
+    }
+    
+    // Color blanco inputs
+    window.onload = function () {
+      const inputs = document.querySelectorAll('input');
+
+      function forceWhiteColor(input) {
+        setTimeout(() => {
+          input.style.color = 'white';
+          input.style.backgroundColor = 'black';
+        }, 50);
+      }
+
+      inputs.forEach(input => {
+        input.addEventListener('focus', function () {
+          input.style.backgroundColor = 'black';
+          input.style.color = 'white';
+          input.style.boxShadow = 'inset 0 0 0 1000px black';
+        });
+
+        input.addEventListener('blur', function () {
+          if (!input.value) {
+            input.style.backgroundColor = 'black';
+            input.style.color = 'white';
+            input.style.boxShadow = 'inset 0 0 0 1000px black';
+          }
+        });
+
+        input.addEventListener('input', function () {
+          if (input.value) {
+            input.style.color = 'white';
+          }
+        });
+
+        input.addEventListener('change', function () {
+          forceWhiteColor(input);
+        });
+
+        forceWhiteColor(input);
+      });
     }
 
     document.getElementById("loginForm").addEventListener("submit", async function (event) {
