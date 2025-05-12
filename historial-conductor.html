@@ -33,11 +33,11 @@
       <div data-card>
         <h1 class="text-3xl font-bold text-center text-white">Historial del conductor</h1>
 
-        <div class="text-white text-center space-y-2 my-4">
-          <p><strong>Nombre:</strong> {{ nombre }}</p>
-          <p><strong>DNI:</strong> {{ dni }}</p>
-          <p><strong>Licencia:</strong> {{ licencia }}</p>
-          <p><strong>Vehículo:</strong> {{ vehiculo }}</p>
+        <div class="text-white text-center space-y-2 my-4" id="infoUsuario">
+          <p><strong>Nombre:</strong> <span id="nombreUsuario">-</span></p>
+          <p><strong>DNI:</strong> <span id="dniUsuario">-</span></p>
+          <p><strong>Licencia:</strong> <span id="licenciaUsuario">-</span></p>
+          <p><strong>Vehículo:</strong> <span id="vehiculoUsuario">-</span></p>
         </div>
 
         <!-- Filtros -->
@@ -95,6 +95,16 @@
     localStorage.clear();
     alert("Sesión cerrada.");
     window.location.href = "/";
+  }
+
+  function cargarDatosUsuario() {
+    const usuario = JSON.parse(localStorage.getItem("usuario"));
+    if (!usuario) return;
+
+    document.getElementById("nombreUsuario").textContent = usuario.nombre || "-";
+    document.getElementById("dniUsuario").textContent = usuario.dni || "-";
+    document.getElementById("licenciaUsuario").textContent = usuario.licencia || "-";
+    document.getElementById("vehiculoUsuario").textContent = usuario.vehiculo_modelo || "-";
   }
 
   async function cargarEventos() {
@@ -166,7 +176,10 @@
     URL.revokeObjectURL(url);
   }
 
-  document.addEventListener("DOMContentLoaded", cargarEventos);
+  document.addEventListener("DOMContentLoaded", function() {
+    cargarDatosUsuario();
+    cargarEventos();
+  });
   document.getElementById("filtroEvento").addEventListener("change", cargarEventos);
   document.getElementById("btnDescargar").addEventListener("click", () => {
     exportarCSV(eventosMostrados);
