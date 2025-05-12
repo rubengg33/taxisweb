@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,14 +10,15 @@
     <link rel="manifest" href="img/favicon/site.webmanifest">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
-        .button-hover { 
+        .button-hover {
             transition: transform 0.2s, box-shadow 0.2s;
         }
+
         .button-hover:hover {
             transform: translateY(-3px);
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
         }
-        
+
         /* Animación mejorada del menú móvil */
         .mobile-menu {
             max-height: 0;
@@ -26,7 +28,7 @@
             transform-origin: top right;
             transform: scale(0.95);
         }
-        
+
         .mobile-menu.show {
             max-height: 300px;
             opacity: 1;
@@ -50,17 +52,18 @@
             padding-left: 1.5rem;
             background: linear-gradient(to right, transparent, rgba(56, 189, 248, 0.1));
         }
-        
+
         /* Animación para el icono del menú */
         .menu-icon {
             transition: all 0.3s ease;
         }
-        
+
         .menu-icon.open {
             transform: rotate(180deg);
         }
     </style>
 </head>
+
 <body class="bg-gradient-to-br from-purple-600 via-indigo-500 to-sky-400 min-h-screen">
     <!-- Navbar con nuevos colores -->
     <!-- Navbar structure update -->
@@ -68,11 +71,12 @@
         <div class="w-full">
             <div class="flex justify-between items-center h-16 ml-6">
                 <!-- Logo section sin márgenes -->
-                <div class="flex items-center">
-                    <img src="img/taxi.png" alt="Logo" class="h-16 w-16 rounded">
-                    <span class="ml-2 text-xl font-semibold text-white">TaxiGest</span>
-                </div>
-
+                <a href="index.html" class="block">
+                    <div class="flex items-center button-hover cursor-pointer">
+                        <img src="img/taxi.png" alt="Logo" class="h-16 w-16 rounded">
+                        <span class="ml-2 text-xl font-semibold text-white">TaxiGest</span>
+                    </div>
+                </a>
                 <!-- Desktop menu ajustado a la derecha -->
                 <div class="hidden md:flex items-center space-x-8 pr-8">
                     <a href="index.html" class="text-gray-300 hover:text-sky-400 transition">Inicio</a>
@@ -86,13 +90,18 @@
                     <button class="mobile-menu-button p-2">
                         <span class="material-icons menu-icon text-white transition-transform duration-300">menu</span>
                     </button>
-                    
+
                     <!-- Mobile menu repositioned -->
-                    <div class="mobile-menu hidden md:hidden absolute right-0 top-full mt-2 w-48 rounded-lg overflow-hidden bg-gray-900 shadow-lg z-50">
-                        <a href="index.html" class="block py-3 px-4 text-gray-300 hover:bg-gray-700 hover:text-sky-400 border-b border-gray-700">Inicio</a>
-                        <a href="#" class="block py-3 px-4 text-gray-300 hover:bg-gray-700 hover:text-sky-400 border-b border-gray-700">Servicios</a>
-                        <a href="#" class="block py-3 px-4 text-gray-300 hover:bg-gray-700 hover:text-sky-400 border-b border-gray-700">Contacto</a>
-                        <a href="#" class="block py-3 px-4 text-gray-300 hover:bg-gray-700 hover:text-sky-400">Acerca de</a>
+                    <div
+                        class="mobile-menu hidden md:hidden absolute right-0 top-full mt-2 w-48 rounded-lg overflow-hidden bg-gray-900 shadow-lg z-50">
+                        <a href="index.html"
+                            class="block py-3 px-4 text-gray-300 hover:bg-gray-700 hover:text-sky-400 border-b border-gray-700">Inicio</a>
+                        <a href="#"
+                            class="block py-3 px-4 text-gray-300 hover:bg-gray-700 hover:text-sky-400 border-b border-gray-700">Servicios</a>
+                        <a href="#"
+                            class="block py-3 px-4 text-gray-300 hover:bg-gray-700 hover:text-sky-400 border-b border-gray-700">Contacto</a>
+                        <a href="#" class="block py-3 px-4 text-gray-300 hover:bg-gray-700 hover:text-sky-400">Acerca
+                            de</a>
                     </div>
                 </div>
             </div>
@@ -101,41 +110,46 @@
 
     <div class="flex items-center justify-center min-h-[calc(100vh-4rem)] pt-16">
         <div class="max-w-4xl w-full mx-4">
-            <div class="bg-gradient-to-br from-gray-900/90 to-gray-800/90 backdrop-blur-sm rounded-2xl shadow-2xl p-8 text-center border border-gray-700">
+            <div
+                class="bg-gradient-to-br from-gray-900/90 to-gray-800/90 backdrop-blur-sm rounded-2xl shadow-2xl p-8 text-center border border-gray-700">
                 <h1 class="text-4xl font-bold mb-2 text-white">Sistema de Gestión de Taxis</h1>
                 <p class="text-gray-300 mb-8">Seleccione el tipo de acceso que desea realizar</p>
-                
+
                 <div class="flex flex-col md:flex-row gap-6 justify-center items-center">
                     <!-- Botón de Administración -->
-                    <a href="titulares-conductores.html" 
-                       class="button-hover bg-gradient-to-r from-sky-600 to-blue-700 text-white px-8 py-4 rounded-xl flex items-center gap-3 w-full md:w-64 justify-center hover:from-sky-700 hover:to-blue-800">
+                    <a href="titulares-conductores.html"
+                        class="button-hover bg-gradient-to-r from-sky-600 to-blue-700 text-white px-8 py-4 rounded-xl flex items-center gap-3 w-full md:w-64 justify-center hover:from-sky-700 hover:to-blue-800">
                         <span class="material-icons">admin_panel_settings</span>
                         <span class="text-lg font-semibold">Administración</span>
                     </a>
-                
+
                     <!-- Botón de Conductores -->
-                    <a href="login-conductor.html" 
-                       class="button-hover bg-gradient-to-r from-emerald-500 to-teal-600 text-white px-8 py-4 rounded-xl flex items-center gap-3 w-full md:w-64 justify-center hover:from-emerald-600 hover:to-teal-700">
+                    <a href="login-conductor.html"
+                        class="button-hover bg-gradient-to-r from-emerald-500 to-teal-600 text-white px-8 py-4 rounded-xl flex items-center gap-3 w-full md:w-64 justify-center hover:from-emerald-600 hover:to-teal-700">
                         <span class="material-icons">directions_car</span>
                         <span class="text-lg font-semibold">Conductores</span>
                     </a>
-                    <a href="login-empresa.html" 
-                    class="button-hover bg-gradient-to-r from-purple-500 to-pink-600 text-white px-8 py-4 rounded-xl flex items-center gap-3 w-full md:w-64 justify-center hover:from-purple-600 hover:to-pink-700">
-                     <span class="material-icons">business</span>
-                     <span class="text-lg font-semibold">Empresa</span>
-                 </a>
+                    <a href="login-empresa.html"
+                        class="button-hover bg-gradient-to-r from-purple-500 to-pink-600 text-white px-8 py-4 rounded-xl flex items-center gap-3 w-full md:w-64 justify-center hover:from-purple-600 hover:to-pink-700">
+                        <span class="material-icons">business</span>
+                        <span class="text-lg font-semibold">Empresa</span>
+                    </a>
                 </div>
 
                 <div class="mt-12">
                     <div class="max-w-3xl mx-auto text-sm text-gray-300 leading-relaxed mb-8 px-4">
                         <p class="text-justify">
-                            De acuerdo con la Ley 16/1987, de 30 de julio, de Ordenación de los Transportes Terrestres (LOTT) 
-                            y el Real Decreto 1211/1990, de 28 de septiembre (ROTT), este sistema cumple con la normativa vigente 
+                            De acuerdo con la Ley 16/1987, de 30 de julio, de Ordenación de los Transportes Terrestres
+                            (LOTT)
+                            y el Real Decreto 1211/1990, de 28 de septiembre (ROTT), este sistema cumple con la
+                            normativa vigente
                             para la gestión de servicios de taxi.
-                        </p>        
+                        </p>
                         <p class="text-justify">
-                            El sistema permite a los conductores registrarse y gestionar su información personal, así como a los
-                            titulares de vehículos solicitar servicios de taxi. Además, proporciona herramientas para la gestión
+                            El sistema permite a los conductores registrarse y gestionar su información personal, así
+                            como a los
+                            titulares de vehículos solicitar servicios de taxi. Además, proporciona herramientas para la
+                            gestión
                             de los servicios, como la asignación de conductores y la generación de informes.
                     </div>
                     <footer class="mt-8 pt-4 border-t border-gray-700">
@@ -173,4 +187,5 @@
         });
     </script>
 </body>
+
 </html>

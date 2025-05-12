@@ -1,12 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script>
         // Check authentication immediately before anything else loads
-        if (localStorage.getItem("token") && 
-            localStorage.getItem("empresaEmail") && 
+        if (localStorage.getItem("token") &&
+            localStorage.getItem("empresaEmail") &&
             localStorage.getItem("isEmpresa") === "true") {
             window.location.replace("empresa.html");
         }
@@ -19,34 +20,35 @@
     <title>Document</title>
     <script>
         function checkAuthAndRedirect() {
-        const token = localStorage.getItem("token");
-        const isAdmin = localStorage.getItem("isAdmin") === "true";
-        const isEmpresa = localStorage.getItem("isEmpresa") === "true";
-        const empresaEmail = localStorage.getItem("empresaEmail");
+            const token = localStorage.getItem("token");
+            const isAdmin = localStorage.getItem("isAdmin") === "true";
+            const isEmpresa = localStorage.getItem("isEmpresa") === "true";
+            const empresaEmail = localStorage.getItem("empresaEmail");
 
-        // If user is authenticated (either as admin or empresa)
-        if (token && (isAdmin || (isEmpresa && empresaEmail))) {
-            window.location.href = "empresa.html";
-            return true;
+            // If user is authenticated (either as admin or empresa)
+            if (token && (isAdmin || (isEmpresa && empresaEmail))) {
+                window.location.href = "empresa.html";
+                return true;
+            }
+            return false;
         }
-        return false;
-    }
-      // Check immediately when the script loads
-      checkAuthAndRedirect();
+        // Check immediately when the script loads
+        checkAuthAndRedirect();
 
-// Also check when the document is fully loaded
-document.addEventListener('DOMContentLoaded', function() {
-    checkAuthAndRedirect();
-});
-   
+        // Also check when the document is fully loaded
+        document.addEventListener('DOMContentLoaded', function () {
+            checkAuthAndRedirect();
+        });
+
     </script>
     <style>
         @layer utilities {
+
             /* Force white text for autofilled inputs */
             input:-webkit-autofill,
             input:-webkit-autofill:hover,
             input:-webkit-autofill:focus,
-            input:-webkit-autofill:active { 
+            input:-webkit-autofill:active {
                 -webkit-text-fill-color: white !important;
                 -webkit-box-shadow: 0 0 0 30px black inset !important;
                 box-shadow: 0 0 0 30px black inset !important;
@@ -66,6 +68,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 appearance: none;
             }
         }
+
         /* Animación mejorada del menú móvil */
         .mobile-menu {
             max-height: 0;
@@ -75,7 +78,7 @@ document.addEventListener('DOMContentLoaded', function() {
             transform-origin: top right;
             transform: scale(0.95);
         }
-        
+
         .mobile-menu.show {
             max-height: 300px;
             opacity: 1;
@@ -99,82 +102,85 @@ document.addEventListener('DOMContentLoaded', function() {
             padding-left: 1.5rem;
             background: linear-gradient(to right, transparent, rgba(56, 189, 248, 0.1));
         }
-        
+
         /* Animación para el icono del menú */
         .menu-icon {
             transition: all 0.3s ease;
         }
-        
+
         .menu-icon.open {
             transform: rotate(180deg);
         }
-        
+
         .animated-border {
-    position: relative;
-    z-index: 0;
-    border-radius: 1rem;
-    overflow: hidden;
-    background: linear-gradient(to bottom, #1f1f1f, #111827, black);
-}
+            position: relative;
+            z-index: 0;
+            border-radius: 1rem;
+            overflow: hidden;
+            background: linear-gradient(to bottom, #1f1f1f, #111827, black);
+        }
 
-.animated-border > * {
-    position: relative;
-    z-index: 2;
-}
+        .animated-border>* {
+            position: relative;
+            z-index: 2;
+        }
 
-.animated-border::before {
-    position: absolute;
-    content: '';
-    display: block;
-    width: 250px;
-    height: 200%;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: linear-gradient(
-        90deg,
-        transparent,
-        #22d3ee,
-        #22d3ee,
-        #22d3ee,
-        #22d3ee,
-        transparent
-    );
-    animation: rotation_481 5000ms infinite linear;
-    z-index: 1;
-}
+        .animated-border::before {
+            position: absolute;
+            content: '';
+            display: block;
+            width: 250px;
+            height: 200%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(90deg,
+                    transparent,
+                    #22d3ee,
+                    #22d3ee,
+                    #22d3ee,
+                    #22d3ee,
+                    transparent);
+            animation: rotation_481 5000ms infinite linear;
+            z-index: 1;
+        }
 
-.animated-border::after {
-    content: '';
-    position: absolute;
-    inset: 2px;
-    background: linear-gradient(to bottom, #1f1f1f, #111827, black);
-    border-radius: 14px;
-    z-index: 1;
-}
+        .animated-border::after {
+            content: '';
+            position: absolute;
+            inset: 2px;
+            background: linear-gradient(to bottom, #1f1f1f, #111827, black);
+            border-radius: 14px;
+            z-index: 1;
+        }
 
-@keyframes rotation_481 {
-    0% {
-        transform: translate(-50%, -50%) rotate(0deg);
-    }
-    100% {
-        transform: translate(-50%, -50%) rotate(360deg);
-    }
-}
+        @keyframes rotation_481 {
+            0% {
+                transform: translate(-50%, -50%) rotate(0deg);
+            }
+
+            100% {
+                transform: translate(-50%, -50%) rotate(360deg);
+            }
+        }
     </style>
 </head>
+
 <body>
+
     <body class="bg-[#0f172a] min-h-screen">
         <!-- Add navbar -->
         <nav class="bg-gradient-to-r from-gray-900 to-gray-800 shadow-lg">
             <div class="w-full">
                 <div class="flex justify-between items-center h-16 ml-6">
                     <!-- Logo section -->
-                    <div class="flex items-center">
-                        <img src="img/taxi.png" alt="Logo" class="h-16 w-16 rounded">
-                        <span class="ml-2 text-xl font-semibold text-white">TaxiGest</span>
-                    </div>
-    
+                    <a href="index.html" class="block">
+                        <div class="flex items-center button-hover cursor-pointer">
+                            <img src="img/taxi.png" alt="Logo" class="h-16 w-16 rounded">
+                            <span class="ml-2 text-xl font-semibold text-white">TaxiGest</span>
+                        </div>
+                    </a>
+
                     <!-- Desktop menu -->
                     <div class="hidden md:flex items-center space-x-8 pr-8">
                         <a href="index.html" class="text-gray-300 hover:text-sky-400 transition">Inicio</a>
@@ -182,19 +188,25 @@ document.addEventListener('DOMContentLoaded', function() {
                         <a href="#" class="text-gray-300 hover:text-sky-400 transition">Contacto</a>
                         <a href="#" class="text-gray-300 hover:text-sky-400 transition">Acerca de</a>
                     </div>
-    
+
                     <!-- Mobile menu button -->
                     <div class="md:hidden relative">
                         <button class="mobile-menu-button p-2">
-                            <span class="material-icons menu-icon text-white transition-transform duration-300">menu</span>
+                            <span
+                                class="material-icons menu-icon text-white transition-transform duration-300">menu</span>
                         </button>
-                        
+
                         <!-- Mobile menu -->
-                        <div class="mobile-menu hidden md:hidden absolute right-0 top-full mt-2 w-48 rounded-lg overflow-hidden bg-gray-900 shadow-lg z-50">
-                            <a href="index.html" class="block py-3 px-4 text-gray-300 hover:bg-gray-700 hover:text-sky-400 border-b border-gray-700">Inicio</a>
-                            <a href="#" class="block py-3 px-4 text-gray-300 hover:bg-gray-700 hover:text-sky-400 border-b border-gray-700">Servicios</a>
-                            <a href="#" class="block py-3 px-4 text-gray-300 hover:bg-gray-700 hover:text-sky-400 border-b border-gray-700">Contacto</a>
-                            <a href="#" class="block py-3 px-4 text-gray-300 hover:bg-gray-700 hover:text-sky-400">Acerca de</a>
+                        <div
+                            class="mobile-menu hidden md:hidden absolute right-0 top-full mt-2 w-48 rounded-lg overflow-hidden bg-gray-900 shadow-lg z-50">
+                            <a href="index.html"
+                                class="block py-3 px-4 text-gray-300 hover:bg-gray-700 hover:text-sky-400 border-b border-gray-700">Inicio</a>
+                            <a href="#"
+                                class="block py-3 px-4 text-gray-300 hover:bg-gray-700 hover:text-sky-400 border-b border-gray-700">Servicios</a>
+                            <a href="#"
+                                class="block py-3 px-4 text-gray-300 hover:bg-gray-700 hover:text-sky-400 border-b border-gray-700">Contacto</a>
+                            <a href="#"
+                                class="block py-3 px-4 text-gray-300 hover:bg-gray-700 hover:text-sky-400">Acerca de</a>
                         </div>
                     </div>
                 </div>
@@ -204,7 +216,7 @@ document.addEventListener('DOMContentLoaded', function() {
         <div class="flex items-center justify-center min-h-[calc(100vh-4rem)]">
             <div class="w-[19rem] p-6 flex flex-col gap-4 rounded-2xl animated-border
             shadow-[0_0_20px_2px_rgba(34,211,238,0.3)]">
-                
+
                 <!-- Header -->
                 <div class="text-center">
                     <span class="material-icons text-green-400">business</span>
@@ -217,31 +229,25 @@ document.addEventListener('DOMContentLoaded', function() {
                 <form id="loginForm" class="space-y-3">
                     <div>
                         <label for="email" class="block text-sm text-white mb-1">Correo Electrónico</label>
-                        <input type="email" id="email" 
-                            placeholder="ejemplo@email.com"
-                            class="w-full px-4 py-2 rounded-lg bg-gray-800 border border-gray-600 
+                        <input type="email" id="email" placeholder="ejemplo@email.com" class="w-full px-4 py-2 rounded-lg bg-gray-800 border border-gray-600 
                                    text-white placeholder-gray-400 
-                                   focus:outline-none focus:ring-2 focus:ring-cyan-500 transition" 
-                            required>
+                                   focus:outline-none focus:ring-2 focus:ring-cyan-500 transition" required>
                     </div>
                     <div>
                         <label for="password" class="block text-sm text-white mb-1">Contraseña</label>
                         <div class="relative">
-                            <input type="password" id="password" 
-                                placeholder="12345678X"
-                                class="w-full px-4 py-2 rounded-lg bg-gray-800 border border-gray-600 
+                            <input type="password" id="password" placeholder="12345678X" class="w-full px-4 py-2 rounded-lg bg-gray-800 border border-gray-600 
                                        text-white placeholder-gray-400 
-                                       focus:outline-none focus:ring-2 focus:ring-cyan-500 transition" 
-                                required>
-                            <button type="button" 
-                                class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-200" 
+                                       focus:outline-none focus:ring-2 focus:ring-cyan-500 transition" required>
+                            <button type="button"
+                                class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-200"
                                 onclick="togglePasswordVisibility()">
-                                <span class="material-icons text-sm hover:cursor-pointer" id="passwordToggleIcon">visibility_off</span>
+                                <span class="material-icons text-sm hover:cursor-pointer"
+                                    id="passwordToggleIcon">visibility_off</span>
                             </button>
                         </div>
                     </div>
-                    <button type="submit"
-                        class="w-full py-2 text-white text-sm rounded-full 
+                    <button type="submit" class="w-full py-2 text-white text-sm rounded-full 
                                bg-gradient-to-r from-cyan-400 to-cyan-600 
                                shadow-inner hover:from-cyan-300 transition hover:cursor-pointer">
                         Ingresar
@@ -251,156 +257,157 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
 
         <script src="scripts/config.js"></script>
-        
+
         <script>
             //menu movil
-             const mobileMenuButton = document.querySelector('.mobile-menu-button');
-    const mobileMenu = document.querySelector('.mobile-menu');
-    const menuIcon = document.querySelector('.menu-icon');
+            const mobileMenuButton = document.querySelector('.mobile-menu-button');
+            const mobileMenu = document.querySelector('.mobile-menu');
+            const menuIcon = document.querySelector('.menu-icon');
 
-    mobileMenuButton.addEventListener('click', () => {
-        if (mobileMenu.classList.contains('show')) {
-            mobileMenu.classList.remove('show');
-            menuIcon.style.transform = 'rotate(0deg)';
-            setTimeout(() => {
-                menuIcon.textContent = 'menu';
-                mobileMenu.classList.add('hidden');
-            }, 150);
-        } else {
-            mobileMenu.classList.remove('hidden');
-            setTimeout(() => {
-                mobileMenu.classList.add('show');
-                menuIcon.textContent = 'close';
-                menuIcon.style.transform = 'rotate(180deg)';
-            }, 10);
-        }
-    });
-//color blanco inputs
-        window.onload = function () {
-        const inputs = document.querySelectorAll('input');
-        
-        function forceWhiteColor(input) {
-            setTimeout(() => {
-                input.style.color = 'white';
-                input.style.backgroundColor = 'black';
-            }, 50);
-        }
-        
-        inputs.forEach(input => {
-            input.addEventListener('focus', function () {
-                input.style.backgroundColor = 'black';
-                input.style.color = 'white';
-                input.style.boxShadow = 'inset 0 0 0 1000px black';
-            });
-
-            input.addEventListener('blur', function () {
-                if (!input.value) {
-                    input.style.backgroundColor = 'black';
-                    input.style.color = 'white';
-                    input.style.boxShadow = 'inset 0 0 0 1000px black';
+            mobileMenuButton.addEventListener('click', () => {
+                if (mobileMenu.classList.contains('show')) {
+                    mobileMenu.classList.remove('show');
+                    menuIcon.style.transform = 'rotate(0deg)';
+                    setTimeout(() => {
+                        menuIcon.textContent = 'menu';
+                        mobileMenu.classList.add('hidden');
+                    }, 150);
+                } else {
+                    mobileMenu.classList.remove('hidden');
+                    setTimeout(() => {
+                        mobileMenu.classList.add('show');
+                        menuIcon.textContent = 'close';
+                        menuIcon.style.transform = 'rotate(180deg)';
+                    }, 10);
                 }
             });
+            //color blanco inputs
+            window.onload = function () {
+                const inputs = document.querySelectorAll('input');
 
-            input.addEventListener('input', function () {
-                if (input.value) {
-                    input.style.color = 'white';
+                function forceWhiteColor(input) {
+                    setTimeout(() => {
+                        input.style.color = 'white';
+                        input.style.backgroundColor = 'black';
+                    }, 50);
                 }
-            });
 
-            input.addEventListener('change', function () {
-                forceWhiteColor(input);
-            });
+                inputs.forEach(input => {
+                    input.addEventListener('focus', function () {
+                        input.style.backgroundColor = 'black';
+                        input.style.color = 'white';
+                        input.style.boxShadow = 'inset 0 0 0 1000px black';
+                    });
 
-            forceWhiteColor(input);
-        });
-    }
+                    input.addEventListener('blur', function () {
+                        if (!input.value) {
+                            input.style.backgroundColor = 'black';
+                            input.style.color = 'white';
+                            input.style.boxShadow = 'inset 0 0 0 1000px black';
+                        }
+                    });
 
-    function togglePasswordVisibility() {
-        const passwordInput = document.getElementById('password');
-        const passwordToggleIcon = document.getElementById('passwordToggleIcon');
-        
-        if (passwordInput.type === 'password') {
-            passwordInput.type = 'text';
-            passwordToggleIcon.textContent = 'visibility';
-        } else {
-            passwordInput.type = 'password';
-            passwordToggleIcon.textContent = 'visibility_off';
-        }
-    }
+                    input.addEventListener('input', function () {
+                        if (input.value) {
+                            input.style.color = 'white';
+                        }
+                    });
 
-    // Add the login form handler
-    // First, add the showAlert function at the top of your script section
-    function showAlert(message, type = 'info') {
-        return Swal.fire({
-            text: message,
-            icon: type,
-            background: '#1a1a1a',
-            color: '#ffffff',
-            confirmButtonColor: '#3085d6'
-        });
-    }
+                    input.addEventListener('change', function () {
+                        forceWhiteColor(input);
+                    });
 
-    // Then update the login handler
-    document.getElementById('loginForm').addEventListener('submit', async function(e) {
-        e.preventDefault();
-        const email = document.getElementById('email').value;
-        const password = document.getElementById('password').value;
-    
-        try {
-            const response = await fetch(`${API_URL}/login`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password })
-            });
-    
-            const data = await response.json();
-    
-            if (data.exists && data.admin) {
-                localStorage.setItem('token', data.token);
-                localStorage.setItem('isAdmin', 'true');
-                localStorage.setItem('userEmail', email);
-                window.location.href = 'empresa.html';
-                return;
+                    forceWhiteColor(input);
+                });
             }
-    
-            // If not admin, try empresa login
-            const empresaResponse = await fetch(`${API_URL}/login-empresa`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, dni: password })
-            });
-    
-            const empresaData = await empresaResponse.json();
-            
-            if (empresaData.exists) {
-                localStorage.setItem('token', empresaData.token);
-                localStorage.setItem('empresaEmail', email);
-                localStorage.setItem('isEmpresa', 'true');
-                localStorage.setItem('empresaData', JSON.stringify(empresaData.empresaData));
-                window.location.href = 'empresa.html';
-            } else {
-                await Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: 'Correo o DNI incorrectos',
+
+            function togglePasswordVisibility() {
+                const passwordInput = document.getElementById('password');
+                const passwordToggleIcon = document.getElementById('passwordToggleIcon');
+
+                if (passwordInput.type === 'password') {
+                    passwordInput.type = 'text';
+                    passwordToggleIcon.textContent = 'visibility';
+                } else {
+                    passwordInput.type = 'password';
+                    passwordToggleIcon.textContent = 'visibility_off';
+                }
+            }
+
+            // Add the login form handler
+            // First, add the showAlert function at the top of your script section
+            function showAlert(message, type = 'info') {
+                return Swal.fire({
+                    text: message,
+                    icon: type,
                     background: '#1a1a1a',
                     color: '#ffffff',
                     confirmButtonColor: '#3085d6'
                 });
             }
-        } catch (error) {
-            console.error("Error en el login:", error);
-            await Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: error.message || 'Error al conectar con el servidor',
-                background: '#1a1a1a',
-                color: '#ffffff',
-                confirmButtonColor: '#3085d6'
-            });
-        }
-    });
 
-                </script>
-</body>
+            // Then update the login handler
+            document.getElementById('loginForm').addEventListener('submit', async function (e) {
+                e.preventDefault();
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+
+                try {
+                    const response = await fetch(`${API_URL}/login`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email, password })
+                    });
+
+                    const data = await response.json();
+
+                    if (data.exists && data.admin) {
+                        localStorage.setItem('token', data.token);
+                        localStorage.setItem('isAdmin', 'true');
+                        localStorage.setItem('userEmail', email);
+                        window.location.href = 'empresa.html';
+                        return;
+                    }
+
+                    // If not admin, try empresa login
+                    const empresaResponse = await fetch(`${API_URL}/login-empresa`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email, dni: password })
+                    });
+
+                    const empresaData = await empresaResponse.json();
+
+                    if (empresaData.exists) {
+                        localStorage.setItem('token', empresaData.token);
+                        localStorage.setItem('empresaEmail', email);
+                        localStorage.setItem('isEmpresa', 'true');
+                        localStorage.setItem('empresaData', JSON.stringify(empresaData.empresaData));
+                        window.location.href = 'empresa.html';
+                    } else {
+                        await Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Correo o DNI incorrectos',
+                            background: '#1a1a1a',
+                            color: '#ffffff',
+                            confirmButtonColor: '#3085d6'
+                        });
+                    }
+                } catch (error) {
+                    console.error("Error en el login:", error);
+                    await Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: error.message || 'Error al conectar con el servidor',
+                        background: '#1a1a1a',
+                        color: '#ffffff',
+                        confirmButtonColor: '#3085d6'
+                    });
+                }
+            });
+
+        </script>
+    </body>
+
 </html>

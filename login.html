@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <!--prueba-->
     <meta charset="UTF-8">
@@ -13,6 +14,7 @@
     <title>controldeconductores.com</title>
     <style>
         @layer utilities {
+
             /* Force white text for autofilled inputs */
             input:-webkit-autofill,
             input:-webkit-autofill:hover,
@@ -37,6 +39,7 @@
                 appearance: none;
             }
         }
+
         /* Animación mejorada del menú móvil */
         .mobile-menu {
             max-height: 0;
@@ -46,7 +49,7 @@
             transform-origin: top right;
             transform: scale(0.95);
         }
-        
+
         .mobile-menu.show {
             max-height: 300px;
             opacity: 1;
@@ -70,80 +73,82 @@
             padding-left: 1.5rem;
             background: linear-gradient(to right, transparent, rgba(56, 189, 248, 0.1));
         }
-        
+
         /* Animación para el icono del menú */
         .menu-icon {
             transition: all 0.3s ease;
         }
-        
+
         .menu-icon.open {
             transform: rotate(180deg);
         }
-         
+
         .animated-border {
-    position: relative;
-    z-index: 0;
-    border-radius: 1rem;
-    overflow: hidden;
-    background: linear-gradient(to bottom, #1f1f1f, #111827, black);
-}
+            position: relative;
+            z-index: 0;
+            border-radius: 1rem;
+            overflow: hidden;
+            background: linear-gradient(to bottom, #1f1f1f, #111827, black);
+        }
 
-.animated-border > * {
-    position: relative;
-    z-index: 2;
-}
+        .animated-border>* {
+            position: relative;
+            z-index: 2;
+        }
 
-.animated-border::before {
-    position: absolute;
-    content: '';
-    display: block;
-    width: 250px;
-    height: 200%;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: linear-gradient(
-        90deg,
-        transparent,
-        #22d3ee,
-        #22d3ee,
-        #22d3ee,
-        #22d3ee,
-        transparent
-    );
-    animation: rotation_481 5000ms infinite linear;
-    z-index: 1;
-}
+        .animated-border::before {
+            position: absolute;
+            content: '';
+            display: block;
+            width: 250px;
+            height: 200%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(90deg,
+                    transparent,
+                    #22d3ee,
+                    #22d3ee,
+                    #22d3ee,
+                    #22d3ee,
+                    transparent);
+            animation: rotation_481 5000ms infinite linear;
+            z-index: 1;
+        }
 
-.animated-border::after {
-    content: '';
-    position: absolute;
-    inset: 2px;
-    background: linear-gradient(to bottom, #1f1f1f, #111827, black);
-    border-radius: 14px;
-    z-index: 1;
-}
+        .animated-border::after {
+            content: '';
+            position: absolute;
+            inset: 2px;
+            background: linear-gradient(to bottom, #1f1f1f, #111827, black);
+            border-radius: 14px;
+            z-index: 1;
+        }
 
-@keyframes rotation_481 {
-    0% {
-        transform: translate(-50%, -50%) rotate(0deg);
-    }
-    100% {
-        transform: translate(-50%, -50%) rotate(360deg);
-    }
-}
+        @keyframes rotation_481 {
+            0% {
+                transform: translate(-50%, -50%) rotate(0deg);
+            }
+
+            100% {
+                transform: translate(-50%, -50%) rotate(360deg);
+            }
+        }
     </style>
 </head>
+
 <body class="bg-[#0f172a] min-h-screen">
     <!-- Add navbar -->
     <nav class="bg-gradient-to-r from-gray-900 to-gray-800 shadow-lg">
         <div class="w-full">
             <div class="flex justify-between items-center h-16 ml-6">
                 <!-- Logo section -->
-                <div class="flex items-center">
-                    <img src="img/taxi.png" alt="Logo" class="h-16 w-16 rounded">
-                    <span class="ml-2 text-xl font-semibold text-white">TaxiGest</span>
-                </div>
+                <a href="index.html" class="block">
+                    <div class="flex items-center button-hover cursor-pointer">
+                        <img src="img/taxi.png" alt="Logo" class="h-16 w-16 rounded">
+                        <span class="ml-2 text-xl font-semibold text-white">TaxiGest</span>
+                    </div>
+                </a>
 
                 <!-- Desktop menu -->
                 <div class="hidden md:flex items-center space-x-8 pr-8">
@@ -158,13 +163,18 @@
                     <button class="mobile-menu-button p-2">
                         <span class="material-icons menu-icon text-white transition-transform duration-300">menu</span>
                     </button>
-                    
+
                     <!-- Mobile menu -->
-                    <div class="mobile-menu hidden md:hidden absolute right-0 top-full mt-2 w-48 rounded-lg overflow-hidden bg-gray-900 shadow-lg z-50">
-                        <a href="index.html" class="block py-3 px-4 text-gray-300 hover:bg-gray-700 hover:text-sky-400 border-b border-gray-700">Inicio</a>
-                        <a href="#" class="block py-3 px-4 text-gray-300 hover:bg-gray-700 hover:text-sky-400 border-b border-gray-700">Servicios</a>
-                        <a href="#" class="block py-3 px-4 text-gray-300 hover:bg-gray-700 hover:text-sky-400 border-b border-gray-700">Contacto</a>
-                        <a href="#" class="block py-3 px-4 text-gray-300 hover:bg-gray-700 hover:text-sky-400">Acerca de</a>
+                    <div
+                        class="mobile-menu hidden md:hidden absolute right-0 top-full mt-2 w-48 rounded-lg overflow-hidden bg-gray-900 shadow-lg z-50">
+                        <a href="index.html"
+                            class="block py-3 px-4 text-gray-300 hover:bg-gray-700 hover:text-sky-400 border-b border-gray-700">Inicio</a>
+                        <a href="#"
+                            class="block py-3 px-4 text-gray-300 hover:bg-gray-700 hover:text-sky-400 border-b border-gray-700">Servicios</a>
+                        <a href="#"
+                            class="block py-3 px-4 text-gray-300 hover:bg-gray-700 hover:text-sky-400 border-b border-gray-700">Contacto</a>
+                        <a href="#" class="block py-3 px-4 text-gray-300 hover:bg-gray-700 hover:text-sky-400">Acerca
+                            de</a>
                     </div>
                 </div>
             </div>
@@ -174,15 +184,15 @@
     <div class="flex items-center justify-center min-h-[calc(100vh-4rem)]">
         <div class="w-[19rem] p-6 flex flex-col gap-4 rounded-2xl animated-border
         shadow-[0_0_20px_2px_rgba(34,211,238,0.3)]">
-        <div class="text-center">
-            <span class="material-icons text-blue-500">admin_panel_settings</span>
-            <h1 class="text-xl font-bold text-white">Administrador</h1>
-            <p class="text-sm text-gray-300">Iniciar sesión</p>
-        </div>
-        
-        <hr class="border-gray-700" />
+            <div class="text-center">
+                <span class="material-icons text-blue-500">admin_panel_settings</span>
+                <h1 class="text-xl font-bold text-white">Administrador</h1>
+                <p class="text-sm text-gray-300">Iniciar sesión</p>
+            </div>
 
-            <form id="loginForm" class="space-y-4"> 
+            <hr class="border-gray-700" />
+
+            <form id="loginForm" class="space-y-4">
                 <div>
                     <label for="email" class="block text-sm text-white mb-1">Correo Electrónico</label>
                     <input type="email" id="email" placeholder="ejemplo@email.com" class="w-full px-4 py-2 rounded-lg bg-gray-800 border border-gray-600 
@@ -195,8 +205,11 @@
                         <input type="password" id="password" placeholder="contraseña123" class="w-full px-4 py-2 rounded-lg bg-gray-800 border border-gray-600 
                         text-white placeholder-gray-400 
                         focus:outline-none focus:ring-2 focus:ring-cyan-500 transition" required>
-                        <button type="button" class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-200" onclick="togglePasswordVisibility()">
-                            <span class="material-icons hover:cursor-pointer" id="passwordToggleIcon">visibility_off</span>
+                        <button type="button"
+                            class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-200"
+                            onclick="togglePasswordVisibility()">
+                            <span class="material-icons hover:cursor-pointer"
+                                id="passwordToggleIcon">visibility_off</span>
                         </button>
                     </div>
                 </div>
@@ -206,7 +219,8 @@
                 <!-- Add forgot password link -->
                 <p class="text-center text-sm text-gray-400">
                     ¿Olvidaste tu contraseña?
-                    <a href="#" onclick="showResetPasswordForm()" class="text-cyan-400 hover:underline">Recupérala aquí</a>
+                    <a href="#" onclick="showResetPasswordForm()" class="text-cyan-400 hover:underline">Recupérala
+                        aquí</a>
                 </p>
             </form>
 
@@ -225,7 +239,8 @@
                     Enviar correo de recuperación
                 </button>
                 <div class="text-center">
-                    <a href="#" onclick="showLoginForm()" class="text-sm text-cyan-400 hover:underline">Volver al inicio de sesión</a>
+                    <a href="#" onclick="showLoginForm()" class="text-sm text-cyan-400 hover:underline">Volver al inicio
+                        de sesión</a>
                 </div>
             </div>
 
@@ -243,16 +258,16 @@
 
                 async function requestPasswordReset() {
                     const email = document.getElementById('resetEmail').value;
-                    
+
                     try {
                         const response = await fetch(`${API_URL}/request-password-reset`, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ email })
                         });
-    
+
                         const data = await response.json();
-    
+
                         if (response.ok) {
                             await Swal.fire({
                                 icon: 'success',
@@ -285,26 +300,26 @@
                 }
 
                 // Update your existing error handling to use SweetAlert
-                document.getElementById("loginForm").addEventListener("submit", async function(event) {
+                document.getElementById("loginForm").addEventListener("submit", async function (event) {
                     event.preventDefault();
                     const email = document.getElementById("email").value;
                     const password = document.getElementById("password").value;
-    
+
                     try {
                         const response = await fetch(`${API_URL}/login`, {
                             method: "POST",
                             headers: { "Content-Type": "application/json" },
                             body: JSON.stringify({ email, password })
                         });
-    
+
                         const data = await response.json();
-    
+
                         if (data.exists && data.admin) {
                             localStorage.setItem("userEmail", email);
                             localStorage.setItem("isAdmin", data.admin);
                             // Store the JWT token
                             localStorage.setItem("token", data.token); // The server should return this token
-    
+
                             await Swal.fire({
                                 text: '¡Bienvenido! Sesión iniciada correctamente',
                                 icon: 'success',
@@ -312,9 +327,9 @@
                                 color: '#ffffff',
                                 confirmButtonColor: '#3085d6'
                             });
-    
-                            
-                                window.location.href = "titulares-conductores.html";
+
+
+                            window.location.href = "titulares-conductores.html";
                         } else {
                             await Swal.fire({
                                 icon: 'error',
@@ -337,18 +352,18 @@
                         });
                     }
                 });
-        
-       document.addEventListener("DOMContentLoaded", function() {
-            const userEmail = localStorage.getItem("userEmail");
-            const isAdmin = localStorage.getItem("isAdmin");
-    
-            if (userEmail && isAdmin === "true" && window.location.pathname !== "/titulares-conductores.html") {
-        window.location.href = "titulares-conductores.html";
-    }
-});
-    
 
-        </script>
+                document.addEventListener("DOMContentLoaded", function () {
+                    const userEmail = localStorage.getItem("userEmail");
+                    const isAdmin = localStorage.getItem("isAdmin");
+
+                    if (userEmail && isAdmin === "true" && window.location.pathname !== "/titulares-conductores.html") {
+                        window.location.href = "titulares-conductores.html";
+                    }
+                });
+
+
+            </script>
         </div>
     </div>
 
@@ -377,6 +392,7 @@
         });
     </script>
 </body>
+
 </html>
 
 <script>
@@ -393,16 +409,16 @@
 
     async function requestPasswordReset() {
         const email = document.getElementById('resetEmail').value;
-        
+
         try {
             const response = await fetch(`${API_URL}/request-password-reset`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email })
             });
-    
+
             const data = await response.json();
-    
+
             if (response.ok) {
                 await Swal.fire({
                     icon: 'success',
@@ -435,18 +451,18 @@
     }
 
     // Update your existing error handling to use SweetAlert
-    
+
 
     window.onload = function () {
         const inputs = document.querySelectorAll('input');
-        
+
         function forceWhiteColor(input) {
             setTimeout(() => {
                 input.style.color = 'white';
                 input.style.backgroundColor = 'black';
             }, 50);
         }
-        
+
         inputs.forEach(input => {
             input.addEventListener('focus', function () {
                 input.style.backgroundColor = 'black';
@@ -479,7 +495,7 @@
     function togglePasswordVisibility() {
         const passwordInput = document.getElementById('password');
         const passwordToggleIcon = document.getElementById('passwordToggleIcon');
-        
+
         if (passwordInput.type === 'password') {
             passwordInput.type = 'text';
             passwordToggleIcon.textContent = 'visibility';

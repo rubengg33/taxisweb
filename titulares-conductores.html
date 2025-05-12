@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,104 +9,114 @@
     <!-- Agregar Material Icons -->
     <link rel="icon" type="image/png" sizes="512x512" href="img/favicon/android-chrome-512x512.png">
     <link rel="manifest" href="img/favicon/site.webmanifest">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">      
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <script src="scripts/config.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         .group {
- display: flex;
- line-height: 28px;
- align-items: center;
- position: relative;
- max-width: 190px;
-}
-
-.input {
- width: 100%;
- height: 40px;
- line-height: 28px;
- padding: 0 1rem;
- padding-left: 2.5rem;
- border: 2px solid transparent;
- border-radius: 8px;
- outline: none;
- background-color: #f3f3f4;
- transition: .3s ease;
-}
-
-.input::placeholder {
- color: #9e9ea7;
-}
-
-.input:focus, input:hover {
- outline: none;
- border-color: rgba(234,76,137,0.4);
- background-color: #fff;
- box-shadow: 0 0 0 4px rgb(234 76 137 / 10%);
-}
-
-.icon {
- position: absolute;
- left: 1rem;
- fill: #9e9ea7;
- width: 1rem;
- height: 1rem;
-}
-  
-    /* Estilos específicos para los campos de búsqueda */
-    #buscarLicencia, #buscarConductor {
-        color: #fff !important; /* Color oscuro para el texto */
-    }
-    
-    /* Para cuando el campo tiene autocompletado */
-    #buscarLicencia:-webkit-autofill, 
-    #buscarConductor:-webkit-autofill {
-        -webkit-text-fill-color: #fff !important;
-    }
-    
-    /* Asegurar que el texto sea visible en todos los estados */
-    #buscarLicencia:hover, #buscarLicencia:focus,
-    #buscarConductor:hover, #buscarConductor:focus {
-        color: #fff !important;
-    }
-    
-    /* Mantener el fondo blanco para mejor contraste */
-    #buscarLicencia, #buscarConductor {
-        background-color: #333 !important;
-    }
-       @layer utilities {
-        /* Force white text for autofilled inputs */
-        input:-webkit-autofill,
-        input:-webkit-autofill:hover,
-        input:-webkit-autofill:focus,
-        input:-webkit-autofill:active {
-            -webkit-text-fill-color: white !important;
-            -webkit-box-shadow: 0 0 0 30px black inset !important;
-            box-shadow: 0 0 0 30px black inset !important;
-            transition: background-color 5000s ease-in-out 0s;
-            background-clip: content-box !important;
+            display: flex;
+            line-height: 28px;
+            align-items: center;
+            position: relative;
+            max-width: 190px;
         }
 
-        /* Additional styles for Firefox and other browsers */
-        input.input-autofill {
-            background-color: black !important;
-            color: white !important;
+        .input {
+            width: 100%;
+            height: 40px;
+            line-height: 28px;
+            padding: 0 1rem;
+            padding-left: 2.5rem;
+            border: 2px solid transparent;
+            border-radius: 8px;
+            outline: none;
+            background-color: #f3f3f4;
+            transition: .3s ease;
         }
 
-        /* Remove menulist button appearance */
-        input:-webkit-autofill {
-            -webkit-appearance: none;
-            appearance: none;
+        .input::placeholder {
+            color: #9e9ea7;
         }
-    }
-        .button-hover { 
+
+        .input:focus,
+        input:hover {
+            outline: none;
+            border-color: rgba(234, 76, 137, 0.4);
+            background-color: #fff;
+            box-shadow: 0 0 0 4px rgb(234 76 137 / 10%);
+        }
+
+        .icon {
+            position: absolute;
+            left: 1rem;
+            fill: #9e9ea7;
+            width: 1rem;
+            height: 1rem;
+        }
+
+        /* Estilos específicos para los campos de búsqueda */
+        #buscarLicencia,
+        #buscarConductor {
+            color: #fff !important;
+            /* Color oscuro para el texto */
+        }
+
+        /* Para cuando el campo tiene autocompletado */
+        #buscarLicencia:-webkit-autofill,
+        #buscarConductor:-webkit-autofill {
+            -webkit-text-fill-color: #fff !important;
+        }
+
+        /* Asegurar que el texto sea visible en todos los estados */
+        #buscarLicencia:hover,
+        #buscarLicencia:focus,
+        #buscarConductor:hover,
+        #buscarConductor:focus {
+            color: #fff !important;
+        }
+
+        /* Mantener el fondo blanco para mejor contraste */
+        #buscarLicencia,
+        #buscarConductor {
+            background-color: #333 !important;
+        }
+
+        @layer utilities {
+
+            /* Force white text for autofilled inputs */
+            input:-webkit-autofill,
+            input:-webkit-autofill:hover,
+            input:-webkit-autofill:focus,
+            input:-webkit-autofill:active {
+                -webkit-text-fill-color: white !important;
+                -webkit-box-shadow: 0 0 0 30px black inset !important;
+                box-shadow: 0 0 0 30px black inset !important;
+                transition: background-color 5000s ease-in-out 0s;
+                background-clip: content-box !important;
+            }
+
+            /* Additional styles for Firefox and other browsers */
+            input.input-autofill {
+                background-color: black !important;
+                color: white !important;
+            }
+
+            /* Remove menulist button appearance */
+            input:-webkit-autofill {
+                -webkit-appearance: none;
+                appearance: none;
+            }
+        }
+
+        .button-hover {
             transition: transform 0.2s, box-shadow 0.2s;
         }
+
         .button-hover:hover {
             transform: translateY(-3px);
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
         }
-        
+
         /* Animación mejorada del menú móvil */
         .mobile-menu {
             max-height: 0;
@@ -115,7 +126,7 @@
             transform-origin: top right;
             transform: scale(0.95);
         }
-        
+
         .mobile-menu.show {
             max-height: 300px;
             opacity: 1;
@@ -139,12 +150,12 @@
             padding-left: 1.5rem;
             background: linear-gradient(to right, transparent, rgba(56, 189, 248, 0.1));
         }
-        
+
         /* Animación para el icono del menú */
         .menu-icon {
             transition: all 0.3s ease;
         }
-        
+
         .menu-icon.open {
             transform: rotate(180deg);
         }
@@ -168,6 +179,7 @@
         });
     </script>
 </head>
+
 <body class="bg-gradient-to-br from-purple-600 via-indigo-500 to-sky-400 min-h-screen">
     <!-- Add content-hidden class to the main content -->
     <div id="mainContent" class="content-hidden">
@@ -183,13 +195,14 @@
     <!-- Navbar structure update -->
     <nav class="bg-gradient-to-r from-gray-900 to-gray-800 shadow-lg">
         <div class="w-full">
-            <div class="flex justify-between items-center h-16 ml-6">   
+            <div class="flex justify-between items-center h-16 ml-6">
                 <!-- Logo section -->
-                <div class="flex items-center">
-                    <img src="img/taxi.png" alt="Logo" class="h-16 w-16 rounded">
-                    <span class="ml-2 text-xl font-semibold text-white">TaxiGest</span>
-                </div>
-
+                <a href="index.html" class="block">
+                    <div class="flex items-center button-hover cursor-pointer">
+                        <img src="img/taxi.png" alt="Logo" class="h-16 w-16 rounded">
+                        <span class="ml-2 text-xl font-semibold text-white">TaxiGest</span>
+                    </div>
+                </a>
                 <!-- Desktop menu -->
                 <div class="hidden md:flex items-center space-x-8 pr-4">
                     <a href="index.html" class="text-gray-300 hover:text-sky-400 transition">Inicio</a>
@@ -197,7 +210,9 @@
                     <a href="#" class="text-gray-300 hover:text-sky-400 transition">Contacto</a>
                     <a href="#" class="text-gray-300 hover:text-sky-400 transition">Acerca de</a>
                     <!-- Botón de cerrar sesión actualizado -->
-                    <button class="button-hover bg-gradient-to-r from-red-600 to-red-700 text-white px-8 py-4 rounded-xl flex items-center gap-3 justify-center hover:from-red-700 hover:to-red-800" id="logoutButton">
+                    <button
+                        class="button-hover cursor-pointer bg-gradient-to-r from-red-600 to-red-700 text-white px-8 py-4 rounded-xl flex items-center gap-3 justify-center hover:from-red-700 hover:to-red-800"
+                        id="logoutButton">
                         <span class="material-icons">logout</span>
                         <span>Cerrar sesión</span>
                     </button>
@@ -206,20 +221,27 @@
                 <!-- Mobile menu button container -->
                 <div class="md:hidden relative flex items-center gap-4">
                     <!-- Botón de cerrar sesión móvil actualizado -->
-                    <button class="button-hover bg-gradient-to-r from-red-600 to-red-700 text-white px-4 py-2 rounded-xl flex items-center gap-2 justify-center hover:from-red-700 hover:to-red-800" id="logoutButtonMobile">
+                    <button
+                        class="button-hover cursor-pointer bg-gradient-to-r from-red-600 to-red-700 text-white px-4 py-2 rounded-xl flex items-center gap-2 justify-center hover:from-red-700 hover:to-red-800"
+                        id="logoutButtonMobile">
                         <span class="material-icons text-sm">logout</span>
                         <span>Cerrar sesión</span>
                     </button>
                     <button class="mobile-menu-button p-2">
                         <span class="material-icons menu-icon text-white transition-transform duration-300">menu</span>
                     </button>
-                    
+
                     <!-- Mobile menu -->
-                    <div class="mobile-menu hidden md:hidden absolute right-0 top-full mt-2 w-48 rounded-lg overflow-hidden bg-gray-900 shadow-lg z-50">
-                        <a href="index.html" class="block py-3 px-4 text-gray-300 hover:bg-gray-700 hover:text-sky-400 border-b border-gray-700">Inicio</a>
-                        <a href="#" class="block py-3 px-4 text-gray-300 hover:bg-gray-700 hover:text-sky-400 border-b border-gray-700">Servicios</a>
-                        <a href="#" class="block py-3 px-4 text-gray-300 hover:bg-gray-700 hover:text-sky-400 border-b border-gray-700">Contacto</a>
-                        <a href="#" class="block py-3 px-4 text-gray-300 hover:bg-gray-700 hover:text-sky-400">Acerca de</a>
+                    <div
+                        class="mobile-menu hidden md:hidden absolute right-0 top-full mt-2 w-48 rounded-lg overflow-hidden bg-gray-900 shadow-lg z-50">
+                        <a href="index.html"
+                            class="block py-3 px-4 text-gray-300 hover:bg-gray-700 hover:text-sky-400 border-b border-gray-700">Inicio</a>
+                        <a href="#"
+                            class="block py-3 px-4 text-gray-300 hover:bg-gray-700 hover:text-sky-400 border-b border-gray-700">Servicios</a>
+                        <a href="#"
+                            class="block py-3 px-4 text-gray-300 hover:bg-gray-700 hover:text-sky-400 border-b border-gray-700">Contacto</a>
+                        <a href="#" class="block py-3 px-4 text-gray-300 hover:bg-gray-700 hover:text-sky-400">Acerca
+                            de</a>
                     </div>
                 </div>
             </div>
@@ -234,498 +256,323 @@
             <div class="w-[90%] min-h-[800px] bg-gray-900 p-6 rounded-lg shadow-lg">
                 <h2 class="text-2xl font-bold text-center mb-4 text-white">Gestión de Conductores y Titulares</h2>
 
-        <div class="flex justify-center gap-4 mb-4">
-            <button onclick="mostrarTabla('licencias')" 
-                    class="button-hover cursor-pointer bg-gradient-to-r from-sky-600 to-blue-700 text-white px-8 py-4 rounded-xl flex items-center gap-3 w-full md:w-64 justify-center hover:from-sky-700 hover:to-blue-800 mt-4">
-                <span class="material-icons">assignment</span>
-                Ver Titulares
-            </button>
-            <button onclick="mostrarTabla('conductores')" 
-                    class="button-hover cursor-pointer bg-gradient-to-r from-emerald-500 to-green-600 text-white px-8 py-4 rounded-xl flex items-center gap-3 w-full md:w-64 justify-center hover:from-emerald-600 hover:to-green-700 mt-4">
-                <span class="material-icons">groups</span>
-                Ver Conductores
-            </button>
-        </div>
-
-        <div id="licencias" class="hidden">
-            <h3 class="text-xl font-semibold mb-2 text-center text-white">Titulares</h3>
-            <div class="flex  gap-25 mb-6 ml-5">
-                <button onclick="abrirFormulario('licencias')" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-800 flex items-center justify-center cursor-pointer">
-                    <span class="material-icons text-sm mr-1 flex items-center">add</span>
-                    <span class="flex items-center">Agregar Titular</span>
-                </button>
-                <div class="relative w-full max-w-lg p-2 pr-8">
-                    <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-6 h-6 pointer-events-none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="black" stroke="white" stroke-width="2">
-                        <circle cx="10" cy="10" r="6" />
-                        <line x1="14" y1="14" x2="20" y2="20" />
-                      </svg>                      
-                    <input
-                      id="buscarLicencia"
-                      type="search"
-                      placeholder="Buscar en cualquier campo..."
-                      class="w-full h-10 pl-10 pr-3 rounded-md border-2 border-transparent bg-gray-100 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-pink-300 focus:bg-white transition duration-300"
-                    />
-                  </div>                  
-            </div>
-            <table class="w-full table-auto border border-gray-300 text-white">
-                <thead>
-                    <tr class="bg-blue-500 text-white">
-                        <th class="border border-gray-400 p-2">LICENCIA</th>
-                        <th class="border border-gray-400 p-2">DNI</th>
-                        <th class="border border-gray-400 p-2">NOMBRE Y APELLIDOS</th>
-                        <th class="border border-gray-400 p-2">MATRÍCULA</th>
-                        <th class="border border-gray-400 p-2">MARCA Y MODELO</th>
-                        <th class="border border-gray-400 p-2">EMAIL</th>
-                        <th class="border border-gray-400 p-2">Nº PATRONAL</th>
-                        <th class="border border-gray-400 p-2">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody id="dataTableLicencias"></tbody>
-            </table>
-        </div>
-        <div id="conductores" class="hidden">
-            <h3 class="text-xl font-semibold mb-2 text-center text-white">Conductores</h3>
-            <div class="flex  gap-25 mb-6 ml-5">
-                <button onclick="abrirFormulario('conductores')" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-800 flex items-center justify-center cursor-pointer">
-                    <span class="material-icons text-sm mr-1 flex items-center">add</span>
-                    <span class="flex items-center">Agregar Conductor</span>
-                </button>
-                <div class="relative w-full max-w-lg p-2 pr-8">
-                    <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-6 h-6 pointer-events-none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="black" stroke="white" stroke-width="2">
-                        <circle cx="10" cy="10" r="6" />
-                        <line x1="14" y1="14" x2="20" y2="20" />
-                      </svg>    
-                    <input
-                      id="buscarConductor"
-                      type="search"
-                      placeholder="Buscar en cualquier campo..."
-                      class="w-full h-10 pl-10 pr-3 rounded-md border-2 border-transparent bg-gray-100 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-pink-300 focus:bg-white transition duration-300"
-                    />
-                  </div>                  
-            </div>
-            <table class="w-full table-auto border border-gray-300 text-white">
-                <thead>
-                    <tr class="bg-green-500 text-white">
-                        <th class="border border-gray-400 p-2">ID</th>
-                        <th class="border border-gray-400 p-2">NOMBRE Y APELLIDOS</th>
-                        <th class="border border-gray-400 p-2">DNI</th>
-                        <th class="border border-gray-400 p-2">DIRECCIÓN</th>
-                        <th class="border border-gray-400 p-2">CÓDIGO POSTAL</th>
-                        <th class="border border-gray-400 p-2">EMAIL</th>
-                        <th class="border border-gray-400 p-2">Nº SEGURIDAD SOCIAL</th>
-                        <th class="border border-gray-400 p-2">LICENCIA</th>
-                        <th class="border border-gray-400 p-2">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody id="dataTableConductores"></tbody>
-            </table>
-        </div>
-    </div>
-        <div id="formularioTitulares" class="fixed inset-0 flex items-center justify-center hidden bg-gray-900 bg-opacity-50">
-            <div class="bg-black p-6 rounded-lg shadow-lg max-w-md w-full">
-                <h3 id="formTitle2" class="text-xl font-semibold mb-4 text-center text-white"></h3>
-                <input type="hidden" id="formId2">
-                <div class="space-y-2">
-                    <input id="formLicencia2" type="text" placeholder="Licencia" class="w-full p-2 border border-gray-300 rounded bg-black text-white input-autofill">
-                    <input id="formDNI2" type="text" placeholder="DNI" class="w-full p-2 border border-gray-300 rounded bg-black text-white input-autofill">
-                    <input id="formNombre2" type="text" placeholder="Nombre" class="w-full p-2 border border-gray-300 rounded bg-black text-white input-autofill">
-                    <input id="formMatricula" type="text" placeholder="Matricula" class="w-full p-2 border border-gray-300 rounded bg-black text-white input-autofill">
-                    <input id="formMM" type="text" placeholder="Marca" class="w-full p-2 border border-gray-300 rounded bg-black text-white input-autofill">
-                    <input id="formEmail2" type="email" placeholder="Email" class="w-full p-2 border border-gray-300 rounded bg-black text-white input-autofill">
-                    <input id="formNP" type="text" placeholder="Numero Patronal" class="w-full p-2 border border-gray-300 rounded bg-black text-white input-autofill">
+                <div class="flex justify-center gap-4 mb-4">
+                    <button onclick="mostrarTabla('licencias')"
+                        class="button-hover cursor-pointer bg-gradient-to-r from-sky-600 to-blue-700 text-white px-8 py-4 rounded-xl flex items-center gap-3 w-full md:w-64 justify-center hover:from-sky-700 hover:to-blue-800 mt-4">
+                        <span class="material-icons">assignment</span>
+                        Ver Titulares
+                    </button>
+                    <button onclick="mostrarTabla('conductores')"
+                        class="button-hover cursor-pointer bg-gradient-to-r from-emerald-500 to-green-600 text-white px-8 py-4 rounded-xl flex items-center gap-3 w-full md:w-64 justify-center hover:from-emerald-600 hover:to-green-700 mt-4">
+                        <span class="material-icons">groups</span>
+                        Ver Conductores
+                    </button>
                 </div>
-                <div class="flex justify-end mt-4 space-x-2">
-                    <button onclick="cerrarFormulario('licencias')" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-700">Cancelar</button>
-                    <button onclick="guardarDatos('licencias')" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700">Guardar</button>
+
+                <div id="licencias" class="hidden">
+                    <h3 class="text-xl font-semibold mb-2 text-center text-white">Titulares</h3>
+                    <div class="flex  gap-25 mb-6 ml-5">
+                        <button onclick="abrirFormulario('licencias')"
+                            class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-800 flex items-center justify-center cursor-pointer">
+                            <span class="material-icons text-sm mr-1 flex items-center">add</span>
+                            <span class="flex items-center">Agregar Titular</span>
+                        </button>
+                        <div class="relative w-full max-w-lg p-2 pr-8">
+                            <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-6 h-6 pointer-events-none"
+                                xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="black" stroke="white"
+                                stroke-width="2">
+                                <circle cx="10" cy="10" r="6" />
+                                <line x1="14" y1="14" x2="20" y2="20" />
+                            </svg>
+                            <input id="buscarLicencia" type="search" placeholder="Buscar en cualquier campo..."
+                                class="w-full h-10 pl-10 pr-3 rounded-md border-2 border-transparent bg-gray-100 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-pink-300 focus:bg-white transition duration-300" />
+                        </div>
+                    </div>
+                    <table class="w-full table-auto border border-gray-300 text-white">
+                        <thead>
+                            <tr class="bg-blue-500 text-white">
+                                <th class="border border-gray-400 p-2">LICENCIA</th>
+                                <th class="border border-gray-400 p-2">DNI</th>
+                                <th class="border border-gray-400 p-2">NOMBRE Y APELLIDOS</th>
+                                <th class="border border-gray-400 p-2">MATRÍCULA</th>
+                                <th class="border border-gray-400 p-2">MARCA Y MODELO</th>
+                                <th class="border border-gray-400 p-2">EMAIL</th>
+                                <th class="border border-gray-400 p-2">Nº PATRONAL</th>
+                                <th class="border border-gray-400 p-2">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dataTableLicencias"></tbody>
+                    </table>
+                </div>
+                <div id="conductores" class="hidden">
+                    <h3 class="text-xl font-semibold mb-2 text-center text-white">Conductores</h3>
+                    <div class="flex  gap-25 mb-6 ml-5">
+                        <button onclick="abrirFormulario('conductores')"
+                            class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-800 flex items-center justify-center cursor-pointer">
+                            <span class="material-icons text-sm mr-1 flex items-center">add</span>
+                            <span class="flex items-center">Agregar Conductor</span>
+                        </button>
+                        <div class="relative w-full max-w-lg p-2 pr-8">
+                            <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-6 h-6 pointer-events-none"
+                                xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="black" stroke="white"
+                                stroke-width="2">
+                                <circle cx="10" cy="10" r="6" />
+                                <line x1="14" y1="14" x2="20" y2="20" />
+                            </svg>
+                            <input id="buscarConductor" type="search" placeholder="Buscar en cualquier campo..."
+                                class="w-full h-10 pl-10 pr-3 rounded-md border-2 border-transparent bg-gray-100 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-pink-300 focus:bg-white transition duration-300" />
+                        </div>
+                    </div>
+                    <table class="w-full table-auto border border-gray-300 text-white">
+                        <thead>
+                            <tr class="bg-green-500 text-white">
+                                <th class="border border-gray-400 p-2">ID</th>
+                                <th class="border border-gray-400 p-2">NOMBRE Y APELLIDOS</th>
+                                <th class="border border-gray-400 p-2">DNI</th>
+                                <th class="border border-gray-400 p-2">DIRECCIÓN</th>
+                                <th class="border border-gray-400 p-2">CÓDIGO POSTAL</th>
+                                <th class="border border-gray-400 p-2">EMAIL</th>
+                                <th class="border border-gray-400 p-2">Nº SEGURIDAD SOCIAL</th>
+                                <th class="border border-gray-400 p-2">LICENCIA</th>
+                                <th class="border border-gray-400 p-2">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dataTableConductores"></tbody>
+                    </table>
                 </div>
             </div>
-        </div>
-        <div id="formularioConductores" class="fixed inset-0 flex items-center justify-center hidden bg-gray-900 bg-opacity-50">
-            <div class="bg-black p-6 rounded-lg shadow-lg max-w-md w-full">
-                <h3 id="formTitle" class="text-xl font-semibold mb-4 text-center text-white"></h3>
-                <input type="hidden" id="formId">
-                <div class="space-y-2">
-                    <input id="formNombre" type="text" placeholder="Nombre" class="w-full p-2 border border-gray-300 rounded bg-black text-white input-autofill">
-                    <input id="formDNI" type="text" placeholder="DNI" class="w-full p-2 border border-gray-300 rounded bg-black text-white input-autofill">
-                    <input id="formDireccion" type="text" placeholder="Dirección" class="w-full p-2 border border-gray-300 rounded bg-black text-white input-autofill">
-                    <input id="formCP" type="text" placeholder="Código Postal" class="w-full p-2 border border-gray-300 rounded bg-black text-white input-autofill">
-                    <input id="formEmail" type="email" placeholder="Email" class="w-full p-2 border border-gray-300 rounded bg-black text-white input-autofill">
-                    <input id="formSS" type="text" placeholder="Seguridad Social" class="w-full p-2 border border-gray-300 rounded bg-black text-white input-autofill">
-                    <input id="formLicencia" type="text" placeholder="Licencia" class="w-full p-2 border border-gray-300 rounded bg-black text-white input-autofill">
-                </div>
-                <div class="flex justify-end mt-4 space-x-2">
-                    <button onclick="cerrarFormulario('conductores')" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-700">Cancelar</button>
-                    <button onclick="guardarDatos('conductores')" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700">Guardar</button>
+            <div id="formularioTitulares"
+                class="fixed inset-0 flex items-center justify-center hidden bg-gray-900 bg-opacity-50">
+                <div class="bg-black p-6 rounded-lg shadow-lg max-w-md w-full">
+                    <h3 id="formTitle2" class="text-xl font-semibold mb-4 text-center text-white"></h3>
+                    <input type="hidden" id="formId2">
+                    <div class="space-y-2">
+                        <input id="formLicencia2" type="text" placeholder="Licencia"
+                            class="w-full p-2 border border-gray-300 rounded bg-black text-white input-autofill">
+                        <input id="formDNI2" type="text" placeholder="DNI"
+                            class="w-full p-2 border border-gray-300 rounded bg-black text-white input-autofill">
+                        <input id="formNombre2" type="text" placeholder="Nombre"
+                            class="w-full p-2 border border-gray-300 rounded bg-black text-white input-autofill">
+                        <input id="formMatricula" type="text" placeholder="Matricula"
+                            class="w-full p-2 border border-gray-300 rounded bg-black text-white input-autofill">
+                        <input id="formMM" type="text" placeholder="Marca"
+                            class="w-full p-2 border border-gray-300 rounded bg-black text-white input-autofill">
+                        <input id="formEmail2" type="email" placeholder="Email"
+                            class="w-full p-2 border border-gray-300 rounded bg-black text-white input-autofill">
+                        <input id="formNP" type="text" placeholder="Numero Patronal"
+                            class="w-full p-2 border border-gray-300 rounded bg-black text-white input-autofill">
+                    </div>
+                    <div class="flex justify-end mt-4 space-x-2">
+                        <button onclick="cerrarFormulario('licencias')"
+                            class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-700">Cancelar</button>
+                        <button onclick="guardarDatos('licencias')"
+                            class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700">Guardar</button>
+                    </div>
                 </div>
             </div>
-        </div>
-        
-        <script> window.onload = function () {
-            const inputs = document.querySelectorAll('input');
-            
-            // Función para asegurar el color blanco
-            function forceWhiteColor(input) {
-              setTimeout(() => {
-                input.style.color = 'white';  // Forzar color blanco al texto
-                input.style.backgroundColor = 'black';  // Fondo negro
-              }, 50);  // 50ms de retraso, permite que el navegador termine su acción de autocompletado
-            }
-            
-            // Recorremos todos los inputs
-            inputs.forEach(input => {
-              // Cuando el input tiene autocompletado, forzamos el color blanco para el texto
-              input.addEventListener('focus', function () {
-                input.style.backgroundColor = 'black';  // Fondo consistente
-                input.style.color = 'white';  // Texto blanco
-                input.style.boxShadow = 'inset 0 0 0 1000px black';  // Fondo autofill
-              });
-    
-              input.addEventListener('blur', function () {
-                if (!input.value) {
-                  input.style.backgroundColor = 'black';
-                  input.style.color = 'white';  // Texto blanco
-                  input.style.boxShadow = 'inset 0 0 0 1000px black';
-                }
-              });
-    
-              input.addEventListener('input', function () {
-                if (input.value) {
-                  input.style.color = 'white';  // Aseguramos el texto blanco cuando el usuario escribe
-                }
-              });
-    
-              input.addEventListener('change', function () {
-                forceWhiteColor(input);  // Forzar el color blanco después de autocompletado
-              });
-    
-              // Asegurarnos de aplicar el color blanco cuando el autocompletado se aplica (si no hay foco)
-              forceWhiteColor(input);
-            });
-          }
-            // Add these helper functions at the beginning of your script
-            function showAlert(message, type = 'info') {
-                return Swal.fire({
-                    text: message,
-                    icon: type,
-                    background: '#1a1a1a',
-                    color: '#ffffff',
-                    confirmButtonColor: '#3085d6'
-                });
-            }
+            <div id="formularioConductores"
+                class="fixed inset-0 flex items-center justify-center hidden bg-gray-900 bg-opacity-50">
+                <div class="bg-black p-6 rounded-lg shadow-lg max-w-md w-full">
+                    <h3 id="formTitle" class="text-xl font-semibold mb-4 text-center text-white"></h3>
+                    <input type="hidden" id="formId">
+                    <div class="space-y-2">
+                        <input id="formNombre" type="text" placeholder="Nombre"
+                            class="w-full p-2 border border-gray-300 rounded bg-black text-white input-autofill">
+                        <input id="formDNI" type="text" placeholder="DNI"
+                            class="w-full p-2 border border-gray-300 rounded bg-black text-white input-autofill">
+                        <input id="formDireccion" type="text" placeholder="Dirección"
+                            class="w-full p-2 border border-gray-300 rounded bg-black text-white input-autofill">
+                        <input id="formCP" type="text" placeholder="Código Postal"
+                            class="w-full p-2 border border-gray-300 rounded bg-black text-white input-autofill">
+                        <input id="formEmail" type="email" placeholder="Email"
+                            class="w-full p-2 border border-gray-300 rounded bg-black text-white input-autofill">
+                        <input id="formSS" type="text" placeholder="Seguridad Social"
+                            class="w-full p-2 border border-gray-300 rounded bg-black text-white input-autofill">
+                        <input id="formLicencia" type="text" placeholder="Licencia"
+                            class="w-full p-2 border border-gray-300 rounded bg-black text-white input-autofill">
+                    </div>
+                    <div class="flex justify-end mt-4 space-x-2">
+                        <button onclick="cerrarFormulario('conductores')"
+                            class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-700">Cancelar</button>
+                        <button onclick="guardarDatos('conductores')"
+                            class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700">Guardar</button>
+                    </div>
+                </div>
+            </div>
 
-            async function showConfirm(message) {
-                const result = await Swal.fire({
-                    text: message,
-                    icon: 'warning',
-                    background: '#1a1a1a',
-                    color: '#ffffff',
-                    showCancelButton: true,
-                    confirmButtonColor: '#3085d6',
-                    cancelButtonColor: '#d33',
-                    confirmButtonText: 'Sí, eliminar',
-                    cancelButtonText: 'Cancelar'
-                });
-                return result.isConfirmed;
-            }
-            const mobileMenuButton = document.querySelector('.mobile-menu-button');
-        const mobileMenu = document.querySelector('.mobile-menu');
-        const menuIcon = document.querySelector('.menu-icon');
+            <script> window.onload = function () {
+                    const inputs = document.querySelectorAll('input');
 
-        mobileMenuButton.addEventListener('click', () => {
-            if (mobileMenu.classList.contains('show')) {
-                mobileMenu.classList.remove('show');
-                menuIcon.style.transform = 'rotate(0deg)';
-                setTimeout(() => {
-                    menuIcon.textContent = 'menu';
-                    mobileMenu.classList.add('hidden');
-                }, 150);
-            } else {
-                mobileMenu.classList.remove('hidden');
-                setTimeout(() => {
-                    mobileMenu.classList.add('show');
-                    menuIcon.textContent = 'close';
-                    menuIcon.style.transform = 'rotate(180deg)';
-                }, 10);
-            }
-        });
-        let tipoFormulario = '';
-
-// Actualizamos los inputs para que trabajen dinámicamente
-document.getElementById('buscarLicencia').addEventListener('input', function(e) {
-    const value = e.target.value.trim();
-    if (value === '') {
-        localStorage.removeItem('busquedaLicencia'); // Si el input está vacío, limpia el localStorage
-    } else {
-        localStorage.setItem('busquedaLicencia', value); // Si hay algo, guarda el término de búsqueda
-    }
-    buscar('licencias'); // Ejecuta la búsqueda
-});
-
-document.getElementById('buscarConductor').addEventListener('input', function(e) {
-    const value = e.target.value.trim();
-    if (value === '') {
-        localStorage.removeItem('busquedaConductor');
-    } else {
-        localStorage.setItem('busquedaConductor', value);
-    }
-    buscar('conductores');
-});
-
-// Al cargar la página, recuperamos el término de búsqueda guardado (si hay alguno)
-document.addEventListener("DOMContentLoaded", function () {
-    const busquedaLicencia = localStorage.getItem("busquedaLicencia");
-    const busquedaConductor = localStorage.getItem("busquedaConductor");
-
-    if (busquedaLicencia) {
-        document.getElementById('buscarLicencia').value = busquedaLicencia;
-        buscar('licencias');
-    }
-    if (busquedaConductor) {
-        document.getElementById('buscarConductor').value = busquedaConductor;
-        buscar('conductores');
-    }
-});
- // Replace logout alert
- document.getElementById("logoutButton").addEventListener("click", async () => {
-                try {
-                    const response = await fetch(`${API_URL}/logout`, {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" }
-                    });
-
-                    if (response.ok) {
-                        localStorage.removeItem("userEmail");
-                        localStorage.removeItem("isAdmin");
-                        await showAlert("Sesión cerrada correctamente", "success");
-                        window.location.href = "login.html";
-                    } else {
-                        await showAlert("Error al cerrar sesión", "error");
+                    // Función para asegurar el color blanco
+                    function forceWhiteColor(input) {
+                        setTimeout(() => {
+                            input.style.color = 'white';  // Forzar color blanco al texto
+                            input.style.backgroundColor = 'black';  // Fondo negro
+                        }, 50);  // 50ms de retraso, permite que el navegador termine su acción de autocompletado
                     }
-                } catch (error) {
-                    console.error("Error al cerrar sesión:", error);
-                    await showAlert("Hubo un problema con la conexión al servidor", "error");
+
+                    // Recorremos todos los inputs
+                    inputs.forEach(input => {
+                        // Cuando el input tiene autocompletado, forzamos el color blanco para el texto
+                        input.addEventListener('focus', function () {
+                            input.style.backgroundColor = 'black';  // Fondo consistente
+                            input.style.color = 'white';  // Texto blanco
+                            input.style.boxShadow = 'inset 0 0 0 1000px black';  // Fondo autofill
+                        });
+
+                        input.addEventListener('blur', function () {
+                            if (!input.value) {
+                                input.style.backgroundColor = 'black';
+                                input.style.color = 'white';  // Texto blanco
+                                input.style.boxShadow = 'inset 0 0 0 1000px black';
+                            }
+                        });
+
+                        input.addEventListener('input', function () {
+                            if (input.value) {
+                                input.style.color = 'white';  // Aseguramos el texto blanco cuando el usuario escribe
+                            }
+                        });
+
+                        input.addEventListener('change', function () {
+                            forceWhiteColor(input);  // Forzar el color blanco después de autocompletado
+                        });
+
+                        // Asegurarnos de aplicar el color blanco cuando el autocompletado se aplica (si no hay foco)
+                        forceWhiteColor(input);
+                    });
                 }
-            });
-async function buscar(tipo) {
-    const termino = document.getElementById(tipo === 'licencias' ? 'buscarLicencia' : 'buscarConductor').value.trim();
-    
-    localStorage.setItem(tipo === 'licencias' ? 'busquedaLicencia' : 'busquedaConductor', termino);
-
-    if (!termino) {
-        localStorage.removeItem(tipo === 'licencias' ? 'busquedaLicencia' : 'busquedaConductor');
-        await cargarDatos(`${API_URL}/${tipo}`, `dataTable${tipo.charAt(0).toUpperCase() + tipo.slice(1)}`, tipo);
-        return;
-    }
-
-     try {
-        const response = await fetch(`${API_URL}/${tipo}/buscar/${termino}`, {
-            headers: getAuthHeaders()
-        });
-
-        if (!response.ok) throw new Error('Error en la búsqueda');
-        
-        const data = await response.json();
-        const tableBody = document.getElementById(`dataTable${tipo.charAt(0).toUpperCase() + tipo.slice(1)}`);
-        
-        tableBody.innerHTML = "";
-        
-        data.forEach(item => {
-            const row = document.createElement("tr");
-            row.innerHTML = Object.values(item).map(valor =>`<td class='border border-gray-400 p-2 text-center'>${valor || '-'}</td>`).join('') +
-                `<td class='border border-gray-400 p-2 text-center flex justify-center gap-2'>
-                    <button onclick="editar('${tipo}', '${item[tipo === 'licencias' ? 'LICENCIA' : 'id']}')" 
-                        class='bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-700 flex items-center gap-1 cursor-pointer'>
-                        <span class="material-icons text-sm">edit</span>
-                        <span>Editar</span>
-                    </button>
-                    <button onclick="eliminar('${tipo}', '${item[tipo === 'licencias' ? 'LICENCIA' : 'id']}')" 
-                        class='bg-red-500 text-white px-3 py-1 rounded hover:bg-red-700 flex items-center gap-1 cursor-pointer'>
-                        <span class="material-icons text-sm">delete</span>
-                        <span>Eliminar</span>
-                    </button>
-                </td>`; 
-            // `<td class='border border-gray-400 p-2 text-center'>${valor || '-'}</td>`).join('') +
-            //     `<td class='border border-gray-400 p-2 text-center'>
-            //         <button onclick="editar('${tipo}', '${item[tipo === 'licencias' ? 'LICENCIA' : 'id']}')" 
-            //             class='bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-700 flex items-center gap-1 inline-flex'>
-            //             <span class="material-icons text-sm">edit</span>
-            //             <span>Editar</span>
-            //         </button>
-            //         <button onclick="eliminar('${tipo}', '${item[tipo === 'licencias' ? 'LICENCIA' : 'id']}')" 
-            //             class='bg-red-500 text-white px-3 py-1 rounded hover:bg-red-700 flex items-center gap-1 inline-flex mt-1'>
-            //             <span class="material-icons text-sm">delete</span>
-            //             <span>Eliminar</span>
-            //         </button>
-            //     </td>`;
-                
-            tableBody.appendChild(row);
-        });
-    } catch (error) {
-        console.error("Error en la búsqueda:", error);
-        await showAlert("Error al realizar la búsqueda", "error");
-    }
-}  
-    function abrirFormulario(tipo, datos = null) {
-        tipoFormulario = tipo; // Guardamos el tipo seleccionado
-        if(tipo === 'conductores'){
-        document.getElementById('formularioConductores').classList.remove('hidden');
-        document.getElementById('formTitle').innerText = datos ? `Editar ${tipo}` : `Agregar ${tipo}`;
-        
-        document.getElementById('formId').value = datos && (datos.id || datos.LICENCIA) ? (datos.id || datos.LICENCIA) : "";
-        document.getElementById('formNombre').value = datos ? datos.nombre_apellidos || '' : '';
-        document.getElementById('formDNI').value = datos ? datos.dni || '' : '';
-        document.getElementById('formDireccion').value = datos ? datos.direccion || '' : '';
-        document.getElementById('formCP').value = datos ? datos.codigo_postal || '' : '';
-        document.getElementById('formEmail').value = datos ? datos.email || '' : '';
-        document.getElementById('formSS').value = datos ? datos.numero_seguridad_social || '' : '';
-        document.getElementById('formLicencia').value = datos ? datos.licencia || '' : '';
-        }
-        else
-        {
-            document.getElementById('formularioTitulares').classList.remove('hidden');
-            document.getElementById('formTitle2').innerText = datos ? `Editar ${tipo}` : `Agregar ${tipo}`;
-
-            document.getElementById('formId2').value = datos && (datos.id || datos.LICENCIA) ? (datos.id || datos.LICENCIA) : "";
-            document.getElementById('formLicencia2').value = datos ? datos.LICENCIA || '' : '';
-            document.getElementById('formDNI2').value = datos ? datos.DNI || '' : '';
-            document.getElementById('formNombre2').value = datos ? datos.NOMBRE_APELLIDOS|| '' : '';
-            document.getElementById('formMatricula').value = datos ? datos.MATRICULA|| '' : '';
-            document.getElementById('formMM').value = datos ? datos.MARCA_MODELO || '' : '';
-            document.getElementById('formEmail2').value = datos ? datos.EMAIL || '' : '';
-            document.getElementById('formNP').value = datos ? datos.NUMERO_PATRONAL || '' : '';
-
-        }   
-    }
-
-    function cerrarFormulario(tipo) {
-        tipoFormulario = tipo; // Guardamos el tipo seleccionado
-        if(tipo === 'conductores'){
-            document.getElementById('formularioConductores').classList.add('hidden');
-        }
-        else
-        {
-            document.getElementById('formularioTitulares').classList.add('hidden');
-        }
-    }
-
-    async function guardarDatos(tipoFormulario) {
-    let id, datos, apiTipo;
-
-    if (tipoFormulario === 'licencias') {  // TITULARES
-        id = document.getElementById('formId2')?.value || null;
-        const licencia = document.getElementById('formLicencia2').value.trim();
-        const dni = document.getElementById('formDNI2').value.trim();
-        const nombre_apellidos = document.getElementById('formNombre2').value.trim();
-        const matricula = document.getElementById('formMatricula').value.trim();
-        const marca_modelo = document.getElementById('formMM').value.trim();
-        const email = document.getElementById('formEmail2').value.trim();
-        const numero_patronal = document.getElementById('formNP').value.trim();
-
-        if (!licencia || !dni || !nombre_apellidos) {
-                    await showAlert("Por favor, llena todos los campos obligatorios.", "warning");
-                    return;
+                // Add these helper functions at the beginning of your script
+                function showAlert(message, type = 'info') {
+                    return Swal.fire({
+                        text: message,
+                        icon: type,
+                        background: '#1a1a1a',
+                        color: '#ffffff',
+                        confirmButtonColor: '#3085d6'
+                    });
                 }
 
-        datos = { licencia, dni, nombre_apellidos, matricula, marca_modelo, email, numero_patronal };
-        apiTipo = 'licencias';
-    } else {  // CONDUCTORES
-        id = document.getElementById('formId')?.value || null;
-        const nombre_apellidos = document.getElementById('formNombre').value.trim();
-        const dni = document.getElementById('formDNI').value.trim();
-        const direccion = document.getElementById('formDireccion').value.trim();
-        const codigo_postal = document.getElementById('formCP').value.trim();
-        const email = document.getElementById('formEmail').value.trim();
-        const numero_seguridad_social = document.getElementById('formSS').value.trim();
-        const licencia = document.getElementById('formLicencia').value.trim();
-        if (!nombre_apellidos || !dni || !direccion || !email || !licencia) {
-                    await showAlert("Por favor, llena todos los campos obligatorios.", "warning");
-                    return;
+                async function showConfirm(message) {
+                    const result = await Swal.fire({
+                        text: message,
+                        icon: 'warning',
+                        background: '#1a1a1a',
+                        color: '#ffffff',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Sí, eliminar',
+                        cancelButtonText: 'Cancelar'
+                    });
+                    return result.isConfirmed;
                 }
+                const mobileMenuButton = document.querySelector('.mobile-menu-button');
+                const mobileMenu = document.querySelector('.mobile-menu');
+                const menuIcon = document.querySelector('.menu-icon');
 
-        datos = { nombre_apellidos, dni, direccion, codigo_postal, email, numero_seguridad_social, licencia };
-        apiTipo = 'conductores';
-    }
+                mobileMenuButton.addEventListener('click', () => {
+                    if (mobileMenu.classList.contains('show')) {
+                        mobileMenu.classList.remove('show');
+                        menuIcon.style.transform = 'rotate(0deg)';
+                        setTimeout(() => {
+                            menuIcon.textContent = 'menu';
+                            mobileMenu.classList.add('hidden');
+                        }, 150);
+                    } else {
+                        mobileMenu.classList.remove('hidden');
+                        setTimeout(() => {
+                            mobileMenu.classList.add('show');
+                            menuIcon.textContent = 'close';
+                            menuIcon.style.transform = 'rotate(180deg)';
+                        }, 10);
+                    }
+                });
+                let tipoFormulario = '';
 
-    const url = id ? `${API_URL}/${apiTipo}/${id}` : `${API_URL}/${apiTipo}`;
+                // Actualizamos los inputs para que trabajen dinámicamente
+                document.getElementById('buscarLicencia').addEventListener('input', function (e) {
+                    const value = e.target.value.trim();
+                    if (value === '') {
+                        localStorage.removeItem('busquedaLicencia'); // Si el input está vacío, limpia el localStorage
+                    } else {
+                        localStorage.setItem('busquedaLicencia', value); // Si hay algo, guarda el término de búsqueda
+                    }
+                    buscar('licencias'); // Ejecuta la búsqueda
+                });
 
-    console.log("Guardando datos en:", url);
-    console.log("Datos enviados:", datos);
+                document.getElementById('buscarConductor').addEventListener('input', function (e) {
+                    const value = e.target.value.trim();
+                    if (value === '') {
+                        localStorage.removeItem('busquedaConductor');
+                    } else {
+                        localStorage.setItem('busquedaConductor', value);
+                    }
+                    buscar('conductores');
+                });
 
-    try {
-        const response = await fetch(url, {
-            method: id ? "PUT" : "POST",
-            headers: getAuthHeaders(), // Replace the existing headers with getAuthHeaders
-            body: JSON.stringify(datos)
-        });
+                // Al cargar la página, recuperamos el término de búsqueda guardado (si hay alguno)
+                document.addEventListener("DOMContentLoaded", function () {
+                    const busquedaLicencia = localStorage.getItem("busquedaLicencia");
+                    const busquedaConductor = localStorage.getItem("busquedaConductor");
 
-        const resultado = await response.json();
+                    if (busquedaLicencia) {
+                        document.getElementById('buscarLicencia').value = busquedaLicencia;
+                        buscar('licencias');
+                    }
+                    if (busquedaConductor) {
+                        document.getElementById('buscarConductor').value = busquedaConductor;
+                        buscar('conductores');
+                    }
+                });
+                // Replace logout alert
+                document.getElementById("logoutButton").addEventListener("click", async () => {
+                    try {
+                        const response = await fetch(`${API_URL}/logout`, {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" }
+                        });
 
-        if (!response.ok) {
-            if (response.status === 500) {
-                await showAlert("No puedes agregar un conductor con una licencia que no existe. Por favor, crea primero la licencia.", "error");
-                return;
-            }
-            throw new Error(resultado.message || "Error al guardar los datos");
-        }
+                        if (response.ok) {
+                            localStorage.removeItem("userEmail");
+                            localStorage.removeItem("isAdmin");
+                            await showAlert("Sesión cerrada correctamente", "success");
+                            window.location.href = "login.html";
+                        } else {
+                            await showAlert("Error al cerrar sesión", "error");
+                        }
+                    } catch (error) {
+                        console.error("Error al cerrar sesión:", error);
+                        await showAlert("Hubo un problema con la conexión al servidor", "error");
+                    }
+                });
+                async function buscar(tipo) {
+                    const termino = document.getElementById(tipo === 'licencias' ? 'buscarLicencia' : 'buscarConductor').value.trim();
 
-        await showAlert(resultado.message || "Datos guardados correctamente", "success");
-        cerrarFormulario(tipoFormulario);
-        await cargarDatos(`${API_URL}/${apiTipo}`, `dataTable${tipoFormulario.charAt(0).toUpperCase() + tipoFormulario.slice(1)}`, tipoFormulario);
-    } catch (error) {
-        console.error("Error guardando:", error);
-        await showAlert(error.message || "Error al guardar los datos", "error");
-    }
-}
+                    localStorage.setItem(tipo === 'licencias' ? 'busquedaLicencia' : 'busquedaConductor', termino);
 
+                    if (!termino) {
+                        localStorage.removeItem(tipo === 'licencias' ? 'busquedaLicencia' : 'busquedaConductor');
+                        await cargarDatos(`${API_URL}/${tipo}`, `dataTable${tipo.charAt(0).toUpperCase() + tipo.slice(1)}`, tipo);
+                        return;
+                    }
 
+                    try {
+                        const response = await fetch(`${API_URL}/${tipo}/buscar/${termino}`, {
+                            headers: getAuthHeaders()
+                        });
 
-            function mostrarTabla(tabla) {
-                document.getElementById('licencias').classList.add('hidden');
-                document.getElementById('conductores').classList.add('hidden');
-                document.getElementById(tabla).classList.remove('hidden');
-                
-                // Actualizar color de los botones de navegación
-                const btnSubir = document.getElementById('btnSubir');
-                const btnBajar = document.getElementById('btnBajar');
-                
-                if (tabla === 'conductores') {
-                    btnSubir.className = 'bg-green-500 text-white p-2 rounded-full shadow-lg hover:bg-green-700 transition-colors';
-                    btnBajar.className = 'bg-green-500 text-white p-2 rounded-full shadow-lg hover:bg-green-700 transition-colors';
-                } else {
-                    btnSubir.className = 'bg-blue-500 text-white p-2 rounded-full shadow-lg hover:bg-blue-700 transition-colors';
-                    btnBajar.className = 'bg-blue-500 text-white p-2 rounded-full shadow-lg hover:bg-blue-700 transition-colors';
-                }
-            }
-            
-            async function cargarDatos(url, tablaId, tipo) {
-    console.log("Cargando datos con URL:", url, "en la tabla:", tablaId);
-    try {
-        const response = await fetch(url, {
-            headers: getAuthHeaders() // Add authentication headers
-        });
-        
-        if (response.status === 401) {
-            // Token expired or invalid
-            window.location.href = '/login.html';
-            return;
-        }
-        
-        const data = await response.json();
-        console.log(data);
-        
-        const tableBody = document.getElementById(tablaId);
-        console.log("ID de tabla:", tablaId); // Para depurar
-        if (!tableBody) {
-            console.error(`No se encontró el elemento con ID: ${tablaId}`);
-            return; // Salir de la función si no se encuentra el elemento
-        }
-        
-        tableBody.innerHTML = "";
-        
-        data.forEach(item => {
-            const row = document.createElement("tr");
-            row.innerHTML = Object.values(item).map(valor => `<td class='border border-gray-400 p-2 text-center'>${valor || '-'}</td>`).join('') +
-                `<td class='border border-gray-400 p-2 text-center flex justify-center gap-2'>
+                        if (!response.ok) throw new Error('Error en la búsqueda');
+
+                        const data = await response.json();
+                        const tableBody = document.getElementById(`dataTable${tipo.charAt(0).toUpperCase() + tipo.slice(1)}`);
+
+                        tableBody.innerHTML = "";
+
+                        data.forEach(item => {
+                            const row = document.createElement("tr");
+                            row.innerHTML = Object.values(item).map(valor => `<td class='border border-gray-400 p-2 text-center'>${valor || '-'}</td>`).join('') +
+                                `<td class='border border-gray-400 p-2 text-center flex justify-center gap-2'>
                     <button onclick="editar('${tipo}', '${item[tipo === 'licencias' ? 'LICENCIA' : 'id']}')" 
                         class='bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-700 flex items-center gap-1 cursor-pointer'>
                         <span class="material-icons text-sm">edit</span>
@@ -737,81 +584,273 @@ async function buscar(tipo) {
                         <span>Eliminar</span>
                     </button>
                 </td>`;
-            tableBody.appendChild(row);
-        });
-    } catch (error) {
-        console.error("Error cargando datos:", error);
-    }
-}
-            
-async function editar(tipo, id) {
-    try {
-        const apiTipo = tipo === 'licencias' ? 'licencias' : 'conductores';
-        const response = await fetch(`${API_URL}/${apiTipo}/${id}`, {
-            headers: getAuthHeaders() // Add authentication headers
-        });
-        
-        if (!response.ok) {
-            throw new Error('Error al obtener los datos');
-        }
-        
-        const datos = await response.json();
-        abrirFormulario(tipo, datos);
-    } catch (error) {
-        console.error("Error obteniendo datos:", error);
-        await showAlert("Error al cargar los datos", "error");
-    }
-}
+                            // `<td class='border border-gray-400 p-2 text-center'>${valor || '-'}</td>`).join('') +
+                            //     `<td class='border border-gray-400 p-2 text-center'>
+                            //         <button onclick="editar('${tipo}', '${item[tipo === 'licencias' ? 'LICENCIA' : 'id']}')" 
+                            //             class='bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-700 flex items-center gap-1 inline-flex'>
+                            //             <span class="material-icons text-sm">edit</span>
+                            //             <span>Editar</span>
+                            //         </button>
+                            //         <button onclick="eliminar('${tipo}', '${item[tipo === 'licencias' ? 'LICENCIA' : 'id']}')" 
+                            //             class='bg-red-500 text-white px-3 py-1 rounded hover:bg-red-700 flex items-center gap-1 inline-flex mt-1'>
+                            //             <span class="material-icons text-sm">delete</span>
+                            //             <span>Eliminar</span>
+                            //         </button>
+                            //     </td>`;
 
+                            tableBody.appendChild(row);
+                        });
+                    } catch (error) {
+                        console.error("Error en la búsqueda:", error);
+                        await showAlert("Error al realizar la búsqueda", "error");
+                    }
+                }
+                function abrirFormulario(tipo, datos = null) {
+                    tipoFormulario = tipo; // Guardamos el tipo seleccionado
+                    if (tipo === 'conductores') {
+                        document.getElementById('formularioConductores').classList.remove('hidden');
+                        document.getElementById('formTitle').innerText = datos ? `Editar ${tipo}` : `Agregar ${tipo}`;
 
-    async function eliminar(tipo, id) {
-                const confirmed = await showConfirm("¿Seguro que deseas eliminar este registro?");
-                if (!confirmed) return;
+                        document.getElementById('formId').value = datos && (datos.id || datos.LICENCIA) ? (datos.id || datos.LICENCIA) : "";
+                        document.getElementById('formNombre').value = datos ? datos.nombre_apellidos || '' : '';
+                        document.getElementById('formDNI').value = datos ? datos.dni || '' : '';
+                        document.getElementById('formDireccion').value = datos ? datos.direccion || '' : '';
+                        document.getElementById('formCP').value = datos ? datos.codigo_postal || '' : '';
+                        document.getElementById('formEmail').value = datos ? datos.email || '' : '';
+                        document.getElementById('formSS').value = datos ? datos.numero_seguridad_social || '' : '';
+                        document.getElementById('formLicencia').value = datos ? datos.licencia || '' : '';
+                    }
+                    else {
+                        document.getElementById('formularioTitulares').classList.remove('hidden');
+                        document.getElementById('formTitle2').innerText = datos ? `Editar ${tipo}` : `Agregar ${tipo}`;
 
-                try {
-                    const apiTipo = tipo === 'licencias' ? 'licencias' : 'conductores';
-                    const response = await fetch(`${API_URL}/${apiTipo}/${id}`, {
-                        method: "DELETE",
-                        headers: getAuthHeaders() // Add authentication headers
-                    });
-                    
-                    if (!response.ok) {
-                        const errorData = await response.json();
-                        
-                        if (response.status === 500 || response.status === 409) {
-                            await showAlert("No se puede eliminar esta licencia porque está asignada a uno o más conductores. Por favor, elimine primero los conductores asociados.", "error");
-                            return;
-                        } else if (response.status === 404) {
-                            await showAlert("El registro que intenta eliminar no existe o ya fue eliminado.", "warning");
+                        document.getElementById('formId2').value = datos && (datos.id || datos.LICENCIA) ? (datos.id || datos.LICENCIA) : "";
+                        document.getElementById('formLicencia2').value = datos ? datos.LICENCIA || '' : '';
+                        document.getElementById('formDNI2').value = datos ? datos.DNI || '' : '';
+                        document.getElementById('formNombre2').value = datos ? datos.NOMBRE_APELLIDOS || '' : '';
+                        document.getElementById('formMatricula').value = datos ? datos.MATRICULA || '' : '';
+                        document.getElementById('formMM').value = datos ? datos.MARCA_MODELO || '' : '';
+                        document.getElementById('formEmail2').value = datos ? datos.EMAIL || '' : '';
+                        document.getElementById('formNP').value = datos ? datos.NUMERO_PATRONAL || '' : '';
+
+                    }
+                }
+
+                function cerrarFormulario(tipo) {
+                    tipoFormulario = tipo; // Guardamos el tipo seleccionado
+                    if (tipo === 'conductores') {
+                        document.getElementById('formularioConductores').classList.add('hidden');
+                    }
+                    else {
+                        document.getElementById('formularioTitulares').classList.add('hidden');
+                    }
+                }
+
+                async function guardarDatos(tipoFormulario) {
+                    let id, datos, apiTipo;
+
+                    if (tipoFormulario === 'licencias') {  // TITULARES
+                        id = document.getElementById('formId2')?.value || null;
+                        const licencia = document.getElementById('formLicencia2').value.trim();
+                        const dni = document.getElementById('formDNI2').value.trim();
+                        const nombre_apellidos = document.getElementById('formNombre2').value.trim();
+                        const matricula = document.getElementById('formMatricula').value.trim();
+                        const marca_modelo = document.getElementById('formMM').value.trim();
+                        const email = document.getElementById('formEmail2').value.trim();
+                        const numero_patronal = document.getElementById('formNP').value.trim();
+
+                        if (!licencia || !dni || !nombre_apellidos) {
+                            await showAlert("Por favor, llena todos los campos obligatorios.", "warning");
                             return;
                         }
-                        
-                        throw new Error(errorData.message || 'Error desconocido al eliminar');
+
+                        datos = { licencia, dni, nombre_apellidos, matricula, marca_modelo, email, numero_patronal };
+                        apiTipo = 'licencias';
+                    } else {  // CONDUCTORES
+                        id = document.getElementById('formId')?.value || null;
+                        const nombre_apellidos = document.getElementById('formNombre').value.trim();
+                        const dni = document.getElementById('formDNI').value.trim();
+                        const direccion = document.getElementById('formDireccion').value.trim();
+                        const codigo_postal = document.getElementById('formCP').value.trim();
+                        const email = document.getElementById('formEmail').value.trim();
+                        const numero_seguridad_social = document.getElementById('formSS').value.trim();
+                        const licencia = document.getElementById('formLicencia').value.trim();
+                        if (!nombre_apellidos || !dni || !direccion || !email || !licencia) {
+                            await showAlert("Por favor, llena todos los campos obligatorios.", "warning");
+                            return;
+                        }
+
+                        datos = { nombre_apellidos, dni, direccion, codigo_postal, email, numero_seguridad_social, licencia };
+                        apiTipo = 'conductores';
                     }
 
-                    const resultado = await response.json();
-                    await showAlert(resultado.message || "Eliminado correctamente", "success");
-                    await cargarDatos(`${API_URL}/${apiTipo}`, `dataTable${tipo.charAt(0).toUpperCase() + tipo.slice(1)}`, tipo);
-                } catch (error) {
-                    console.error("Error eliminando:", error);
-                    await showAlert("No se puede eliminar este registro. Si es una licencia, asegúrese de que no tenga conductores asociados.", "error");
-                }
-            }
-            cargarDatos(`${API_URL}/licencias`, "dataTableLicencias", "licencias");
-            cargarDatos(`${API_URL}/conductores`, "dataTableConductores", "conductores");
-        </script>
-        
-        <!-- Botones de navegación flotantes -->
-        <div class="fixed bottom-4 right-4 flex flex-col gap-2">
-            <button id="btnSubir" onclick="window.scrollTo({top: 0})" 
-                    class="bg-blue-500 text-white p-2 rounded-full shadow-lg hover:bg-blue-700 transition-colors">
-                <span class="material-icons">arrow_upward</span>
-            </button>
-            <button id="btnBajar" onclick="window.scrollTo({top: document.documentElement.scrollHeight})" 
-                    class="bg-blue-500 text-white p-2 rounded-full shadow-lg hover:bg-blue-700 transition-colors">
-                <span class="material-icons">arrow_downward</span>
-            </button>
-        </div>
+                    const url = id ? `${API_URL}/${apiTipo}/${id}` : `${API_URL}/${apiTipo}`;
 
-    </body>
+                    console.log("Guardando datos en:", url);
+                    console.log("Datos enviados:", datos);
+
+                    try {
+                        const response = await fetch(url, {
+                            method: id ? "PUT" : "POST",
+                            headers: getAuthHeaders(), // Replace the existing headers with getAuthHeaders
+                            body: JSON.stringify(datos)
+                        });
+
+                        const resultado = await response.json();
+
+                        if (!response.ok) {
+                            if (response.status === 500) {
+                                await showAlert("No puedes agregar un conductor con una licencia que no existe. Por favor, crea primero la licencia.", "error");
+                                return;
+                            }
+                            throw new Error(resultado.message || "Error al guardar los datos");
+                        }
+
+                        await showAlert(resultado.message || "Datos guardados correctamente", "success");
+                        cerrarFormulario(tipoFormulario);
+                        await cargarDatos(`${API_URL}/${apiTipo}`, `dataTable${tipoFormulario.charAt(0).toUpperCase() + tipoFormulario.slice(1)}`, tipoFormulario);
+                    } catch (error) {
+                        console.error("Error guardando:", error);
+                        await showAlert(error.message || "Error al guardar los datos", "error");
+                    }
+                }
+
+
+
+                function mostrarTabla(tabla) {
+                    document.getElementById('licencias').classList.add('hidden');
+                    document.getElementById('conductores').classList.add('hidden');
+                    document.getElementById(tabla).classList.remove('hidden');
+
+                    // Actualizar color de los botones de navegación
+                    const btnSubir = document.getElementById('btnSubir');
+                    const btnBajar = document.getElementById('btnBajar');
+
+                    if (tabla === 'conductores') {
+                        btnSubir.className = 'bg-green-500 text-white p-2 rounded-full shadow-lg hover:bg-green-700 transition-colors';
+                        btnBajar.className = 'bg-green-500 text-white p-2 rounded-full shadow-lg hover:bg-green-700 transition-colors';
+                    } else {
+                        btnSubir.className = 'bg-blue-500 text-white p-2 rounded-full shadow-lg hover:bg-blue-700 transition-colors';
+                        btnBajar.className = 'bg-blue-500 text-white p-2 rounded-full shadow-lg hover:bg-blue-700 transition-colors';
+                    }
+                }
+
+                async function cargarDatos(url, tablaId, tipo) {
+                    console.log("Cargando datos con URL:", url, "en la tabla:", tablaId);
+                    try {
+                        const response = await fetch(url, {
+                            headers: getAuthHeaders() // Add authentication headers
+                        });
+
+                        if (response.status === 401) {
+                            // Token expired or invalid
+                            window.location.href = '/login.html';
+                            return;
+                        }
+
+                        const data = await response.json();
+                        console.log(data);
+
+                        const tableBody = document.getElementById(tablaId);
+                        console.log("ID de tabla:", tablaId); // Para depurar
+                        if (!tableBody) {
+                            console.error(`No se encontró el elemento con ID: ${tablaId}`);
+                            return; // Salir de la función si no se encuentra el elemento
+                        }
+
+                        tableBody.innerHTML = "";
+
+                        data.forEach(item => {
+                            const row = document.createElement("tr");
+                            row.innerHTML = Object.values(item).map(valor => `<td class='border border-gray-400 p-2 text-center'>${valor || '-'}</td>`).join('') +
+                                `<td class='border border-gray-400 p-2 text-center flex justify-center gap-2'>
+                    <button onclick="editar('${tipo}', '${item[tipo === 'licencias' ? 'LICENCIA' : 'id']}')" 
+                        class='bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-700 flex items-center gap-1 cursor-pointer'>
+                        <span class="material-icons text-sm">edit</span>
+                        <span>Editar</span>
+                    </button>
+                    <button onclick="eliminar('${tipo}', '${item[tipo === 'licencias' ? 'LICENCIA' : 'id']}')" 
+                        class='bg-red-500 text-white px-3 py-1 rounded hover:bg-red-700 flex items-center gap-1 cursor-pointer'>
+                        <span class="material-icons text-sm">delete</span>
+                        <span>Eliminar</span>
+                    </button>
+                </td>`;
+                            tableBody.appendChild(row);
+                        });
+                    } catch (error) {
+                        console.error("Error cargando datos:", error);
+                    }
+                }
+
+                async function editar(tipo, id) {
+                    try {
+                        const apiTipo = tipo === 'licencias' ? 'licencias' : 'conductores';
+                        const response = await fetch(`${API_URL}/${apiTipo}/${id}`, {
+                            headers: getAuthHeaders() // Add authentication headers
+                        });
+
+                        if (!response.ok) {
+                            throw new Error('Error al obtener los datos');
+                        }
+
+                        const datos = await response.json();
+                        abrirFormulario(tipo, datos);
+                    } catch (error) {
+                        console.error("Error obteniendo datos:", error);
+                        await showAlert("Error al cargar los datos", "error");
+                    }
+                }
+
+
+                async function eliminar(tipo, id) {
+                    const confirmed = await showConfirm("¿Seguro que deseas eliminar este registro?");
+                    if (!confirmed) return;
+
+                    try {
+                        const apiTipo = tipo === 'licencias' ? 'licencias' : 'conductores';
+                        const response = await fetch(`${API_URL}/${apiTipo}/${id}`, {
+                            method: "DELETE",
+                            headers: getAuthHeaders() // Add authentication headers
+                        });
+
+                        if (!response.ok) {
+                            const errorData = await response.json();
+
+                            if (response.status === 500 || response.status === 409) {
+                                await showAlert("No se puede eliminar esta licencia porque está asignada a uno o más conductores. Por favor, elimine primero los conductores asociados.", "error");
+                                return;
+                            } else if (response.status === 404) {
+                                await showAlert("El registro que intenta eliminar no existe o ya fue eliminado.", "warning");
+                                return;
+                            }
+
+                            throw new Error(errorData.message || 'Error desconocido al eliminar');
+                        }
+
+                        const resultado = await response.json();
+                        await showAlert(resultado.message || "Eliminado correctamente", "success");
+                        await cargarDatos(`${API_URL}/${apiTipo}`, `dataTable${tipo.charAt(0).toUpperCase() + tipo.slice(1)}`, tipo);
+                    } catch (error) {
+                        console.error("Error eliminando:", error);
+                        await showAlert("No se puede eliminar este registro. Si es una licencia, asegúrese de que no tenga conductores asociados.", "error");
+                    }
+                }
+                cargarDatos(`${API_URL}/licencias`, "dataTableLicencias", "licencias");
+                cargarDatos(`${API_URL}/conductores`, "dataTableConductores", "conductores");
+            </script>
+
+            <!-- Botones de navegación flotantes -->
+            <div class="fixed bottom-4 right-4 flex flex-col gap-2">
+                <button id="btnSubir" onclick="window.scrollTo({top: 0})"
+                    class="bg-blue-500 text-white p-2 rounded-full shadow-lg hover:bg-blue-700 transition-colors">
+                    <span class="material-icons">arrow_upward</span>
+                </button>
+                <button id="btnBajar" onclick="window.scrollTo({top: document.documentElement.scrollHeight})"
+                    class="bg-blue-500 text-white p-2 rounded-full shadow-lg hover:bg-blue-700 transition-colors">
+                    <span class="material-icons">arrow_downward</span>
+                </button>
+            </div>
+
+</body>
+
 </html>
