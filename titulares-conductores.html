@@ -623,7 +623,18 @@
                         document.getElementById('formEmail').value = datos ? datos.email || '' : '';
                         document.getElementById('formSS').value = datos ? datos.numero_seguridad_social || '' : '';
                         document.getElementById('formLicencia').value = datos ? datos.licencia || '' : '';
-                        document.getElementById('formEstado').value = datos ? (datos.estado || '').toLowerCase() : '';
+                        if (datos && datos.estado) {
+                            const estadoNormalizado = datos.estado.toString().trim().toLowerCase();
+                            const selectEstado = document.getElementById('formEstado');
+                            const opciones = Array.from(selectEstado.options).map(opt => opt.value);
+                            if (opciones.includes(estadoNormalizado)) {
+                                selectEstado.value = estadoNormalizado;
+                            } else {
+                                selectEstado.value = ''; // O selecciona un default si no coincide
+                            }
+                        } else {
+                            document.getElementById('formEstado').value = '';
+                        }
                     }
                     else {
                         document.getElementById('formularioTitulares').classList.remove('hidden');
@@ -680,7 +691,7 @@
                         const email = document.getElementById('formEmail').value.trim();
                         const numero_seguridad_social = document.getElementById('formSS').value.trim();
                         const licencia = document.getElementById('formLicencia').value.trim();
-                        const estado = document.getElementById('formEstado').value.trim();
+                        const estado = document.getElementById('formEstado').value.trim().toLowerCase(); // <- AQUI el cambio
                         if (!nombre_apellidos || !dni || !direccion || !email || !licencia) {
                             await showAlert("Por favor, llena todos los campos obligatorios.", "warning");
                             return;
