@@ -680,12 +680,13 @@
                         const email = document.getElementById('formEmail').value.trim();
                         const numero_seguridad_social = document.getElementById('formSS').value.trim();
                         const licencia = document.getElementById('formLicencia').value.trim();
+                        const estado = document.getElementById('formLicencia').value.trim();
                         if (!nombre_apellidos || !dni || !direccion || !email || !licencia) {
                             await showAlert("Por favor, llena todos los campos obligatorios.", "warning");
                             return;
                         }
 
-                        datos = { nombre_apellidos, dni, direccion, codigo_postal, email, numero_seguridad_social, licencia };
+                        datos = { nombre_apellidos, dni, direccion, codigo_postal, email, numero_seguridad_social, licencia, estado };
                         apiTipo = 'conductores';
                     }
 
