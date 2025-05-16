@@ -106,12 +106,32 @@
               </svg>
             </span>
           </button>
+
+          <button onclick="pantallaConductores()" type="button"
+            class="relative w-[150px] h-[40px] cursor-pointer flex items-center border border-cyan-400 bg-gradient-to-b from-[#1f1f1f] via-[#111827] to-black overflow-hidden group transition-all duration-300 shadow-[0_0_20px_2px_rgba(34,211,238,0.3)]">
+            <span
+              class="text-white font-semibold transform translate-x-[22px] transition-all duration-300 group-hover:text-transparent">Ir
+              a Inicio</span>
+            <span
+              class="absolute h-full w-[39px] bg-cyan-600 flex items-center justify-center transform translate-x-[109px] transition-all duration-300 group-hover:w-[148px] group-hover:translate-x-0 group-active:bg-cyan-700">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" height="22px" width="22px"
+                class="fill-black">
+                <path d="M224 480h640a32 32 0 1 1 0 64H224a32 32 0 0 1 0-64z" />
+                <path
+                  d="m237.248 512 265.408 265.344a32 32 0 0 1-45.312 45.312l-288-288a32 32 0 0 1 0-45.312l288-288a32 32 0 1 1 45.312 45.312L237.248 512z" />
+              </svg>
+            </span>
+          </button>
         </div>
       </div>
     </div>
   </div>
 
   <script>
+
+function pantallaConductores() {
+      window.location.href = "conductores.html";
+    }
     function cerrarSesion() {
       localStorage.clear();
       alert("Sesión cerrada.");
