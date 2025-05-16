@@ -178,7 +178,22 @@ function pantallaConductores() {
           eventosMostrados.forEach(ev => {
             const li = document.createElement("li");
             li.className = "px-4";
-            li.innerHTML = `<span class="text-cyan-400 font-semibold">${ev.nombre_conductor}</span> — ${ev.evento} 🕒 <span class="text-gray-400">${new Date(ev.fecha_hora).toLocaleString()}</span>`;
+            
+            // Formatear la fecha correctamente para la zona horaria de Madrid (Europe/Madrid)
+            const fechaHora = new Date(ev.fecha_hora);
+            const opciones = { 
+              timeZone: 'Europe/Madrid',
+              year: 'numeric', 
+              month: '2-digit', 
+              day: '2-digit',
+              hour: '2-digit', 
+              minute: '2-digit', 
+              second: '2-digit',
+              hour12: false
+            };
+            const fechaFormateada = fechaHora.toLocaleString('es-ES', opciones);
+            
+            li.innerHTML = `<span class="text-cyan-400 font-semibold">${ev.nombre_conductor}</span> — ${ev.evento} 🕒 <span class="text-gray-400">${fechaFormateada}</span>`;
             lista.appendChild(li);
           });
         } else {
