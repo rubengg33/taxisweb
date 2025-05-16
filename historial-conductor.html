@@ -133,7 +133,8 @@
   <script>
 
 function pantallaConductores() {
-      window.location.href = "conductores.html";
+  const usuario = JSON.parse(localStorage.getItem("usuario"));
+  window.location.href = `/conductores.html?licencia=${usuario.licencia}`;
     }
     function cerrarSesion() {
       localStorage.clear();
