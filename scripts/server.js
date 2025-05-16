@@ -269,12 +269,12 @@ app.post("/api/conductores", authenticateToken, validateApiKey, (req, res) => {
     });
 });
 
-// Actualizar un conductor por ID
+// Actualizar un conductor por ID, para editar conductor
 app.put("/api/conductores/:id", (req, res) => {
     const id = req.params.id;
-    const { nombre_apellidos, dni, direccion, codigo_postal, email, numero_seguridad_social, licencia } = req.body;
-    const query = "UPDATE conductores SET nombre_apellidos = ?, dni = ?, direccion = ?, codigo_postal = ?, email = ?, numero_seguridad_social = ?, licencia = ? WHERE id = ?";
-    db.query(query, [nombre_apellidos, dni, direccion, codigo_postal, email, numero_seguridad_social, licencia, id], (err, result) => {
+    const { nombre_apellidos, dni, direccion, codigo_postal, email, numero_seguridad_social, licencia, estado } = req.body;
+    const query = "UPDATE conductores SET nombre_apellidos = ?, dni = ?, direccion = ?, codigo_postal = ?, email = ?, numero_seguridad_social = ?, licencia = ?, estado = ? WHERE id = ?";
+    db.query(query, [nombre_apellidos, dni, direccion, codigo_postal, email, numero_seguridad_social, licencia, id, estado], (err, result) => {
         if (err) return res.status(500).json({ error: "Error al actualizar conductor" });
         if (result.affectedRows === 0) return res.status(404).json({ error: "Conductor no encontrado" });
         res.json({ message: "Conductor actualizado correctamente" });
