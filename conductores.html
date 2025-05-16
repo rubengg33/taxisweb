@@ -486,7 +486,7 @@
 
   function mostrarMensaje(texto) {
     const div = document.getElementById("mensaje");
-    div.innerHTML = <strong>${texto}</strong>;
+    div.innerHTML = `<strong>${texto}</strong>`;
     div.classList.remove("text-white");
     div.classList.add("text-black", "bg-white");
     setTimeout(() => {
