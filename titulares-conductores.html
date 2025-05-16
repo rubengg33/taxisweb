@@ -333,7 +333,7 @@
                                 <th class="border border-gray-400 p-2">EMAIL</th>
                                 <th class="border border-gray-400 p-2">Nº SEGURIDAD SOCIAL</th>
                                 <th class="border border-gray-400 p-2">LICENCIA</th>
-                                <th class="border border-gray-400 p-2">ESTAD0</th>
+                                <th class="border border-gray-400 p-2">ESTADO</th>
                                 <th class="border border-gray-400 p-2">Acciones</th>
                             </tr>
                         </thead>
@@ -623,7 +623,7 @@
                         document.getElementById('formEmail').value = datos ? datos.email || '' : '';
                         document.getElementById('formSS').value = datos ? datos.numero_seguridad_social || '' : '';
                         document.getElementById('formLicencia').value = datos ? datos.licencia || '' : '';
-                        document.getElementById('formEstado').value = datos ? datos.estado || '' : '';
+                        document.getElementById('formEstado').value = datos ? (datos.estado || '').toLowerCase() : '';
                     }
                     else {
                         document.getElementById('formularioTitulares').classList.remove('hidden');
