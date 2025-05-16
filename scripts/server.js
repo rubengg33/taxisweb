@@ -331,7 +331,7 @@ app.get("/api/conductores/buscar/:termino", authenticateToken, validateApiKey, (
         licencia LIKE ? OR
         estado LIKE ? `;
     const searchTerm = `%${termino}%`;
-    db.query(query, Array(8).fill(searchTerm), (err, result) => {
+    db.query(query, Array(9).fill(searchTerm), (err, result) => {
         if (err) return res.status(500).json({ error: err.message });
         res.json(result);
     });
