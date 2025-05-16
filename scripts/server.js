@@ -328,7 +328,8 @@ app.get("/api/conductores/buscar/:termino", authenticateToken, validateApiKey, (
         codigo_postal LIKE ? OR 
         email LIKE ? OR 
         numero_seguridad_social LIKE ? OR 
-        licencia LIKE ?`;
+        licencia LIKE ? OR
+        estado LIKE ? `;
     const searchTerm = `%${termino}%`;
     db.query(query, Array(8).fill(searchTerm), (err, result) => {
         if (err) return res.status(500).json({ error: err.message });
