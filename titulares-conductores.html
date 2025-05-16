@@ -186,7 +186,7 @@
         <!-- Your entire content (nav, tables, etc) goes here -->
     </div>
 
-    <!-- Add a loading state -->    
+    <!-- Add a loading state -->
     <div id="loadingState" class="flex items-center justify-center min-h-screen">
         <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-white"></div>
     </div>
@@ -333,6 +333,7 @@
                                 <th class="border border-gray-400 p-2">EMAIL</th>
                                 <th class="border border-gray-400 p-2">Nº SEGURIDAD SOCIAL</th>
                                 <th class="border border-gray-400 p-2">LICENCIA</th>
+                                <th class="border border-gray-400 p-2">ESTAD0</th>
                                 <th class="border border-gray-400 p-2">Acciones</th>
                             </tr>
                         </thead>
@@ -389,6 +390,10 @@
                             class="w-full p-2 border border-gray-300 rounded bg-black text-white input-autofill">
                         <input id="formLicencia" type="text" placeholder="Licencia"
                             class="w-full p-2 border border-gray-300 rounded bg-black text-white input-autofill">
+                        <select id="formEstado" class="w-full p-2 border border-gray-300 rounded bg-black text-white">
+                            <option value="activo">Activo</option>
+                            <option value="baja">Baja</option>
+                        </select>
                     </div>
                     <div class="flex justify-end mt-4 space-x-2">
                         <button onclick="cerrarFormulario('conductores')"
@@ -618,6 +623,7 @@
                         document.getElementById('formEmail').value = datos ? datos.email || '' : '';
                         document.getElementById('formSS').value = datos ? datos.numero_seguridad_social || '' : '';
                         document.getElementById('formLicencia').value = datos ? datos.licencia || '' : '';
+                        document.getElementById('formEstado').value = datos ? datos.estado || '' : '';
                     }
                     else {
                         document.getElementById('formularioTitulares').classList.remove('hidden');
