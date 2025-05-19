@@ -462,37 +462,53 @@ app.post('/api/login-conductor', async (req, res) => {
     if (!email || !dni) return res.status(400).json({ message: 'Faltan datos' });
 
     try {
-        db.query(`
-            SELECT c.nombre_apellidos AS nombre, c.licencia, c.dni, c.email, 
-                   c.numero_seguridad_social, l.marca_modelo AS vehiculo_modelo, 
-                   l.nombre_apellidos AS empresa, l.matricula
-            FROM conductores c
-            JOIN licencias l ON c.licencia = l.licencia
-            WHERE c.email = ? AND c.dni = ?`, [email, dni], (err, rows) => {
-            
+        // Primero consultamos si el conductor existe, sin filtrar por estado
+        db.query(`SELECT * FROM conductores WHERE email = ? AND dni = ?`, [email, dni], (err, results) => {
             if (err) {
-                console.error('❌ Error en /login-conductor:', err);
+                console.error('❌ Error en /login-conductor (verificación de existencia):', err);
                 return res.status(500).json({ message: 'Error interno del servidor' });
             }
-            
-            if (rows.length === 0) return res.status(401).json({ message: '❌ Usuario no encontrado' });
-            
-            // Crear el token JWT
-            const token = jwt.sign(
-                {
-                    email,
-                    isConductor: true,
-                    licencia: rows[0].licencia
-                },
-                process.env.JWT_SECRET, // Asegúrate de tener el JWT_SECRET en tu archivo .env
-                { expiresIn: '24h' }
-            );
-            
-            // Agregar el token a la respuesta
-            rows[0].token = token;
-            res.json(rows[0]);
-        });
 
+            if (results.length === 0) {
+                return res.status(401).json({ message: '❌ Usuario no encontrado' });
+            }
+
+            const conductor = results[0];
+
+            if (conductor.estado !== 'activo') {
+                return res.status(403).json({ message: '❌ Usuario dado de baja, no puedes iniciar sesión' });
+            }
+
+            // Ahora hacemos la consulta con JOIN porque ya sabemos que el usuario es válido y activo
+            db.query(`
+                SELECT c.nombre_apellidos AS nombre, c.licencia, c.dni, c.email, 
+                       c.numero_seguridad_social, l.marca_modelo AS vehiculo_modelo, 
+                       l.nombre_apellidos AS empresa, l.matricula
+                FROM conductores c
+                JOIN licencias l ON c.licencia = l.licencia
+                WHERE c.email = ? AND c.dni = ?`,
+                [email, dni],
+                (err, rows) => {
+                    if (err) {
+                        console.error('❌ Error en /login-conductor (datos completos):', err);
+                        return res.status(500).json({ message: 'Error interno del servidor' });
+                    }
+
+                    const token = jwt.sign(
+                        {
+                            email,
+                            isConductor: true,
+                            licencia: rows[0].licencia
+                        },
+                        process.env.JWT_SECRET,
+                        { expiresIn: '24h' }
+                    );
+
+                    rows[0].token = token;
+                    res.json(rows[0]);
+                }
+            );
+        });
     } catch (e) {
         console.error('❌ Error en /login-conductor:', e);
         res.status(500).json({ message: 'Error interno del servidor' });
