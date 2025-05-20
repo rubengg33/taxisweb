@@ -741,7 +741,8 @@ app.get("/api/conductores/licencia/:licencia", authenticateToken, async (req, re
                 c.dni,
                 c.nombre_apellidos,
                 c.email,
-                c.licencia
+                c.licencia,
+                c.estado
             FROM conductores c
             WHERE c.licencia = ?
             ORDER BY c.nombre_apellidos`;
