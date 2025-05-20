@@ -428,24 +428,23 @@ app.post("/api/login-empresa", async (req, res) => {
                 const token = jwt.sign(
                     { 
                         email, 
-                        isEmpresa: true,
-                        licencia: result[0].LICENCIA 
+                        isEmpresa: true
                     }, 
                     process.env.JWT_SECRET, 
                     { expiresIn: '24h' }
                 );
 
-                return res.json({ 
+                return res.json({
                     exists: true,
                     token,
-                    empresaData: {
-                        nombre: result[0].NOMBRE_APELLIDOS,
-                        licencia: result[0].LICENCIA,
-                        matricula: result[0].MATRICULA,
-                        marca_modelo: result[0].MARCA_MODELO,
-                        email: result[0].EMAIL,
-                        dni: result[0].DNI,
-                    }
+                    licencias: result.map(lic => ({
+                        licencia: lic.LICENCIA,
+                        nombre: lic.NOMBRE_APELLIDOS,
+                        matricula: lic.MATRICULA,
+                        marca_modelo: lic.MARCA_MODELO,
+                        dni: lic.DNI,
+                        email: lic.EMAIL
+                    }))
                 });
             } else {
                 return res.json({ exists: false });

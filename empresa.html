@@ -153,7 +153,13 @@
                 </div>
             </div>
         </div>
-
+        <div class="mb-4">
+            <label for="licenciaSelector" class="text-white font-semibold">Selecciona una Licencia:</label>
+            <select id="licenciaSelector"
+                class="mt-2 w-full p-3 rounded-lg bg-gray-800 text-white border border-gray-700">
+                <option value="">Seleccione una licencia...</option>
+            </select>
+        </div>
         <!-- Conductor Selector Section -->
         <div class="bg-gray-900 rounded-lg shadow-xl p-6 md:p-8 mb-8">
             <div class="text-center mb-4">
@@ -282,65 +288,74 @@
     <script>
         // Update the DOMContentLoaded event handler
         document.addEventListener('DOMContentLoaded', async function () {
-            const loadingState = document.getElementById('loadingState');
+            const isAdmin = localStorage.getItem("isAdmin") === "true";
             const welcomeSection = document.querySelector('.welcome-section');
+            const loadingState = document.getElementById('loadingState');
+            loadingState.classList.remove('hidden');
 
-            try {
-                loadingState.classList.remove('hidden');
-                const isAdmin = localStorage.getItem("isAdmin") === "true";
+            if (!isAdmin) {
+                const licencias = JSON.parse(localStorage.getItem('empresaLicencias') || "[]");
+                const licenciaSelector = document.getElementById('licenciaSelector');
 
-                if (!isAdmin) {
-                    const empresaDataRaw = localStorage.getItem('empresaData');
-                    if (!empresaDataRaw) {
-                        throw new Error('No empresa data found in localStorage');
-                    }
+                if (!licencias.length) throw new Error("No se encontraron licencias");
 
-                    const empresaData = JSON.parse(empresaDataRaw);
-                    // Update empresa data fields
-                    document.getElementById('empresaLicencia').textContent = empresaData.licencia || 'N/A';
-                    document.getElementById('empresaMatricula').textContent = empresaData.matricula || 'N/A';
-                    document.getElementById('empresaMarcaModelo').textContent = empresaData.marca_modelo || 'N/A';
-                    document.getElementById('empresaDNI').textContent = empresaData.dni || 'N/A';
-                    document.getElementById('empresaEmail').textContent = empresaData.email || empresaData.empresaEmail || 'N/A';
-                } else {
-                    // For admin, initially show placeholder text
-                    document.getElementById('empresaLicencia').textContent = "Seleccione un conductor";
-                    document.getElementById('empresaMatricula').textContent = "Pendiente";
-                    document.getElementById('empresaMarcaModelo').textContent = "Pendiente";
-                    document.getElementById('empresaDNI').textContent = "Pendiente";
-                    document.getElementById('empresaEmail').textContent = "Pendiente";
-                }
+                licencias.forEach(l => {
+                    const opt = document.createElement('option');
+                    opt.value = l.licencia;
+                    opt.textContent = `${l.licencia} - ${l.marca_modelo}`;
+                    licenciaSelector.appendChild(opt);
+                });
+
+                licenciaSelector.addEventListener('change', (e) => {
+                    const selected = licencias.find(l => l.licencia === e.target.value);
+                    if (!selected) return;
+
+                    // Guardamos esta licencia temporalmente para futuras consultas
+                    localStorage.setItem('empresaData', JSON.stringify(selected));
+
+                    // Mostramos sus datos
+                    document.getElementById('empresaLicencia').textContent = selected.licencia;
+                    document.getElementById('empresaMatricula').textContent = selected.matricula;
+                    document.getElementById('empresaMarcaModelo').textContent = selected.marca_modelo;
+                    document.getElementById('empresaDNI').textContent = selected.dni;
+                    document.getElementById('empresaEmail').textContent = selected.email;
+
+                    // Cargar conductores de esta licencia
+                    loadConductores(selected.licencia);
+                });
 
                 welcomeSection.classList.remove('hidden');
-                await loadConductores();
-                loadingState.classList.add('hidden');
-            } catch (error) {
-                console.error('Error in DOMContentLoaded:', error);
-                loadingState.classList.add('hidden');
-                await showAlert('Error al cargar los datos. Por favor, inicie sesión nuevamente.', 'error');
-                window.location.href = 'login-empresa.html';
+            } else {
+                // Admin: comportamiento actual
+                document.getElementById('empresaLicencia').textContent = "Seleccione un conductor";
+                document.getElementById('empresaMatricula').textContent = "Pendiente";
+                document.getElementById('empresaMarcaModelo').textContent = "Pendiente";
+                document.getElementById('empresaDNI').textContent = "Pendiente";
+                document.getElementById('empresaEmail').textContent = "Pendiente";
+
+                welcomeSection.classList.remove('hidden');
+                loadConductores(); // carga todos los conductores si es admin
             }
+
+            loadingState.classList.add('hidden');
+
         });
 
         // Update loadConductores to only show names in dropdown
         // Update loadConductores function
-        async function loadConductores() {
+        async function loadConductores(licenciaSeleccionada = null) {
             try {
                 const isAdmin = localStorage.getItem("isAdmin") === "true";
-                const empresaData = !isAdmin ? JSON.parse(localStorage.getItem('empresaData')) : null;
-
                 let endpoint;
+
                 if (isAdmin) {
                     endpoint = `${API_URL}/conductores`;
                 } else {
-                    if (!empresaData || !empresaData.licencia) {
-                        throw new Error('No license found for empresa');
+                    if (!licenciaSeleccionada) {
+                        throw new Error('Licencia no seleccionada');
                     }
-                    // Make sure this matches your server endpoint
-                    endpoint = `${API_URL}/conductores/licencia/${empresaData.licencia}`;
+                    endpoint = `${API_URL}/conductores/licencia/${licenciaSeleccionada}`;
                 }
-
-                console.log('Fetching conductores from:', endpoint); // Debug log
 
                 const response = await fetch(endpoint, {
                     headers: getAuthHeaders()
@@ -351,8 +366,6 @@
                 }
 
                 const data = await response.json();
-                console.log('Received conductores data:', data); // Debug log
-
                 const conductorSelect = document.getElementById('conductorSelect');
                 conductorSelect.innerHTML = '<option value="">Seleccione un conductor...</option>';
 
@@ -366,14 +379,14 @@
                         }
                     });
                 } else {
-                    console.log('No conductores found for this license'); // Debug log
                     await showAlert('No se encontraron conductores para esta licencia', 'info');
                 }
             } catch (error) {
-                console.error('Error loading conductores:', error);
+                console.error('Error cargando conductores:', error);
                 await showAlert('Error al cargar los conductores', 'error');
             }
         }
+
     </script>
 </body>
 

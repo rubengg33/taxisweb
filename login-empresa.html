@@ -390,7 +390,7 @@
                         localStorage.setItem('token', empresaData.token);
                         localStorage.setItem('empresaEmail', email);
                         localStorage.setItem('isEmpresa', 'true');
-                        localStorage.setItem('empresaData', JSON.stringify(empresaData.empresaData));
+                        localStorage.setItem('empresaLicencias', JSON.stringify(empresaData.licencias));
                         window.location.href = 'empresa.html';
                     } else {
                         await Swal.fire({
