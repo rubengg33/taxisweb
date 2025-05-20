@@ -393,9 +393,10 @@
 
                             option.textContent = `${iconoEstado} ${conductor.nombre_apellidos} (${estado})`;
 
-                            // ✅ Fondo gris claro si no es activo
+                            // ✅ Fondo blanco si no es activo
                             if (conductor.estado !== 'activo') {
                                 option.style.backgroundColor = 'rgba(255, 255, 255, 1)';
+                                option.style.color = 'black'
                             }
 
                             conductorSelect.appendChild(option);
