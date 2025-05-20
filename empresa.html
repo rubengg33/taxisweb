@@ -142,7 +142,7 @@
         <!-- Welcome section -->
         <div class="bg-gray-900 rounded-lg shadow-xl p-6 md:p-8 mb-8 welcome-section hidden">
             <div class="text-center">
-                <h1 class="text-2xl md:text-3xl font-bold text-white mb-2">Bienvenido, Empresa</h1>
+                <h1 id="bienvenidaTitulo" class="text-2xl md:text-3xl font-bold text-white mb-2">Bienvenido</h1>
                 <h2 class="text-xl md:text-2xl text-sky-400 mb-4">Jornada de Conductor</h2>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-gray-300">
                     <p>Licencia: <span id="empresaLicencia" class="text-sky-400"></span></p>
@@ -288,6 +288,7 @@
     <script>
         // Update the DOMContentLoaded event handler
         document.addEventListener('DOMContentLoaded', async function () {
+            const titulo = document.getElementById('bienvenidaTitulo');
             const isAdmin = localStorage.getItem("isAdmin") === "true";
             const welcomeSection = document.querySelector('.welcome-section');
             const loadingState = document.getElementById('loadingState');
@@ -295,6 +296,8 @@
 
             if (!isAdmin) {
                 const licencias = JSON.parse(localStorage.getItem('empresaLicencias') || "[]");
+                const nombre = licencias[0]?.nombre || 'Empresa';
+                titulo.textContent = `Bienvenido, ${nombre.split(' ')[0]}`;
                 const licenciaSelector = document.getElementById('licenciaSelector');
 
                 if (!licencias.length) throw new Error("No se encontraron licencias");
@@ -334,6 +337,7 @@
                 document.getElementById('empresaEmail').textContent = "Pendiente";
 
                 welcomeSection.classList.remove('hidden');
+                titulo.textContent = 'Bienvenido, Admin';
                 loadConductores(); // carga todos los conductores si es admin
             }
 
@@ -374,7 +378,7 @@
                         if (conductor && conductor.dni && conductor.nombre_apellidos) {
                             const option = document.createElement('option');
                             option.value = conductor.dni;
-                            option.textContent = conductor.nombre_apellidos;
+                            option.textContent = `${conductor.nombre_apellidos} (${conductor.estado || 'sin estado'})`;
                             conductorSelect.appendChild(option);
                         }
                     });
