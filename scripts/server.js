@@ -146,7 +146,7 @@ app.delete("/api/licencias/:licencia", (req, res) => {
 });
 // Obtener todos los conductores
 app.get("/api/conductores", authenticateToken, validateApiKey, (req, res) => {
-    db.query("SELECT * FROM conductores", (err, result) => {
+    db.query("SELECT * FROM conductores ORDER BY estado = 'activo' DESC", (err, result) => {
         if (err) return res.status(500).json({ error: err.message });
         res.json(result);
     });
