@@ -374,11 +374,30 @@
                 conductorSelect.innerHTML = '<option value="">Seleccione un conductor...</option>';
 
                 if (Array.isArray(data) && data.length > 0) {
-                    data.forEach(conductor => {
+                    // ✅ Ordenar: primero los activos
+                    const ordenados = data.sort((a, b) => {
+                        if (a.estado === 'activo' && b.estado !== 'activo') return -1;
+                        if (a.estado !== 'activo' && b.estado === 'activo') return 1;
+                        return a.nombre_apellidos.localeCompare(b.nombre_apellidos);
+                    });
+
+                    ordenados.forEach(conductor => {
                         if (conductor && conductor.dni && conductor.nombre_apellidos) {
                             const option = document.createElement('option');
                             option.value = conductor.dni;
-                            option.textContent = `${conductor.nombre_apellidos} (${conductor.estado || 'sin estado'})`;
+                            let estado = conductor.estado?.toLowerCase() || 'desconocido';
+                            let iconoEstado = '⚪'; // predeterminado
+
+                            if (estado === 'activo') iconoEstado = '🟢';
+                            else if (estado === 'baja') iconoEstado = '🔴';
+
+                            option.textContent = `${iconoEstado} ${conductor.nombre_apellidos} (${estado})`;
+
+                            // ✅ Fondo gris claro si no es activo
+                            if (conductor.estado !== 'activo') {
+                                option.style.backgroundColor = 'rgba(156, 163, 175, 0.3)';
+                            }
+
                             conductorSelect.appendChild(option);
                         }
                     });
