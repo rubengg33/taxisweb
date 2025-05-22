@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Gestión de Taxis</title>
+    <title>Acerca de</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="icon" type="image/png" sizes="512x512" href="img/favicon/android-chrome-512x512.png">
     <link rel="manifest" href="img/favicon/site.webmanifest">
@@ -63,8 +63,7 @@
         }
     </style>
 </head>
-
-<body class="bg-gradient-to-br from-purple-600 via-indigo-500 to-sky-400 min-h-screen">
+<body class="bg-[#0f172a]">
     <!-- Navbar con nuevos colores -->
     <!-- Navbar structure update -->
     <nav class="bg-gradient-to-r from-gray-900 to-gray-800 shadow-lg">
@@ -106,67 +105,61 @@
             </div>
         </div>
     </nav>
-
-    <div class="flex items-center justify-center min-h-[calc(100vh-4rem)] pt-16">
-        <div class="max-w-4xl w-full mx-4">
-            <div
-                class="bg-gradient-to-br from-gray-900/90 to-gray-800/90 backdrop-blur-sm rounded-2xl shadow-2xl p-8 text-center border border-gray-700">
-                <h1 class="text-4xl font-bold mb-2 text-white">Sistema de Gestión de Taxis</h1>
-                <p class="text-gray-300 mb-8">Seleccione el tipo de acceso que desea realizar</p>
-
-                <div class="flex flex-col md:flex-row gap-6 justify-center items-center">
-                    <!-- Botón de Administración -->
-                    <a href="titulares-conductores.html"
-                        class="button-hover bg-gradient-to-r from-sky-600 to-blue-700 text-white px-8 py-4 rounded-xl flex items-center gap-3 w-full md:w-64 justify-center hover:from-sky-700 hover:to-blue-800">
-                        <span class="material-icons">admin_panel_settings</span>
-                        <span class="text-lg font-semibold">Administración</span>
-                    </a>
-
-                    <!-- Botón de Conductores -->
-                    <a href="login-conductor.html"
-                        class="button-hover bg-gradient-to-r from-emerald-500 to-teal-600 text-white px-8 py-4 rounded-xl flex items-center gap-3 w-full md:w-64 justify-center hover:from-emerald-600 hover:to-teal-700">
-                        <span class="material-icons">directions_car</span>
-                        <span class="text-lg font-semibold">Conductores</span>
-                    </a>
-                    <a href="login-empresa.html"
-                        class="button-hover bg-gradient-to-r from-purple-500 to-pink-600 text-white px-8 py-4 rounded-xl flex items-center gap-3 w-full md:w-64 justify-center hover:from-purple-600 hover:to-pink-700">
-                        <span class="material-icons">business</span>
-                        <span class="text-lg font-semibold">Empresa</span>
-                    </a>
-                </div>
-                    <footer class="mt-8 pt-4 border-t border-gray-700">
-                        <p class="text-sm text-gray-400">
-                            © 2025 Sistema de Gestión de Taxis. Todos los derechos reservados.
-                        </p>
-                    </footer>
-            </div>
-        </div>
+<section class="py-16 px-6 sm:px-10 lg:px-20">
+    <div class="max-w-5xl mx-auto">
+      <h2 class="text-4xl font-bold text-white mb-6 border-b-4 border-gray-500 inline-block pb-2">
+        Acerca de Control de Conductores
+      </h2>
+      <p class="text-gray-300 text-lg mb-6">
+        <strong class="text-blue-500">Control de Conductores</strong> es una herramienta digital diseñada para conductores profesionales del sector del taxi. Su objetivo es facilitar el cumplimiento de la obligación legal de registrar diariamente la jornada laboral, según lo establecido en el <strong class="text-blue-500">artículo 34.9 del Estatuto de los Trabajadores</strong>, modificado por el <strong class="text-blue-500">Real Decreto-ley 8/2019</strong>.
+      </p>
+      <blockquote class="border-l-4 border-blue-500 pl-4 italic text-gray-400 mb-6">
+        “La empresa garantizará el registro diario de jornada, que deberá incluir el horario concreto de inicio y finalización de la jornada de trabajo de cada persona trabajadora...”
+      </blockquote>
+      <p class="text-gray-300 text-lg mb-6">
+        Esta plataforma permite registrar de forma objetiva, fiable y accesible:
+      </p>
+      <ul class="list-disc list-inside text-gray-300 text-lg mb-6 space-y-2">
+        <li>Hora de inicio y finalización de la jornada diaria.</li>
+        <li>Descansos, pausas y cambios de estado durante el servicio.</li>
+        <li>Historial de actividad diario, semanal y mensual.</li>
+        <li>Acceso individual mediante DNI/NIE, asegurando la privacidad de cada conductor.</li>
+      </ul>
+      <p class="text-gray-300 text-lg mb-6">
+        Los datos se almacenan de forma segura durante un mínimo de <strong class="text-blue-500">cuatro años</strong>, cumpliendo la normativa vigente y estando disponibles para la <strong class="text-blue-500">Inspección de Trabajo</strong> y, si corresponde, para los <strong class="text-blue-500">representantes legales de los trabajadores</strong>.
+      </p>
+      <p class="text-gray-300 text-lg">
+        En resumen, <strong class="text-blue-500">Control de Conductores</strong> es una solución confiable que impulsa la transparencia, minimiza riesgos legales y simplifica la gestión laboral en el sector del taxi.
+      </p>
+      <footer class="mt-8 pt-4 border-t border-gray-700">
+        <p class="text-sm text-gray-400">
+            © 2025 Sistema de Gestión de Taxis. Todos los derechos reservados.
+        </p>
+    </footer>
     </div>
+  </section>
+  <script>
+    const mobileMenuButton = document.querySelector('.mobile-menu-button');
+    const mobileMenu = document.querySelector('.mobile-menu');
+    const menuIcon = document.querySelector('.menu-icon');
 
-    <!-- Add JavaScript for mobile menu toggle -->
-    <script>
-        const mobileMenuButton = document.querySelector('.mobile-menu-button');
-        const mobileMenu = document.querySelector('.mobile-menu');
-        const menuIcon = document.querySelector('.menu-icon');
-
-        mobileMenuButton.addEventListener('click', () => {
-            if (mobileMenu.classList.contains('show')) {
-                mobileMenu.classList.remove('show');
-                menuIcon.style.transform = 'rotate(0deg)';
-                setTimeout(() => {
-                    menuIcon.textContent = 'menu';
-                    mobileMenu.classList.add('hidden');
-                }, 150);
-            } else {
-                mobileMenu.classList.remove('hidden');
-                setTimeout(() => {
-                    mobileMenu.classList.add('show');
-                    menuIcon.textContent = 'close';
-                    menuIcon.style.transform = 'rotate(180deg)';
-                }, 10);
-            }
-        });
-    </script>
-</body>
-
+    mobileMenuButton.addEventListener('click', () => {
+        if (mobileMenu.classList.contains('show')) {
+            mobileMenu.classList.remove('show');
+            menuIcon.style.transform = 'rotate(0deg)';
+            setTimeout(() => {
+                menuIcon.textContent = 'menu';
+                mobileMenu.classList.add('hidden');
+            }, 150);
+        } else {
+            mobileMenu.classList.remove('hidden');
+            setTimeout(() => {
+                mobileMenu.classList.add('show');
+                menuIcon.textContent = 'close';
+                menuIcon.style.transform = 'rotate(180deg)';
+            }, 10);
+        }
+    });
+</script>
+  </body>
 </html>
