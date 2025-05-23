@@ -271,7 +271,8 @@
     });
 
     function cerrarSesion() {
-      localStorage.clear();
+      localStorage.removeItem('usuario');
+      localStorage.removeItem('session_token');
       alert("Sesión cerrada.");
       window.location.href = "/";
     }

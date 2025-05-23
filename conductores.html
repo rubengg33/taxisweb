@@ -271,7 +271,8 @@
     alert('⚠️ No se proporcionó la licencia en la URL');
   }
     function cerrarSesion() {
-      localStorage.clear();
+      localStorage.removeItem('usuario');
+      localStorage.removeItem('session_token');
       window.location.href = "/";
     }
 

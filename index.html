@@ -167,6 +167,206 @@
             }
         });
     </script>
+    <!-- Estilos generales del modal y fondo -->
+<div id="cookieModal" class="bg-opacity-60 fixed inset-0 z-50 flex items-center justify-center bg-black backdrop-blur-sm">
+    <div
+      class="relative w-full max-w-md rounded-xl bg-white p-6 text-sm text-gray-900 shadow-xl dark:bg-gray-900 dark:text-white"
+    >
+      <h2 class="mb-4 text-xl font-bold">Tu configuración de cookies</h2>
+      <p class="mb-4">
+        Utilizamos cookies para mejorar tu experiencia. Puedes activar o desactivar las cookies según tus preferencias.
+      </p>
+  
+      <!-- Cookies esenciales (siempre activas, inmutables) -->
+      <div class="mb-4 flex items-center justify-between">
+        <div>
+          <p class="font-semibold">Cookies esenciales</p>
+          <p class="text-xs text-gray-500 dark:text-gray-400">
+            Estas cookies permiten funciones básicas como la seguridad, la verificación de la identidad y la administración de la red.
+            Estas cookies no pueden ser desactivadas.
+          </p>
+        </div>
+        <div class="flex items-center gap-3 opacity-70 cursor-not-allowed select-none ml-6">
+          <label class="relative inline-flex w-12 h-6 select-none items-center gap-3">
+            <input type="checkbox" checked disabled class="peer sr-only" />
+            <!-- Track -->
+            <span class="block bg-blue-500 rounded-full h-6 w-full transition-colors duration-300"></span>
+            <!-- Bolita -->
+            <span
+              class="absolute top-[0.15rem] left-[0.18rem] bg-white w-5 h-5 rounded-full shadow-md transition-all duration-300 translate-x-[1.35rem]"
+            ></span>
+          </label>
+          <span class="font-semibold text-blue-600 select-none inline-block w-[90px]">Activado</span>
+        </div>
+      </div>
+  
+      <!-- Cookies de marketing -->
+      <div class="mb-4 flex items-center justify-between">
+        <div>
+          <p class="font-semibold">Cookies de marketing</p>
+          <p class="text-xs text-gray-500 dark:text-gray-400">
+            Seguimiento de publicidad para ofrecer anuncios relevantes y mejorar servicios.
+          </p>
+        </div>
+        <div class="flex items-center gap-3 ml-6">
+          <label class="relative inline-flex w-12 h-6 cursor-pointer select-none">
+            <input id="marketingCookie" type="checkbox" class="peer sr-only" />
+            <!-- Track -->
+            <span
+              class="block bg-gray-300 rounded-full h-6 w-full transition-colors duration-300 peer-checked:bg-blue-500"
+            ></span>
+            <!-- Bolita -->
+            <span
+              class="absolute top-[0.15rem] left-[0.18rem] bg-white w-5 h-5 rounded-full shadow-md transition-transform duration-300
+                   peer-checked:translate-x-[1.35rem] peer-active:w-6 peer-checked:peer-active:translate-x-[1.2rem]"
+            ></span>
+          </label>
+          <span id="marketingCookieText" class="font-semibold select-none inline-block w-[90px]">Desactivado</span>
+        </div>
+      </div>
+  
+      <!-- Cookies funcionales -->
+      <div class="mb-4 flex items-center justify-between">
+        <div>
+          <p class="font-semibold">Cookies funcionales</p>
+          <p class="text-xs text-gray-500 dark:text-gray-400">
+            Recuerdan tus elecciones para ofrecer una experiencia más personalizada.
+          </p>
+        </div>
+        <div class="flex items-center gap-3 ml-6">
+          <label class="relative inline-flex w-12 h-6 cursor-pointer select-none">
+            <input id="functionalCookie" type="checkbox" class="peer sr-only" />
+            <!-- Track -->
+            <span
+              class="block bg-gray-300 rounded-full h-6 w-full transition-colors duration-300 peer-checked:bg-blue-500"
+            ></span>
+            <!-- Bolita -->
+            <span
+              class="absolute top-[0.15rem] left-[0.18rem] bg-white w-5 h-5 rounded-full shadow-md transition-transform duration-300
+                   peer-checked:translate-x-[1.35rem] peer-active:w-6 peer-checked:peer-active:translate-x-[1.2rem]"
+            ></span>
+          </label>
+          <span id="functionalCookieText" class="font-semibold select-none inline-block w-[90px]">Desactivado</span>
+        </div>
+      </div>
+  
+      <!-- Cookies de estadísticas -->
+      <div class="mb-6 flex items-center justify-between">
+        <div>
+          <p class="font-semibold">Cookies de estadísticas</p>
+          <p class="text-xs text-gray-500 dark:text-gray-400">
+            Ayudan a entender cómo interactúan los usuarios con el sitio para mejorarlo.
+          </p>
+        </div>
+        <div class="flex items-center gap-3 ml-6">
+          <label class="relative inline-flex w-12 h-6 cursor-pointer select-none">
+            <input id="statsCookie" type="checkbox" class="peer sr-only" />
+            <!-- Track -->
+            <span
+              class="block bg-gray-300 rounded-full h-6 w-full transition-colors duration-300 peer-checked:bg-blue-500"
+            ></span>
+            <!-- Bolita -->
+            <span
+              class="absolute top-[0.15rem] left-[0.18rem] bg-white w-5 h-5 rounded-full shadow-md transition-transform duration-300
+                   peer-checked:translate-x-[1.35rem] peer-active:w-6 peer-checked:peer-active:translate-x-[1.2rem]"
+            ></span>
+          </label>
+          <span id="statsCookieText" class="font-semibold select-none inline-block w-[90px]">Desactivado</span>
+        </div>
+      </div>
+  
+      <!-- Botón Aceptar -->
+      <div class="flex justify-end">
+        <button
+          id="acceptCookies"
+          class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md transition-colors"
+        >
+          Aceptar
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    // Cambia el texto "Activado"/"Desactivado" según checkbox
+    function setupToggleText(checkboxId, textId) {
+      const checkbox = document.getElementById(checkboxId);
+      const text = document.getElementById(textId);
+  
+      function updateText() {
+        if (checkbox.checked) {
+          text.textContent = 'Activado';
+          text.classList.add('text-blue-600');
+          text.classList.remove('text-gray-400');
+        } else {
+          text.textContent = 'Desactivado';
+          text.classList.add('text-gray-400');
+          text.classList.remove('text-blue-600');
+        }
+      }
+  
+      checkbox.addEventListener('change', updateText);
+      updateText();
+    }
+  
+    // Inicializamos los textos de los toggles
+    setupToggleText('marketingCookie', 'marketingCookieText');
+    setupToggleText('functionalCookie', 'functionalCookieText');
+    setupToggleText('statsCookie', 'statsCookieText');
+  
+    // Función para cargar preferencias guardadas
+    function loadPreferences() {
+      const prefs = localStorage.getItem('cookiePreferences');
+      if (!prefs) return null;
+      try {
+        return JSON.parse(prefs);
+      } catch {
+        return null;
+      }
+    }
+  
+    // Función para guardar preferencias
+    function savePreferences(prefs) {
+      localStorage.setItem('cookiePreferences', JSON.stringify(prefs));
+    }
+  
+    // Cargar preferencias al iniciar y actualizar el estado de los checkboxes
+    function applyPreferences(prefs) {
+      if (!prefs) return;
+      document.getElementById('marketingCookie').checked = prefs.marketingCookie ?? false;
+      document.getElementById('functionalCookie').checked = prefs.functionalCookie ?? false;
+      document.getElementById('statsCookie').checked = prefs.statsCookie ?? false;
+  
+      // Actualizamos textos
+      ['marketingCookie', 'functionalCookie', 'statsCookie'].forEach(id => {
+        document.getElementById(id).dispatchEvent(new Event('change'));
+      });
+    }
+  
+    // Mostrar o esconder modal según si hay preferencias guardadas
+    window.addEventListener('DOMContentLoaded', () => {
+      const prefs = loadPreferences();
+      if (prefs) {
+        // Ocultar modal porque ya hay preferencias guardadas
+        document.getElementById('cookieModal').style.display = 'none';
+        applyPreferences(prefs);
+      }
+    });
+  
+    // Evento para botón Aceptar
+    document.getElementById('acceptCookies').addEventListener('click', () => {
+      const prefs = {
+        marketingCookie: document.getElementById('marketingCookie').checked,
+        functionalCookie: document.getElementById('functionalCookie').checked,
+        statsCookie: document.getElementById('statsCookie').checked
+      };
+      savePreferences(prefs);
+      document.getElementById('cookieModal').style.display = 'none';
+    });
+  </script>
+      
+      
+  
 </body>
 
 </html>
