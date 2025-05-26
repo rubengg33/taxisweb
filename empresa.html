@@ -612,8 +612,9 @@
             });
 
             // Calculate totals and update display
-            const totalWorking = sumFinJornada - sumInicioJornada;
             const totalRest = sumFinDescanso - sumInicioDescanso;
+            const totalWorking = (sumFinJornada - sumInicioJornada) - totalRest;
+
 
             const workingHours = Math.floor(totalWorking / (1000 * 60 * 60));
             const workingMinutes = Math.floor((totalWorking % (1000 * 60 * 60)) / (1000 * 60));
