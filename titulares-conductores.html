@@ -193,44 +193,30 @@
 
     <!-- Navbar con nuevos colores -->
     <!-- Navbar structure update -->
-    <nav class="bg-gradient-to-r from-gray-900 to-gray-800 shadow-lg">
+    <nav class="fixed top-0 w-full z-50 bg-gradient-to-r from-gray-900 to-gray-800 shadow-lg">
         <div class="w-full">
             <div class="flex justify-between items-center h-16 ml-8">
                 <!-- Logo section sin márgenes -->
                 <a href="index.html" class="block">
-                    <div class="flex items-center button-hover cursor-pointer mt-4">
-                        <img src="img/taxi.png" alt="Logo" class="h-30 w-30 rounded">
+                    <div class="flex items-center button-hover cursor-pointer">
+                        <img src="img/taxi.png" alt="Logo" class="h-15 w-35 rounded">
                     </div>
                 </a>
-                <!-- Desktop menu -->
-                <div class="hidden md:flex items-center space-x-8 pr-4">
-                    <a href="index.html" class="text-gray-300 hover:text-sky-400 transition">Inicio</a>
-                    <a href="#" class="text-gray-300 hover:text-sky-400 transition">Servicios</a>
-                    <a href="#" class="text-gray-300 hover:text-sky-400 transition">Contacto</a>
-                    <a href="about.html" class="text-gray-300 hover:text-sky-400 transition">Acerca de</a>
-                    <!-- Botón de cerrar sesión actualizado -->
-                    <button
-                        class="button-hover cursor-pointer bg-gradient-to-r from-red-600 to-red-700 text-white px-8 py-4 rounded-xl flex items-center gap-3 justify-center hover:from-red-700 hover:to-red-800"
-                        id="logoutButton">
-                        <span class="material-icons">logout</span>
-                        <span>Cerrar sesión</span>
-                    </button>
+                <!-- Desktop menu ajustado a la derecha -->
+                <div class="hidden md:flex items-center space-x-8 pr-8">
+                    <a href="index.html" class="text-white hover:text-sky-400 transition">Inicio</a>
+                    <a href="#services" class="text-white hover:text-sky-400 transition">Servicios</a>
+                    <a href="#contact" class="text-white hover:text-sky-400 transition">Contacto</a>
+                    <a href="about.html" class="text-white hover:text-sky-400 transition">Acerca de</a>
                 </div>
 
                 <!-- Mobile menu button container -->
-                <div class="md:hidden relative flex items-center gap-4">
-                    <!-- Botón de cerrar sesión móvil actualizado -->
-                    <button
-                        class="button-hover cursor-pointer bg-gradient-to-r from-red-600 to-red-700 text-white px-4 py-2 rounded-xl flex items-center gap-2 justify-center hover:from-red-700 hover:to-red-800"
-                        id="logoutButtonMobile">
-                        <span class="material-icons text-sm">logout</span>
-                        <span>Cerrar sesión</span>
-                    </button>
+                <div class="md:hidden relative">
                     <button class="mobile-menu-button p-2">
                         <span class="material-icons menu-icon text-white transition-transform duration-300">menu</span>
                     </button>
 
-                    <!-- Mobile menu -->
+                    <!-- Mobile menu repositioned -->
                     <div
                         class="mobile-menu hidden md:hidden absolute right-0 top-full mt-2 w-48 rounded-lg overflow-hidden bg-gray-900 shadow-lg z-50">
                         <a href="index.html"
