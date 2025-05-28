@@ -35,8 +35,9 @@ const validateApiKey = (req, res, next) => {
     }
     next();
 };
-const upload = multer({ dest: 'uploads/' });
 const app = express();
+const upload = multer({ dest: 'uploads/' });
+
 
 // Configuración de CORS
 const corsOptions = {
@@ -70,53 +71,80 @@ app.get("/api/config", (req, res) => {
     res.json({ apiUrl: process.env.API_URL });
 });
 
-function clean(value) {
-    return typeof value === 'string' ? value.trim() : value || '';
-  }
-  
-  app.post('/import', upload.single('file'), (req, res) => {
+app.post('/import', upload.single('file'), (req, res) => {
     const results = [];
   
+    if (!req.file) {
+      return res.status(400).send('No file uploaded.');
+    }
+  
     fs.createReadStream(req.file.path)
-      .pipe(csv())
-      .on('data', (data) => results.push(data))
+      .pipe(csv({ separator: ';' })) // Delimitador punto y coma
+      .on('data', (data) => {
+        // Limpia espacios y valores nulos
+        for (let key in data) {
+          if (data[key] == null || data[key].toLowerCase() === 'nan' || data[key].toLowerCase() === 'none') {
+            data[key] = '';
+          } else {
+            data[key] = data[key].trim();
+          }
+        }
+  
+        // Mapea las columnas del CSV a las columnas de la BD
+        results.push({
+          licencia: data['LICENCIA'] || '',
+          nombre_apellidos: data['CONDUCTOR'] || '',
+          dni: data['DNI'] || '',
+          email: data['CORREO ELECTRÉNICO'] || '',
+          direccion: data['DIRECCION'] || '',
+          codigo_postal: data['CODIGO PORTAL'] || '',
+          numero_seguridad_social: data['NUMERO SEGURIDAD SOCIAL'] || ''
+        });
+      })
       .on('end', () => {
-        // Opcional: eliminar datos antiguos
-        db.query("DELETE FROM conductores_test", (err) => {
+        // Primero eliminar todos los conductores
+        db.query('DELETE FROM conductores', (err) => {
           if (err) {
-            console.error('❌ Error al borrar datos existentes:', err);
-            return res.status(500).send('Error al borrar datos existentes');
+            console.error(err);
+            fs.unlinkSync(req.file.path);
+            return res.status(500).send('Error al eliminar datos previos');
           }
   
+          // Insertar filas una por una con promesas para esperar todas
           const insertPromises = results.map(row => {
-            const licencia = clean(row['LICENCIA']);
-            const nombre_apellidos = clean(row['CONDUCTOR']);
-            const dni = clean(row['DNI']);
-            const email = clean(row['CORREO ELECTRÓNICO'] || row['CORREO ELECTRÉNICO']);
-            const direccion = clean(row['DIRECCION']);
-            const codigo_postal = clean(row['CODIGO POSTAL'] || row['CODIGO PORTAL']);
-            const numero_seguridad_social = clean(row['NUMERO SEGURIDAD SOCIAL']);
-            const estado = 'activo';
-  
-            return db.promise().query(
-              `INSERT INTO conductores_test (licencia, nombre_apellidos, dni, email, direccion, codigo_postal, numero_seguridad_social, estado)
-               VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-              [licencia, nombre_apellidos, dni, email, direccion, codigo_postal, numero_seguridad_social, estado]
-            );
+            return new Promise((resolve, reject) => {
+              const { licencia, nombre_apellidos, dni, direccion, codigo_postal, email, numero_seguridad_social } = row;
+              db.query(
+                `INSERT INTO conductores (licencia, nombre_apellidos, dni, direccion, codigo_postal, email, numero_seguridad_social)
+                 VALUES (?, ?, ?, ?, ?, ?, ?)`,
+                [licencia, nombre_apellidos, dni, direccion, codigo_postal, email, numero_seguridad_social],
+                (err) => {
+                  if (err) reject(err);
+                  else resolve();
+                }
+              );
+            });
           });
   
           Promise.all(insertPromises)
             .then(() => {
-              fs.unlinkSync(req.file.path); // Borra el archivo subido
-              res.send("✅ Importación completada con éxito");
+              fs.unlinkSync(req.file.path); // Borra archivo temporal
+              res.send('🚀 Importación completada correctamente');
             })
-            .catch(error => {
-              console.error('❌ Error al insertar filas:', error);
-              res.status(500).send('Error al insertar los datos en la base de datos');
+            .catch(err => {
+              console.error(err);
+              fs.unlinkSync(req.file.path);
+              res.status(500).send('Error al insertar datos');
             });
         });
+      })
+      .on('error', (err) => {
+        console.error(err);
+        fs.unlinkSync(req.file.path);
+        res.status(500).send('Error al procesar CSV');
       });
   });
+  
 // Obtener todos los titulares (licencias)
 app.get("/api/licencias", authenticateToken, validateApiKey, (req, res) => {
     db.query("SELECT * FROM licencias", (err, result) => {
