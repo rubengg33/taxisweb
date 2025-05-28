@@ -87,42 +87,51 @@ function clean(value) {
   }
   
   app.post('/import', upload.single('file'), async (req, res) => {
-      if (!req.file) {
-    console.log('No se recibió archivo.');
-    return res.status(400).send('No se ha recibido ningún archivo.');
-  }
-
-    
-  try {
-    const workbook = xlsx.readFile(req.file.path);
-    const sheetName = workbook.SheetNames[0];
-    const sheet = workbook.Sheets[sheetName];
-    const data = xlsx.utils.sheet_to_json(sheet);
-
-    for (const row of data) {
-      const nombre_apellidos = clean(row['CONDUCTOR']);
-      const dni = clean(row['DNI']);
-      const direccion = clean(row['DIRECCION']);
-      const codigo_postal = clean(row['CODIGO POSTAL'] || row['CODIGO PORTAL']);
-      const email = clean(row['CORREO ELECTRÓNICO'] || row['CORREO ELECTRÉNICO']);
-      const numero_seguridad_social = clean(row['NUMERO SEGURIDAD SOCIAL']);
-      const licencia = clean(row['LICENCIA']);
-      const estado = 'activo';
-
-      await pool.query(
-        `INSERT INTO conductores_test (nombre_apellidos, dni, direccion, codigo_postal, email, numero_seguridad_social, licencia, estado) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-        [nombre_apellidos, dni, direccion, codigo_postal, email, numero_seguridad_social, licencia, estado]
-      );
+    console.log('👉 POST /import recibido');
+  
+    if (!req.file) {
+      console.log('⚠️ No se recibió archivo');
+      return res.status(400).send('No se ha recibido ningún archivo.');
     }
-
-    fs.unlinkSync(req.file.path);
-    console.log('Importación completada.');
-    return res.send('Importación realizada con éxito.');
-  } catch (error) {
-    console.error('Error al importar:', error);
-    return res.status(500).send('Error procesando el archivo.');
-  }
-});
+  
+    try {
+      console.log('📄 Leyendo archivo Excel:', req.file.path);
+      const workbook = xlsx.readFile(req.file.path);
+      const sheetName = workbook.SheetNames[0];
+      const sheet = workbook.Sheets[sheetName];
+      const data = xlsx.utils.sheet_to_json(sheet);
+  
+      console.log('📊 Datos leídos del Excel:', data);
+  
+      for (const row of data) {
+        const nombre_apellidos = clean(row['CONDUCTOR']);
+        const dni = clean(row['DNI']);
+        const direccion = clean(row['DIRECCION']);
+        const codigo_postal = clean(row['CODIGO POSTAL'] || row['CODIGO PORTAL']);
+        const email = clean(row['CORREO ELECTRÓNICO'] || row['CORREO ELECTRÉNICO']);
+        const numero_seguridad_social = clean(row['NUMERO SEGURIDAD SOCIAL']);
+        const licencia = clean(row['LICENCIA']);
+        const estado = 'activo';
+  
+        console.log('📝 Insertando:', {
+          nombre_apellidos, dni, direccion, codigo_postal, email,
+          numero_seguridad_social, licencia, estado
+        });
+  
+        await pool.query(
+          `INSERT INTO conductores (nombre_apellidos, dni, direccion, codigo_postal, email, numero_seguridad_social, licencia, estado) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+          [nombre_apellidos, dni, direccion, codigo_postal, email, numero_seguridad_social, licencia, estado]
+        );
+      }
+  
+      fs.unlinkSync(req.file.path);
+      console.log('✅ Importación completada correctamente');
+      return res.send('Importación realizada con éxito.');
+    } catch (error) {
+      console.error('💥 Error procesando el archivo:', error);
+      return res.status(500).send('Error procesando el archivo.');
+    }
+  });
 //Crear titular
 app.post("/api/licencias", (req, res) => {
     console.log("📩 Datos recibidos en el servidor:", req.body); // Para verificar los datos enviados
