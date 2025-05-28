@@ -87,39 +87,42 @@ function clean(value) {
   }
   
   app.post('/import', upload.single('file'), async (req, res) => {
-    if (!req.file) {
-      return res.status(400).send('No se ha recibido ningún archivo.');
+      if (!req.file) {
+    console.log('No se recibió archivo.');
+    return res.status(400).send('No se ha recibido ningún archivo.');
+  }
+
+    
+  try {
+    const workbook = xlsx.readFile(req.file.path);
+    const sheetName = workbook.SheetNames[0];
+    const sheet = workbook.Sheets[sheetName];
+    const data = xlsx.utils.sheet_to_json(sheet);
+
+    for (const row of data) {
+      const nombre_apellidos = clean(row['CONDUCTOR']);
+      const dni = clean(row['DNI']);
+      const direccion = clean(row['DIRECCION']);
+      const codigo_postal = clean(row['CODIGO POSTAL'] || row['CODIGO PORTAL']);
+      const email = clean(row['CORREO ELECTRÓNICO'] || row['CORREO ELECTRÉNICO']);
+      const numero_seguridad_social = clean(row['NUMERO SEGURIDAD SOCIAL']);
+      const licencia = clean(row['LICENCIA']);
+      const estado = 'activo';
+
+      await pool.query(
+        `INSERT INTO conductores_test (nombre_apellidos, dni, direccion, codigo_postal, email, numero_seguridad_social, licencia, estado) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+        [nombre_apellidos, dni, direccion, codigo_postal, email, numero_seguridad_social, licencia, estado]
+      );
     }
-  
-    try {
-      const workbook = xlsx.readFile(req.file.path);
-      const sheetName = workbook.SheetNames[0];
-      const sheet = workbook.Sheets[sheetName];
-      const data = xlsx.utils.sheet_to_json(sheet);
-  
-      for (const row of data) {
-        const licencia = clean(row['LICENCIA']);
-        const nombre_apellidos = clean(row['CONDUCTOR']);
-        const dni = clean(row['DNI']);
-        const email = clean(row['CORREO ELECTRÉNICO']);
-        const direccion = clean(row['DIRECCION']);
-        const codigo_postal = clean(row['CODIGO PORTAL']);
-        const numero_seguridad_social = clean(row['NUMERO SEGURIDAD SOCIAL']);
-        const estado = 'activo'; // por defecto
-  
-        await pool.query(
-          `INSERT INTO conductores_test (nombre_apellidos, dni, direccion, codigo_postal, email, numero_seguridad_social, licencia, estado) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-          [nombre_apellidos, dni, direccion, codigo_postal, email, numero_seguridad_social, licencia, estado]
-        );
-      }
-  
-      fs.unlinkSync(req.file.path);
-      res.send('Importación realizada con éxito.');
-    } catch (error) {
-      console.error(error);
-      res.status(500).send('Error procesando el archivo.');
-    }
-  });
+
+    fs.unlinkSync(req.file.path);
+    console.log('Importación completada.');
+    return res.send('Importación realizada con éxito.');
+  } catch (error) {
+    console.error('Error al importar:', error);
+    return res.status(500).send('Error procesando el archivo.');
+  }
+});
 //Crear titular
 app.post("/api/licencias", (req, res) => {
     console.log("📩 Datos recibidos en el servidor:", req.body); // Para verificar los datos enviados

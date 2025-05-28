@@ -890,25 +890,25 @@
                 </button>
             </div>
             <script>
-                function enviarFormulario(e) {
-  e.preventDefault();
-  const form = document.getElementById("importForm");
-  const formData = new FormData(form);
+                  function enviarFormulario(e) {
+                    e.preventDefault();
+                    const form = document.getElementById("importForm");
+                    const formData = new FormData(form);
 
-  fetch("/import", {
-    method: "POST",
-    body: formData,
-  })
-  .then(async res => {
-    const text = await res.text();
-    console.log("Respuesta del servidor:", text);
-    alert(text);
-  })
-  .catch(err => {
-    console.error("Error:", err);
-    alert("Error: " + err.message);
-  });
-}
+                    fetch("/import", {
+                    method: "POST",
+                    body: formData,
+                    })
+                    .then(async res => {
+                    const text = await res.text();
+                    console.log("Respuesta del servidor:", text);
+                    alert(text || "Respuesta vacía del servidor");
+                    })
+                    .catch(err => {
+                    console.error("Error en fetch:", err);
+                    alert("Error: " + err.message);
+                    });
+                }
             </script>
 
 </body>
