@@ -92,35 +92,28 @@ function clean(value) {
     }
   
     try {
-      // Leer el archivo
       const workbook = xlsx.readFile(req.file.path);
       const sheetName = workbook.SheetNames[0];
       const sheet = workbook.Sheets[sheetName];
       const data = xlsx.utils.sheet_to_json(sheet);
   
-      // Por ejemplo, insertar cada fila en la tabla 'conductores'
       for (const row of data) {
-        // Ajusta los nombres de las columnas según tus campos
-        const nombre_apellidos = clean(row['nombre_apellidos']);
-        const dni = clean(row['dni']);
-        const direccion = clean(row['direccion']);
-        const codigo_postal = clean(row['codigo_postal']);
-        const email = clean(row['email']);
-        const numero_seguridad_social = clean(row['numero_seguridad_social']);
-        const licencia = clean(row['licencia']);
+        const licencia = clean(row['LICENCIA']);
+        const nombre_apellidos = clean(row['CONDUCTOR']);
+        const dni = clean(row['DNI']);
+        const email = clean(row['CORREO ELECTRÉNICO']);
+        const direccion = clean(row['DIRECCION']);
+        const codigo_postal = clean(row['CODIGO PORTAL']);
+        const numero_seguridad_social = clean(row['NUMERO SEGURIDAD SOCIAL']);
         const estado = 'activo'; // por defecto
   
-        // Validar si quieres evitar insertar sin datos claves como dni o nombre
-        // Aquí simplemente insertamos
         await pool.query(
           `INSERT INTO conductores_test (nombre_apellidos, dni, direccion, codigo_postal, email, numero_seguridad_social, licencia, estado) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
           [nombre_apellidos, dni, direccion, codigo_postal, email, numero_seguridad_social, licencia, estado]
         );
       }
   
-      // Borrar archivo subido tras procesar
       fs.unlinkSync(req.file.path);
-  
       res.send('Importación realizada con éxito.');
     } catch (error) {
       console.error(error);
