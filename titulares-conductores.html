@@ -317,16 +317,22 @@
                             class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-800 flex items-center justify-center cursor-pointer">
                             <span class="material-icons text-sm mr-1 flex items-center">add</span>
                             <span class="flex items-center">Agregar Conductor</span>
-                             <!-- Formulario solo para conductores -->
-                             <div id="formConductores" style="display:block; margin-top:20px;">
-                            <h2>Importar Conductores</h2>
-                            <form id="importForm" onsubmit="enviarFormulario(event)">
-                            <input type="file" name="file" accept=".xlsx" required />
-                            <button type="submit">Importar</button>
-                            </form>
-                            </div>
-
                         </button>
+                        <!-- Formulario solo para conductores -->
+                        <div id="formConductores" class="block mt-5 max-w-md mx-auto p-6 bg-white rounded-lg shadow-md">
+                            <h2 class="text-2xl font-semibold mb-6 text-gray-800">Importar Conductores</h2>
+                            <form id="importForm" onsubmit="enviarFormulario(event)" class="flex flex-col gap-4">
+                              <label for="fileInput" class="flex items-center justify-center cursor-pointer rounded-md border border-dashed border-gray-400 p-6 text-gray-600 hover:bg-gray-50 hover:border-blue-500 transition">
+                                <span class="material-icons mr-2 text-blue-600">upload_file</span>
+                                <span id="fileLabel">Selecciona un archivo .xlsx</span>
+                                <input id="fileInput" type="file" name="file" accept=".xlsx" required class="hidden" onchange="document.getElementById('fileLabel').textContent = this.files[0]?.name || 'Selecciona un archivo .xlsx'">
+                              </label>
+                          
+                              <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-md shadow-md transition">
+                                Importar
+                              </button>
+                            </form>
+                          </div>
                         <div class="relative w-full max-w-lg p-2 pr-8">
                             <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-6 h-6 pointer-events-none"
                                 xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="black" stroke="white"
