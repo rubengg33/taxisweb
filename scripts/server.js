@@ -7,7 +7,10 @@ require("dotenv").config();
 const cors = require("cors");
 const { DateTime } = require("luxon");
 const { sendPasswordResetEmail } = require('../utils/emailService');
-
+const multer = require('multer');
+const xlsx = require('xlsx');   
+const path = require('path');
+const fs = require('fs');
 // Add the middleware functions
 const authenticateToken = (req, res, next) => {
     const authHeader = req.headers['authorization'];
@@ -35,6 +38,7 @@ const validateApiKey = (req, res, next) => {
 };
 
 const app = express();
+const upload = multer({ dest: 'uploads/' });
 // Configuración de CORS
 const corsOptions = {
     origin: process.env.FRONTEND_URL, // Esto usará 'https://controldeconductores.com'
@@ -75,6 +79,53 @@ app.get("/api/licencias", authenticateToken, validateApiKey, (req, res) => {
         res.json(result);
     });
 });
+// Utilidad para normalizar campos "Sin algo"
+function clean(value) {
+    if (!value || typeof value !== 'string') return null;
+    if (value.trim().toLowerCase().startsWith('sin')) return null;
+    return value.trim();
+  }
+  
+  app.post('/import', upload.single('file'), (req, res) => {
+    const filePath = req.file.path;
+  
+    try {
+      const workbook = xlsx.readFile(filePath);
+      const sheetName = workbook.SheetNames[0];
+      const data = xlsx.utils.sheet_to_json(workbook.Sheets[sheetName]);
+  
+      db.query('DELETE FROM conductores_test', async (err) => {
+        if (err) return res.status(500).send('Error al limpiar tabla');
+  
+        for (const row of data) {
+          const nombre = clean(row['nombre_apellidos']);
+          const dni = clean(row['dni']);
+          const direccion = clean(row['direccion']);
+          const codigo_postal = clean(row['codigo_postal']);
+          const email = clean(row['email']);
+          const nss = clean(row['numero_seguridad_social']);
+          const licencia = clean(row['licencia']);
+  
+          try {
+            await db.promise().query(
+              `INSERT INTO conductores_test
+                (nombre_apellidos, dni, direccion, codigo_postal, email, numero_seguridad_social, licencia)
+               VALUES (?, ?, ?, ?, ?, ?, ?)`,
+              [nombre, dni, direccion, codigo_postal, email, nss, licencia]
+            );
+          } catch (err) {
+            console.error('Error insertando fila:', err);
+          }
+        }       
+
+        fs.unlinkSync(filePath); // elimina el archivo subido
+        res.send('Importación completada correctamente');
+      });
+    } catch (err) {
+      console.error(err);
+      res.status(500).send('Error procesando el archivo');
+    }
+  });
 //Crear titular
 app.post("/api/licencias", (req, res) => {
     console.log("📩 Datos recibidos en el servidor:", req.body); // Para verificar los datos enviados

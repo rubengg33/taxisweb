@@ -10,9 +10,11 @@
         "express": "^4.18.2",
         "jsonwebtoken": "^9.0.2",
         "luxon": "^3.6.1",
+        "multer": "^2.0.0",
         "mysql": "^2.18.1",
         "mysql2": "^3.14.0",
-        "nodemailer": "^6.10.0"
+        "nodemailer": "^6.10.0",
+        "xlsx": "^0.18.5"
     },
     "scripts": {
         "start": "node scripts/server.js"

@@ -317,6 +317,15 @@
                             class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-800 flex items-center justify-center cursor-pointer">
                             <span class="material-icons text-sm mr-1 flex items-center">add</span>
                             <span class="flex items-center">Agregar Conductor</span>
+                             <!-- Formulario solo para conductores -->
+                             <div id="formConductores" style="display:block; margin-top:20px;">
+                            <h2>Importar Conductores</h2>
+                            <form id="importForm" onsubmit="enviarFormulario(event)">
+                            <input type="file" name="file" accept=".xlsx" required />
+                            <button type="submit">Importar</button>
+                            </form>
+                            </div>
+
                         </button>
                         <div class="relative w-full max-w-lg p-2 pr-8">
                             <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-6 h-6 pointer-events-none"
@@ -874,6 +883,21 @@
                     <span class="material-icons">arrow_downward</span>
                 </button>
             </div>
+            <script>
+                function enviarFormulario(e) {
+      e.preventDefault();
+      const form = document.getElementById("importForm");
+      const formData = new FormData(form);
+
+      fetch("/import", {
+        method: "POST",
+        body: formData,
+      })
+      .then(res => res.text())
+      .then(alert)
+      .catch(err => alert("Error: " + err));
+    }
+            </script>
 
 </body>
 
