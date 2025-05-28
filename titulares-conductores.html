@@ -318,30 +318,31 @@
                             <span class="material-icons text-sm mr-1 flex items-center">add</span>
                             <span class="flex items-center">Agregar Conductor</span>
                         </button>
-                       <!-- Formulario solo para conductores -->
-<div id="formConductores" class="block mt-5 max-w-md mx-auto p-6 bg-white rounded-lg shadow-md">
-    <h2 class="text-2xl font-semibold mb-6 text-gray-800">Importar Conductores</h2>
-    <form id="importForm" method="POST" enctype="multipart/form-data" action="/import" class="flex flex-col gap-4">
-      
-      <label for="fileInput" class="flex items-center justify-center cursor-pointer rounded-md border border-dashed border-gray-400 p-6 text-gray-600 hover:bg-gray-50 hover:border-blue-500 transition">
-        <span class="material-icons mr-2 text-blue-600">upload_file</span>
-        <span id="fileLabel">Selecciona un archivo .csv</span>
-        <input
-          id="fileInput"
-          type="file"
-          name="file"
-          accept=".csv"
-          required
-          class="hidden"
-          onchange="document.getElementById('fileLabel').textContent = this.files[0]?.name || 'Selecciona un archivo .csv'"
-        >
-      </label>
-  
-      <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-md shadow-md transition">
-        Importar
-      </button>
-    </form>
-  </div>
+                        <div id="formConductores" class="block mt-5 max-w-md mx-auto p-6 bg-white rounded-lg shadow-md">
+                            <h2 class="text-2xl font-semibold mb-6 text-gray-800">Importar Conductores</h2>
+                            <form id="importForm" class="flex flex-col gap-4">
+                              
+                              <label for="fileInput" class="flex items-center justify-center cursor-pointer rounded-md border border-dashed border-gray-400 p-6 text-gray-600 hover:bg-gray-50 hover:border-blue-500 transition">
+                                <span class="material-icons mr-2 text-blue-600">upload_file</span>
+                                <span id="fileLabel">Selecciona un archivo .csv</span>
+                                <input
+                                  id="fileInput"
+                                  type="file"
+                                  name="file"
+                                  accept=".csv"
+                                  required
+                                  class="sr-only"
+                                  onchange="document.getElementById('fileLabel').textContent = this.files[0]?.name || 'Selecciona un archivo .csv'"
+                                >
+                              </label>
+                          
+                              <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-md shadow-md transition">
+                                Importar
+                              </button>
+                          
+                              <div id="statusMessage" class="text-center text-gray-700 mt-2"></div>
+                            </form>
+                          </div>
                         <div class="relative w-full max-w-lg p-2 pr-8">
                             <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-6 h-6 pointer-events-none"
                                 xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="black" stroke="white"
@@ -899,13 +900,48 @@
                 </button>
             </div>
             <script>
-                   document.getElementById('importForm').addEventListener('submit', function (e) {
-    // No usamos e.preventDefault() para dejar que el form se envíe normalmente
-
-    // Opcional: mostrar algo justo al enviar
-    alert('Importando archivo, por favor espera...');
-  });
-            </script>
+                const form = document.getElementById('importForm');
+                const statusMessage = document.getElementById('statusMessage');
+              
+                form.addEventListener('submit', async (e) => {
+                  e.preventDefault(); // Evita recarga
+              
+                  const fileInput = document.getElementById('fileInput');
+                  if (!fileInput.files.length) {
+                    statusMessage.textContent = 'Por favor, selecciona un archivo CSV.';
+                    return;
+                  }
+              
+                  statusMessage.textContent = 'Importando archivo, por favor espera...';
+              
+                  const formData = new FormData();
+                  formData.append('file', fileInput.files[0]);
+              
+                  try {
+                    const response = await fetch('/import', {
+                      method: 'POST',
+                      body: formData,
+                      headers: {
+                        // No pongas 'Content-Type', fetch lo pone automáticamente para FormData
+                      }
+                    });
+              
+                    if (!response.ok) {
+                      const text = await response.text();
+                      throw new Error(text || 'Error en la importación');
+                    }
+              
+                    const text = await response.text();
+                    statusMessage.textContent = text;
+              
+                    // Opcional: limpiar el input y el label después de éxito
+                    fileInput.value = '';
+                    document.getElementById('fileLabel').textContent = 'Selecciona un archivo .csv';
+                  } catch (error) {
+                    statusMessage.textContent = '❌ ' + error.message;
+                  }
+                });
+              </script>
 
 </body>
 
