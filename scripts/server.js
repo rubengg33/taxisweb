@@ -86,44 +86,45 @@ function clean(value) {
     return value.trim();
   }
   
-  app.post('/import', upload.single('file'), (req, res) => {
-    const filePath = req.file.path;
+  app.post('/import', upload.single('file'), async (req, res) => {
+    if (!req.file) {
+      return res.status(400).send('No se ha recibido ningún archivo.');
+    }
   
     try {
-      const workbook = xlsx.readFile(filePath);
+      // Leer el archivo
+      const workbook = xlsx.readFile(req.file.path);
       const sheetName = workbook.SheetNames[0];
-      const data = xlsx.utils.sheet_to_json(workbook.Sheets[sheetName]);
+      const sheet = workbook.Sheets[sheetName];
+      const data = xlsx.utils.sheet_to_json(sheet);
   
-      db.query('DELETE FROM conductores_test', async (err) => {
-        if (err) return res.status(500).send('Error al limpiar tabla');
+      // Por ejemplo, insertar cada fila en la tabla 'conductores'
+      for (const row of data) {
+        // Ajusta los nombres de las columnas según tus campos
+        const nombre_apellidos = clean(row['nombre_apellidos']);
+        const dni = clean(row['dni']);
+        const direccion = clean(row['direccion']);
+        const codigo_postal = clean(row['codigo_postal']);
+        const email = clean(row['email']);
+        const numero_seguridad_social = clean(row['numero_seguridad_social']);
+        const licencia = clean(row['licencia']);
+        const estado = 'activo'; // por defecto
   
-        for (const row of data) {
-          const nombre = clean(row['nombre_apellidos']);
-          const dni = clean(row['dni']);
-          const direccion = clean(row['direccion']);
-          const codigo_postal = clean(row['codigo_postal']);
-          const email = clean(row['email']);
-          const nss = clean(row['numero_seguridad_social']);
-          const licencia = clean(row['licencia']);
+        // Validar si quieres evitar insertar sin datos claves como dni o nombre
+        // Aquí simplemente insertamos
+        await pool.query(
+          `INSERT INTO conductores_test (nombre_apellidos, dni, direccion, codigo_postal, email, numero_seguridad_social, licencia, estado) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+          [nombre_apellidos, dni, direccion, codigo_postal, email, numero_seguridad_social, licencia, estado]
+        );
+      }
   
-          try {
-            await db.promise().query(
-              `INSERT INTO conductores_test
-                (nombre_apellidos, dni, direccion, codigo_postal, email, numero_seguridad_social, licencia)
-               VALUES (?, ?, ?, ?, ?, ?, ?)`,
-              [nombre, dni, direccion, codigo_postal, email, nss, licencia]
-            );
-          } catch (err) {
-            console.error('Error insertando fila:', err);
-          }
-        }       
-
-        fs.unlinkSync(filePath); // elimina el archivo subido
-        res.send('Importación completada correctamente');
-      });
-    } catch (err) {
-      console.error(err);
-      res.status(500).send('Error procesando el archivo');
+      // Borrar archivo subido tras procesar
+      fs.unlinkSync(req.file.path);
+  
+      res.send('Importación realizada con éxito.');
+    } catch (error) {
+      console.error(error);
+      res.status(500).send('Error procesando el archivo.');
     }
   });
 //Crear titular
