@@ -119,7 +119,7 @@ function clean(value) {
         });
   
         await pool.query(
-          `INSERT INTO conductores (nombre_apellidos, dni, direccion, codigo_postal, email, numero_seguridad_social, licencia, estado) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+          `INSERT INTO conductores_test (nombre_apellidos, dni, direccion, codigo_postal, email, numero_seguridad_social, licencia, estado) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
           [nombre_apellidos, dni, direccion, codigo_postal, email, numero_seguridad_social, licencia, estado]
         );
       }
