@@ -321,7 +321,7 @@
                         <!-- Formulario solo para conductores -->
                         <div id="formConductores" class="block mt-5 max-w-md mx-auto p-6 bg-white rounded-lg shadow-md">
                             <h2 class="text-2xl font-semibold mb-6 text-gray-800">Importar Conductores</h2>
-                            <form id="importForm" onsubmit="enviarFormulario(event)" class="flex flex-col gap-4">
+                            <form id="importForm" method="POST" enctype="multipart/form-data" action="/import" class="flex flex-col gap-4">
                               <label for="fileInput" class="flex items-center justify-center cursor-pointer rounded-md border border-dashed border-gray-400 p-6 text-gray-600 hover:bg-gray-50 hover:border-blue-500 transition">
                                 <span class="material-icons mr-2 text-blue-600">upload_file</span>
                                 <span id="fileLabel">Selecciona un archivo .xlsx</span>
@@ -890,25 +890,12 @@
                 </button>
             </div>
             <script>
-                  function enviarFormulario(e) {
-                    e.preventDefault();
-                    const form = document.getElementById("importForm");
-                    const formData = new FormData(form);
+                   document.getElementById('importForm').addEventListener('submit', function (e) {
+    // No usamos e.preventDefault() para dejar que el form se envíe normalmente
 
-                    fetch("/import", {
-                    method: "POST",
-                    body: formData,
-                    })
-                    .then(async res => {
-                    const text = await res.text();
-                    console.log("Respuesta del servidor:", text);
-                    alert(text || "Respuesta vacía del servidor");
-                    })
-                    .catch(err => {
-                    console.error("Error en fetch:", err);
-                    alert("Error: " + err.message);
-                    });
-                }
+    // Opcional: mostrar algo justo al enviar
+    alert('Importando archivo, por favor espera...');
+  });
             </script>
 
 </body>
