@@ -7,9 +7,8 @@ require("dotenv").config();
 const cors = require("cors");
 const { DateTime } = require("luxon");
 const { sendPasswordResetEmail } = require('../utils/emailService');
-const multer = require('multer');
-const xlsx = require('xlsx');   
-const path = require('path');
+const multer = require('multer'); 
+const csv = require('csv-parser');
 const fs = require('fs');
 // Add the middleware functions
 const authenticateToken = (req, res, next) => {
@@ -36,9 +35,9 @@ const validateApiKey = (req, res, next) => {
     }
     next();
 };
-
-const app = express();
 const upload = multer({ dest: 'uploads/' });
+const app = express();
+
 // Configuración de CORS
 const corsOptions = {
     origin: process.env.FRONTEND_URL, // Esto usará 'https://controldeconductores.com'
@@ -71,7 +70,53 @@ app.get("/api/config", (req, res) => {
     res.json({ apiUrl: process.env.API_URL });
 });
 
-
+function clean(value) {
+    return typeof value === 'string' ? value.trim() : value || '';
+  }
+  
+  app.post('/import', upload.single('file'), (req, res) => {
+    const results = [];
+  
+    fs.createReadStream(req.file.path)
+      .pipe(csv())
+      .on('data', (data) => results.push(data))
+      .on('end', () => {
+        // Opcional: eliminar datos antiguos
+        db.query("DELETE FROM conductores_test", (err) => {
+          if (err) {
+            console.error('❌ Error al borrar datos existentes:', err);
+            return res.status(500).send('Error al borrar datos existentes');
+          }
+  
+          const insertPromises = results.map(row => {
+            const licencia = clean(row['LICENCIA']);
+            const nombre_apellidos = clean(row['CONDUCTOR']);
+            const dni = clean(row['DNI']);
+            const email = clean(row['CORREO ELECTRÓNICO'] || row['CORREO ELECTRÉNICO']);
+            const direccion = clean(row['DIRECCION']);
+            const codigo_postal = clean(row['CODIGO POSTAL'] || row['CODIGO PORTAL']);
+            const numero_seguridad_social = clean(row['NUMERO SEGURIDAD SOCIAL']);
+            const estado = 'activo';
+  
+            return db.promise().query(
+              `INSERT INTO conductores_test (licencia, nombre_apellidos, dni, email, direccion, codigo_postal, numero_seguridad_social, estado)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+              [licencia, nombre_apellidos, dni, email, direccion, codigo_postal, numero_seguridad_social, estado]
+            );
+          });
+  
+          Promise.all(insertPromises)
+            .then(() => {
+              fs.unlinkSync(req.file.path); // Borra el archivo subido
+              res.send("✅ Importación completada con éxito");
+            })
+            .catch(error => {
+              console.error('❌ Error al insertar filas:', error);
+              res.status(500).send('Error al insertar los datos en la base de datos');
+            });
+        });
+      });
+  });
 // Obtener todos los titulares (licencias)
 app.get("/api/licencias", authenticateToken, validateApiKey, (req, res) => {
     db.query("SELECT * FROM licencias", (err, result) => {
@@ -80,59 +125,6 @@ app.get("/api/licencias", authenticateToken, validateApiKey, (req, res) => {
     });
 });
 // Utilidad para normalizar campos "Sin algo"
-function clean(value) {
-    if (!value || typeof value !== 'string') return null;
-    if (value.trim().toLowerCase().startsWith('sin')) return null;
-    return value.trim();
-  }
-  
-  app.post('/import', upload.single('file'), async (req, res) => {
-    try {
-        console.log('📥 Endpoint /import alcanzado');
-    
-        if (!req.file) {
-          console.log('⚠️ No se recibió archivo');
-          return res.status(400).send('No se ha recibido ningún archivo.');
-        }
-    
-        console.log('📄 Archivo recibido:', req.file.path);
-    
-        const workbook = xlsx.readFile(req.file.path);
-        const sheetName = workbook.SheetNames[0];
-        const sheet = workbook.Sheets[sheetName];
-        const data = xlsx.utils.sheet_to_json(sheet);
-    
-        console.log('📊 Datos leídos del Excel:', data);
-    
-        for (const row of data) {
-          const nombre_apellidos = clean(row['CONDUCTOR']);
-          const dni = clean(row['DNI']);
-          const direccion = clean(row['DIRECCION']);
-          const codigo_postal = clean(row['CODIGO POSTAL'] || row['CODIGO PORTAL']);
-          const email = clean(row['CORREO ELECTRÓNICO'] || row['CORREO ELECTRÉNICO']);
-          const numero_seguridad_social = clean(row['NUMERO SEGURIDAD SOCIAL']);
-          const licencia = clean(row['LICENCIA']);
-          const estado = 'activo';
-    
-          console.log('📝 Insertando:', {
-            nombre_apellidos, dni, direccion, codigo_postal, email,
-            numero_seguridad_social, licencia, estado
-          });
-    
-          await pool.query(
-            `INSERT INTO conductores (nombre_apellidos, dni, direccion, codigo_postal, email, numero_seguridad_social, licencia, estado) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-            [nombre_apellidos, dni, direccion, codigo_postal, email, numero_seguridad_social, licencia, estado]
-          );
-        }
-    
-        fs.unlinkSync(req.file.path);
-        console.log('✅ Importación completada correctamente');
-        return res.send('Importación realizada con éxito.');
-      } catch (err) {
-        console.error('💥 Error inesperado en /import:', err);
-        return res.status(500).send('Error interno en el servidor: ' + err.message);
-      }
-    });
 //Crear titular
 app.post("/api/licencias", (req, res) => {
     console.log("📩 Datos recibidos en el servidor:", req.body); // Para verificar los datos enviados
