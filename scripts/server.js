@@ -28,7 +28,7 @@ const authenticateToken = (req, res, next) => {
         next();
     });
 };
-
+//
 const validateApiKey = (req, res, next) => {
     const apiKey = req.headers['x-api-key'];
     if (!apiKey || apiKey !== process.env.API_KEY) {
