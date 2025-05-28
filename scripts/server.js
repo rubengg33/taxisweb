@@ -102,6 +102,15 @@ app.post('/import', upload.single('file'), (req, res) => {
         });
       })
       .on('end', () => {
+        // Aquí recibes los datos parseados en 'results'
+        
+        // Primero desactivar safe updates
+        db.query('SET SQL_SAFE_UPDATES = 0', (err) => {
+          if (err) {
+            console.error('Error desactivando safe updates:', err);
+            fs.unlinkSync(req.file.path);
+            return res.status(500).send('Error interno');
+          }
         // Primero eliminar todos los conductores
         db.query('DELETE FROM conductores_test', (err) => {
           if (err) {
@@ -142,9 +151,9 @@ app.post('/import', upload.single('file'), (req, res) => {
         console.error(err);
         fs.unlinkSync(req.file.path);
         res.status(500).send('Error al procesar CSV');
-      });
-  });
-  
+    });
+});
+});
 // Obtener todos los titulares (licencias)
 app.get("/api/licencias", authenticateToken, validateApiKey, (req, res) => {
     db.query("SELECT * FROM licencias", (err, result) => {
