@@ -103,7 +103,7 @@ app.post('/import', upload.single('file'), (req, res) => {
       })
       .on('end', () => {
         // Primero eliminar todos los conductores
-        db.query('DELETE FROM conductores', (err) => {
+        db.query('DELETE FROM conductores_test', (err) => {
           if (err) {
             console.error(err);
             fs.unlinkSync(req.file.path);
@@ -115,7 +115,7 @@ app.post('/import', upload.single('file'), (req, res) => {
             return new Promise((resolve, reject) => {
               const { licencia, nombre_apellidos, dni, direccion, codigo_postal, email, numero_seguridad_social } = row;
               db.query(
-                `INSERT INTO conductores (licencia, nombre_apellidos, dni, direccion, codigo_postal, email, numero_seguridad_social)
+                `INSERT INTO conductores_test (licencia, nombre_apellidos, dni, direccion, codigo_postal, email, numero_seguridad_social)
                  VALUES (?, ?, ?, ?, ?, ?, ?)`,
                 [licencia, nombre_apellidos, dni, direccion, codigo_postal, email, numero_seguridad_social],
                 (err) => {
