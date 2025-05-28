@@ -902,7 +902,7 @@
             <script>
                 const form = document.getElementById('importForm');
                 const statusMessage = document.getElementById('statusMessage');
-              
+
                 form.addEventListener('submit', async (e) => {
                   e.preventDefault(); // Evita recarga
               
@@ -918,11 +918,15 @@
                   formData.append('file', fileInput.files[0]);
               
                   try {
-                    const response = await fetch('/import', {
+                    // Usar la URL completa con API_URL
+                    const response = await fetch(`/import`, {
                       method: 'POST',
                       body: formData,
+                      // No incluir Content-Type para FormData
                       headers: {
-                        // No pongas 'Content-Type', fetch lo pone automáticamente para FormData
+                        // Incluir solo los headers de autenticación (sin Content-Type)
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                        'x-api-key': '39154f8f6a7a53fda2a02b5f923eb527207095f44abbb52a95e93408e6417d08'
                       }
                     });
               
@@ -933,6 +937,9 @@
               
                     const text = await response.text();
                     statusMessage.textContent = text;
+                    
+                    // Recargar los datos después de una importación exitosa
+                    await cargarDatos(`${API_URL}/conductores`, "dataTableConductores", "conductores");
               
                     // Opcional: limpiar el input y el label después de éxito
                     fileInput.value = '';
