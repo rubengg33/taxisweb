@@ -71,89 +71,70 @@ app.get("/api/config", (req, res) => {
     res.json({ apiUrl: process.env.API_URL });
 });
 
-app.post('/import', upload.single('file'), (req, res) => {
-    const results = [];
-  
+app.post('/import', upload.single('file'), async (req, res) => {
     if (!req.file) {
       return res.status(400).send('No file uploaded.');
     }
   
-    fs.createReadStream(req.file.path)
-      .pipe(csv({ separator: ';' })) // Delimitador punto y coma
-      .on('data', (data) => {
-        // Limpia espacios y valores nulos
-        for (let key in data) {
-          if (data[key] == null || data[key].toLowerCase() === 'nan' || data[key].toLowerCase() === 'none') {
-            data[key] = '';
-          } else {
-            data[key] = data[key].trim();
-          }
-        }
+    const results = [];
   
-        // Mapea las columnas del CSV a las columnas de la BD
-        results.push({
-          licencia: data['LICENCIA'] || '',
-          nombre_apellidos: data['CONDUCTOR'] || '',
-          dni: data['DNI'] || '',
-          email: data['CORREO ELECTRÉNICO'] || '',
-          direccion: data['DIRECCION'] || '',
-          codigo_postal: data['CODIGO PORTAL'] || '',
-          numero_seguridad_social: data['NUMERO SEGURIDAD SOCIAL'] || ''
-        });
-      })
-      .on('end', () => {
-        // Aquí recibes los datos parseados en 'results'
-        
-        // Primero desactivar safe updates
-        db.query('SET SQL_SAFE_UPDATES = 0', (err) => {
-          if (err) {
-            console.error('Error desactivando safe updates:', err);
-            fs.unlinkSync(req.file.path);
-            return res.status(500).send('Error interno');
+    // Leer el CSV en una promesa para esperar que termine
+    const parseCSV = () => new Promise((resolve, reject) => {
+      fs.createReadStream(req.file.path)
+        .pipe(csv({ separator: ';' }))
+        .on('data', (data) => {
+          for (let key in data) {
+            if (!data[key] || ['nan', 'none'].includes(data[key].toLowerCase())) {
+              data[key] = '';
+            } else {
+              data[key] = data[key].trim();
+            }
           }
-        // Primero eliminar todos los conductores
-        db.query('DELETE FROM conductores_test', (err) => {
-          if (err) {
-            console.error(err);
-            fs.unlinkSync(req.file.path);
-            return res.status(500).send('Error al eliminar datos previos');
-          }
-  
-          // Insertar filas una por una con promesas para esperar todas
-          const insertPromises = results.map(row => {
-            return new Promise((resolve, reject) => {
-              const { licencia, nombre_apellidos, dni, direccion, codigo_postal, email, numero_seguridad_social } = row;
-              db.query(
-                `INSERT INTO conductores_test (licencia, nombre_apellidos, dni, direccion, codigo_postal, email, numero_seguridad_social)
-                 VALUES (?, ?, ?, ?, ?, ?, ?)`,
-                [licencia, nombre_apellidos, dni, direccion, codigo_postal, email, numero_seguridad_social],
-                (err) => {
-                  if (err) reject(err);
-                  else resolve();
-                }
-              );
-            });
+          results.push({
+            licencia: data['LICENCIA'] || '',
+            nombre_apellidos: data['CONDUCTOR'] || '',
+            dni: data['DNI'] || '',
+            email: data['CORREO ELECTRÉNICO'] || '',
+            direccion: data['DIRECCION'] || '',
+            codigo_postal: data['CODIGO PORTAL'] || '',
+            numero_seguridad_social: data['NUMERO SEGURIDAD SOCIAL'] || ''
           });
-  
-          Promise.all(insertPromises)
-            .then(() => {
-              fs.unlinkSync(req.file.path); // Borra archivo temporal
-              res.send('🚀 Importación completada correctamente');
-            })
-            .catch(err => {
-              console.error(err);
-              fs.unlinkSync(req.file.path);
-              res.status(500).send('Error al insertar datos');
-            });
-        });
-      })
-      .on('error', (err) => {
-        console.error(err);
-        fs.unlinkSync(req.file.path);
-        res.status(500).send('Error al procesar CSV');
+        })
+        .on('end', resolve)
+        .on('error', reject);
     });
-});
-});
+  
+    // Función para hacer query que devuelve promesa
+    const query = (sql, params) => new Promise((resolve, reject) => {
+      db.query(sql, params, (err, results) => {
+        if (err) reject(err);
+        else resolve(results);
+      });
+    });
+  
+    try {
+      await parseCSV();
+      // Desactivar safe updates
+      await query('SET SQL_SAFE_UPDATES = 0');
+      // Borrar tabla
+      await query('DELETE FROM conductores_test');
+      // Insertar todos los registros con promesas
+      for (const row of results) {
+        const { licencia, nombre_apellidos, dni, direccion, codigo_postal, email, numero_seguridad_social } = row;
+        await query(
+          `INSERT INTO conductores_test (licencia, nombre_apellidos, dni, direccion, codigo_postal, email, numero_seguridad_social)
+           VALUES (?, ?, ?, ?, ?, ?, ?)`,
+          [licencia, nombre_apellidos, dni, direccion, codigo_postal, email, numero_seguridad_social]
+        );
+      }
+      fs.unlinkSync(req.file.path);
+      res.send('🚀 Importación completada correctamente');
+    } catch (err) {
+      console.error('Error en import:', err);
+      try { fs.unlinkSync(req.file.path); } catch {}
+      res.status(500).send('Error al procesar importación');
+    }
+  });
 // Obtener todos los titulares (licencias)
 app.get("/api/licencias", authenticateToken, validateApiKey, (req, res) => {
     db.query("SELECT * FROM licencias", (err, result) => {
