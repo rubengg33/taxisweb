@@ -918,20 +918,23 @@
                   formData.append('file', fileInput.files[0]);
               
                   try {
-                    // Usar la URL completa con API_URL
-                    const response = await fetch(`/import`, {
+                    // Usar la ruta /import como solicitaste
+                    const response = await fetch('/import', {
                       method: 'POST',
                       body: formData,
-                      // No incluir Content-Type para FormData
                       headers: {
-                        // Incluir solo los headers de autenticación (sin Content-Type)
+                        // No incluir Content-Type para FormData
+                        // Incluir los headers de autenticación
                         'Authorization': `Bearer ${localStorage.getItem('token')}`,
                         'x-api-key': '39154f8f6a7a53fda2a02b5f923eb527207095f44abbb52a95e93408e6417d08'
                       }
                     });
               
+                    console.log('Respuesta del servidor:', response.status);
+                    
                     if (!response.ok) {
                       const text = await response.text();
+                      console.error('Error en la respuesta:', text);
                       throw new Error(text || 'Error en la importación');
                     }
               

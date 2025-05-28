@@ -10,6 +10,7 @@ const { sendPasswordResetEmail } = require('../utils/emailService');
 const multer = require('multer'); 
 const csv = require('csv-parser');
 const fs = require('fs');
+const path = require('path');
 // Add the middleware functions
 const authenticateToken = (req, res, next) => {
     const authHeader = req.headers['authorization'];
@@ -36,7 +37,7 @@ const validateApiKey = (req, res, next) => {
     next();
 };
 const app = express();
-const upload = multer({ dest: 'uploads/' });
+const upload = multer({ dest: path.join(__dirname, 'uploads/') });
 
 
 // Configuración de CORS
@@ -71,7 +72,7 @@ app.get("/api/config", (req, res) => {
     res.json({ apiUrl: process.env.API_URL });
 });
 
-app.post('/import', upload.single('file'), async (req, res) => {
+app.post('/import', authenticateToken, validateApiKey, upload.single('file'), async (req, res) => {
     if (!req.file) {
       return res.status(400).send('No file uploaded.');
     }
