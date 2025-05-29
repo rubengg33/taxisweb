@@ -72,10 +72,10 @@ app.get("/api/config", (req, res) => {
     res.json({ apiUrl: process.env.API_URL });
 });
 
-app.post('/api/import', upload.single('file'), async (req, res) => {
-    if (!req.file) {
-      return res.status(400).send('No file uploaded.');
-    }
+app.post('/api/import', authenticateToken, validateApiKey, upload.single('file'), async (req, res) => {
+  if (!req.file) {
+    return res.status(400).send('No file uploaded.');
+  }
   
     const results = [];
   
