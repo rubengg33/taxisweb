@@ -97,7 +97,7 @@ app.post('/api/import', authenticateToken, validateApiKey, upload.single('file')
             dni: data['DNI'] || '',
             email: data['CORREO ELECTRÉNICO'] || '',
             direccion: data['DIRECCION'] || '',
-            codigo_postal: data['CODIGO PORTAL'] || '',
+            codigo_postal: data['CODIGO POSTAL'] || '',
             numero_seguridad_social: data['NUMERO SEGURIDAD SOCIAL'] || ''
           });
         })
