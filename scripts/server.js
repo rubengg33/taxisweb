@@ -125,11 +125,13 @@ app.post('/api/import', authenticateToken, validateApiKey, upload.single('file')
       for (const row of results) {
         const { licencia, nombre_apellidos, dni, direccion, codigo_postal, email, numero_seguridad_social } = row;
         await query(
-          `INSERT INTO conductores_test (licencia, nombre_apellidos, dni, direccion, codigo_postal, email, numero_seguridad_social)
+          `INSERT INTO conductores_test (nombre_apellidos, dni, direccion, codigo_postal, email, numero_seguridad_social, licencia)
            VALUES (?, ?, ?, ?, ?, ?, ?)`,
-          [licencia, nombre_apellidos, dni, direccion, codigo_postal, email, numero_seguridad_social]
+          [nombre_apellidos, dni, direccion, codigo_postal, email, numero_seguridad_social, licencia]
         );
       }
+      // Reactivar safe updates
+      await query('SET SQL_SAFE_UPDATES = 1');
       fs.unlinkSync(req.file.path);
       res.send('🚀 Importación completada correctamente');
     } catch (err) {
