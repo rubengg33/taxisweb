@@ -84,6 +84,8 @@ app.post('/api/import', authenticateToken, validateApiKey, upload.single('file')
       fs.createReadStream(req.file.path)
         .pipe(csv({ separator: ';' }))
         .on('data', (data) => {
+            console.log('Claves reales:', Object.keys(data));
+
           for (let key in data) {
             if (!data[key] || 
                 ['nan', 'none'].includes(data[key].toLowerCase()) ||
