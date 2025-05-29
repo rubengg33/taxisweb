@@ -82,7 +82,7 @@ app.post('/api/import', authenticateToken, validateApiKey, upload.single('file')
     // Leer el CSV en una promesa para esperar que termine
     const parseCSV = () => new Promise((resolve, reject) => {
       fs.createReadStream(req.file.path)
-        .pipe(csv({ separator: ',' }))
+        .pipe(csv({ separator: ';' }))
         .on('data', (data) => {
           for (let key in data) {
             if (!data[key] || ['nan', 'none'].includes(data[key].toLowerCase())) {
