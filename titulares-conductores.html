@@ -918,13 +918,17 @@
                   formData.append('file', fileInput.files[0]);
               
                   try {
-                    // Usar la URL completa con API_URL
-                    const response = await fetch(`${API_URL}/import`, {
-                      method: 'POST',
-                      body: formData,
-                      headers: getAuthHeaders() // Usar la función getAuthHeaders para consistencia
-                      // No incluir Content-Type para FormData
-                    });
+  const token = localStorage.getItem('token');
+  const headers = {
+    'Authorization': `Bearer ${token}`,
+    'x-api-key': '39154f8f6a7a53fda2a02b5f923eb527207095f44abbb52a95e93408e6417d08'
+  };
+  
+  const response = await fetch(`${API_URL}/import`, {
+    method: 'POST',
+    body: formData,
+    headers: headers // Solo incluye los headers de autenticación, no Content-Type
+  });
               
                     console.log('Respuesta del servidor:', response.status);
                     
