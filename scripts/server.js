@@ -85,7 +85,9 @@ app.post('/api/import', authenticateToken, validateApiKey, upload.single('file')
         .pipe(csv({ separator: ';' }))
         .on('data', (data) => {
           for (let key in data) {
-            if (!data[key] || ['nan', 'none'].includes(data[key].toLowerCase())) {
+            if (!data[key] || 
+                ['nan', 'none'].includes(data[key].toLowerCase()) ||
+                data[key].toLowerCase().startsWith('sin ')) { // Detectar valores que empiezan con "Sin "
               data[key] = '';
             } else {
               data[key] = data[key].trim();
