@@ -94,7 +94,7 @@ app.post('/api/import', authenticateToken, validateApiKey, upload.single('file')
             }
           }
           results.push({
-            licencia: data['LICENCIA'] || '',
+            licencia: data['LICENCIA'] ? data['LICENCIA'].padStart(5, '0') : '',
             nombre_apellidos: data['CONDUCTOR'] || '',
             dni: data['DNI'] || '',
             email: data['CORREO ELECTRÉNICO'] || '',
