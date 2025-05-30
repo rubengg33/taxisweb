@@ -73,9 +73,9 @@ app.get("/api/config", (req, res) => {
 });
 
 app.post('/api/import', authenticateToken, validateApiKey, upload.single('file'), async (req, res) => {
-  if (!req.file) {
-    return res.status(400).send('No file uploaded.');
-  }
+    if (!req.file) {
+      return res.status(400).send('No file uploaded.');
+    }
   
     const results = [];
   
@@ -84,25 +84,27 @@ app.post('/api/import', authenticateToken, validateApiKey, upload.single('file')
       fs.createReadStream(req.file.path)
         .pipe(csv({ separator: ';' }))
         .on('data', (data) => {
-            console.log('Claves reales:', Object.keys(data));
-
+          // Detectar y limpiar BOM de las claves (solo afecta a la primera línea)
+          const cleanedData = {};
           for (let key in data) {
-            if (!data[key] || 
-                ['nan', 'none'].includes(data[key].toLowerCase()) ||
-                data[key].toLowerCase().startsWith('sin ')) { // Detectar valores que empiezan con "Sin "
-              data[key] = '';
+            const cleanKey = key.replace(/^\uFEFF/, ''); // Eliminar BOM si existe al inicio
+            let value = data[key];
+            if (!value || ['nan', 'none'].includes(value.toLowerCase()) || value.toLowerCase().startsWith('sin ')) {
+              value = '';
             } else {
-              data[key] = data[key].trim();
+              value = value.trim();
             }
+            cleanedData[cleanKey] = value;
           }
+  
           results.push({
-            licencia: data['LICENCIA'] ? String(data['LICENCIA']).padStart(5, '0') : '',
-            nombre_apellidos: data['CONDUCTOR'] || '',
-            dni: data['DNI'] || '',
-            email: data['CORREO ELECTRÉNICO'] || '',
-            direccion: data['DIRECCION'] || '',
-            codigo_postal: data['CODIGO POSTAL'] || '',
-            numero_seguridad_social: data['NUMERO SEGURIDAD SOCIAL'] || ''
+            licencia: cleanedData['LICENCIA'] ? String(cleanedData['LICENCIA']).padStart(5, '0') : '',
+            nombre_apellidos: cleanedData['CONDUCTOR'] || '',
+            dni: cleanedData['DNI'] || '',
+            email: cleanedData['CORREO ELECTRÉNICO'] || '',
+            direccion: cleanedData['DIRECCION'] || '',
+            codigo_postal: cleanedData['CODIGO POSTAL'] || '',
+            numero_seguridad_social: cleanedData['NUMERO SEGURIDAD SOCIAL'] || ''
           });
         })
         .on('end', resolve)
@@ -119,11 +121,8 @@ app.post('/api/import', authenticateToken, validateApiKey, upload.single('file')
   
     try {
       await parseCSV();
-      // Desactivar safe updates
       await query('SET SQL_SAFE_UPDATES = 0');
-      // Borrar tabla
       await query('DELETE FROM conductores_test');
-      // Insertar todos los registros con promesas
       for (const row of results) {
         const { licencia, nombre_apellidos, dni, direccion, codigo_postal, email, numero_seguridad_social } = row;
         await query(
@@ -132,7 +131,6 @@ app.post('/api/import', authenticateToken, validateApiKey, upload.single('file')
           [nombre_apellidos, dni, direccion, codigo_postal, email, numero_seguridad_social, licencia]
         );
       }
-      // Reactivar safe updates
       await query('SET SQL_SAFE_UPDATES = 1');
       fs.unlinkSync(req.file.path);
       res.send('🚀 Importación completada correctamente');
@@ -142,6 +140,7 @@ app.post('/api/import', authenticateToken, validateApiKey, upload.single('file')
       res.status(500).send('Error al procesar importación');
     }
   });
+  
 // Obtener todos los titulares (licencias)
 app.get("/api/licencias", authenticateToken, validateApiKey, (req, res) => {
     db.query("SELECT * FROM licencias", (err, result) => {
