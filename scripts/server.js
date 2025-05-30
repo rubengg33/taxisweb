@@ -125,6 +125,13 @@ app.post('/api/import', authenticateToken, validateApiKey, upload.single('file')
       await query('DELETE FROM conductores');
       for (const row of results) {
         const { licencia, nombre_apellidos, dni, direccion, codigo_postal, email, numero_seguridad_social } = row;
+         // Validar que la licencia exista en la tabla licencias
+        const existing = await query('SELECT 1 FROM licencias WHERE LICENCIA = ?', [licencia]);
+        if (existing.length === 0) {
+          console.log(`⚠️ Licencia no encontrada en tabla licencias: ${licencia}. Fila omitida.`);
+          continue; // Saltar inserción si la licencia no existe
+        }
+        
         await query(
           `INSERT INTO conductores (nombre_apellidos, dni, direccion, codigo_postal, email, numero_seguridad_social, licencia)
            VALUES (?, ?, ?, ?, ?, ?, ?)`,
