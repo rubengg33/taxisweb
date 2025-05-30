@@ -356,40 +356,6 @@
       });
     });
   </script>
-  
-  
-  
-  
- <script>
-    function mostrarAlertaBloqueo() {
-        document.getElementById("alertaBloqueo").classList.remove("hidden");
-      }
-      
-      function cerrarAlertaBloqueo() {
-        document.getElementById("alertaBloqueo").classList.add("hidden");
-      }
-      
-      function validarLicenciaPorDia() {
-        const ultimoDigito = licencia.slice(-1);
-        const diaSemana = new Date().getDay(); // 0=Dom, 1=Lun, ..., 6=Sáb
-      
-        const restricciones = {
-          1: ['7', '8'],     // Lunes
-          2: ['9', '0'],     // Martes
-          3: ['1', '2'],     // Miércoles
-          4: ['3', '4'],     // Jueves
-          5: ['5', '6'],     // Viernes
-        };
-      
-        if (restricciones[diaSemana] && restricciones[diaSemana].includes(ultimoDigito)) {
-          mostrarAlertaBloqueo();
-          return false;
-        }
-      
-        return true;
-      }
-        
-</script>
 <script>
   let descansoActivo = false;
 
@@ -511,23 +477,76 @@
     document.getElementById("alertaExito").classList.add("hidden");
   }
 
-  // Verificar si ya se cerró jornada hoy
+  function mostrarAlertaBloqueo() {
+    const alerta = document.getElementById("alertaBloqueo");
+    if (alerta) alerta.classList.remove("hidden");
+  }
+
+  function cerrarAlertaBloqueo() {
+    const alerta = document.getElementById("alertaBloqueo");
+    if (alerta) alerta.classList.add("hidden");
+  }
+  function validarLicenciaPorDia() {
+    const ultimoDigito = licencia.slice(-1);
+    const diaSemana = new Date().getDay(); // 0=Dom, 1=Lun, ..., 6=Sáb
+    const restricciones = {
+      1: ['7', '8'],     // Lunes
+      2: ['9', '0'],     // Martes
+      3: ['1', '2'],     // Miércoles
+      4: ['3', '4'],     // Jueves
+      5: ['5', '6'],     // Viernes
+    };
+    return !(restricciones[diaSemana] && restricciones[diaSemana].includes(ultimoDigito));
+  }
+
+  // 🚀 Lógica completa de inicio de jornada + descansos + fin automático
+  btnInicioJornada.addEventListener("click", () => {
+    registrarEvento("inicio_jornada");
+    mostrarMensaje("🕒 Jornada iniciada. Los descansos comenzarán automáticamente cada 5 minutos.");
+    deshabilitarBoton(btnInicioJornada);
+
+    const ciclos = 3;
+    const minutosEntreEventos = 120;
+    let tiempoAcumulado = minutosEntreEventos * 60 * 1000; // 5 minutos
+
+    for (let i = 0; i < ciclos; i++) {
+      setTimeout(() => {
+        registrarEvento("inicio_descanso");
+        mostrarMensaje(`😌 Inicio del descanso ${i + 1}`);
+      }, tiempoAcumulado);
+
+      tiempoAcumulado += minutosEntreEventos * 60 * 1000; 
+
+      setTimeout(() => {
+        registrarEvento("fin_descanso");
+        mostrarMensaje(`✅ Fin del descanso ${i + 1}`);
+      }, tiempoAcumulado);
+
+      tiempoAcumulado += minutosEntreEventos * 60 * 1000;
+    }
+
+    setTimeout(() => {
+      registrarEvento("fin_jornada");
+      mostrarMensaje("🏁 Jornada finalizada automáticamente después de 3 descansos.");
+      deshabilitarTodosLosBotones();
+      localStorage.setItem("finJornadaRegistrado", getFechaHoy());
+    }, tiempoAcumulado);
+  });
+
+  btnFinJornada.addEventListener("click", () => registrarEvento("fin_jornada"));
+  btnInicioDescanso.addEventListener("click", () => registrarEvento("inicio_descanso"));
+  btnFinDescanso.addEventListener("click", () => registrarEvento("fin_descanso"));
+
   window.addEventListener("DOMContentLoaded", () => {
     const registrado = localStorage.getItem("finJornadaRegistrado");
     const hoy = getFechaHoy();
-
     if (registrado === hoy) {
       deshabilitarTodosLosBotones();
     } else {
       localStorage.removeItem("finJornadaRegistrado");
     }
   });
-
-  // Asociar botones
-  btnInicioJornada.addEventListener("click", () => registrarEvento("inicio_jornada"));
-  btnFinJornada.addEventListener("click", () => registrarEvento("fin_jornada"));
-  btnInicioDescanso.addEventListener("click", () => registrarEvento("inicio_descanso"));
-  btnFinDescanso.addEventListener("click", () => registrarEvento("fin_descanso"));
+ 
 </script>
 <script>
   

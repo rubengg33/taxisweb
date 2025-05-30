@@ -6,12 +6,24 @@ const jwt = require('jsonwebtoken'); // Add this line
 require("dotenv").config();
 const cors = require("cors");
 const { DateTime } = require("luxon");
+const nodemailer = require('nodemailer');
 const { sendPasswordResetEmail } = require('../utils/emailService');
 const multer = require('multer'); 
 const csv = require('csv-parser');
 const fs = require('fs');
 const path = require('path');
 // Add the middleware functions
+// Configura tu transporter de nodemailer (SMTP o servicio)
+const transporter = nodemailer.createTransport({
+    host: 'smtp.gmail.com',
+    port: 587,
+    secure: false,
+    auth: {
+      user: 'controldeconductores@gmail.com',
+      pass: 'kcvfplzhswfpbsxn'
+    }
+  });
+  
 const authenticateToken = (req, res, next) => {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
@@ -604,114 +616,187 @@ app.post('/api/login-conductor', async (req, res) => {
     }
 });
 // Registrar evento
-app.post('/api/registrar-fecha', async (req, res) => {
+app.post('/api/registrar-fecha', (req, res) => {
     const { accion, licencia, fecha_hora } = req.body;
-    if (!accion || !licencia) return res.status(400).json({ message: 'Faltan datos (licencia o acción)' });
+    if (!accion || !licencia) {
+      return res.status(400).json({ message: 'Faltan datos (licencia o acción)' });
+    }
   
-    const fechaLocal = DateTime.fromISO(fecha_hora, { zone: 'utc' }).setZone('Europe/Madrid');
+    let fechaLocal;
+    try {   
+      fechaLocal = DateTime.fromISO(fecha_hora, { zone: 'utc' }).setZone('Europe/Madrid');
+    } catch (error) {
+      return res.status(400).json({ message: 'Formato de fecha inválido' });
+    }
+  
     const fechaStr = fechaLocal.toFormat('yyyy-MM-dd HH:mm:ss');
     const fechaDia = fechaLocal.toISODate();
   
-    try {
-      // Verificar si ya se registró ese tipo de evento hoy
-      if (accion === 'inicio_jornada' || accion === 'fin_jornada') {
-        const [rows] = await db.promise().query(
-          "SELECT COUNT(*) AS total FROM eventos WHERE licencia = ? AND evento = ? AND DATE(fecha_hora) = ?",
-          [licencia, accion, fechaDia]
-        );
-  
-        if (rows[0].total > 0) {
-          return res.status(400).json({
-            message: `⚠️ Ya registraste '${accion.replace('_', ' ')}' hoy.`
-          });
+    db.query(
+      "SELECT COUNT(*) AS total FROM eventos WHERE licencia = ? AND evento = 'fin_jornada' AND DATE(fecha_hora) = ?",
+      [licencia, fechaDia],
+      (err, results) => {
+        if (err) return res.status(500).json({ message: 'Error al verificar fin de jornada' });
+        if (results[0].total > 0) {
+          return res.status(400).json({ message: "⛔ Ya finalizaste tu jornada hoy." });
         }
-      }
   
-      // Validación: 'inicio_descanso' requiere 'inicio_jornada' previo
-      if (accion === "inicio_descanso") {
-        const [rows] = await db.promise().query(
-          "SELECT COUNT(*) AS total FROM eventos WHERE licencia = ? AND evento = 'inicio_jornada' AND DATE(fecha_hora) = ?",
-          [licencia, fechaDia]
-        );
-  
-        if (rows[0].total === 0) {
-          return res.status(400).json({
-            message: "⛔ No puedes iniciar un descanso sin haber iniciado la jornada."
-          });
+        const accionesValidas = ['inicio_jornada', 'fin_jornada', 'inicio_descanso', 'fin_descanso'];
+        if (!accionesValidas.includes(accion)) {
+          return res.status(400).json({ message: 'Acción no válida' });
         }
+  
+        // Validaciones encadenadas (igual que antes)
+        const validarAccion = () => {
+          if (accion === 'inicio_jornada' || accion === 'fin_jornada') {
+            db.query(
+              "SELECT COUNT(*) AS total FROM eventos WHERE licencia = ? AND evento = ? AND DATE(fecha_hora) = ?",
+              [licencia, accion, fechaDia],
+              (err, results) => {
+                if (results[0].total > 0) {
+                  return res.status(400).json({
+                    message: `⚠️ Ya registraste '${accion.replace('_', ' ')}' hoy.`
+                  });
+                } else {
+                  seguirValidando();
+                }
+              }
+            );
+          } else {
+            seguirValidando();
+          }
+        };
+  
+        const seguirValidando = () => {
+          if (accion === 'inicio_descanso') {
+            db.query(
+              "SELECT COUNT(*) AS total FROM eventos WHERE licencia = ? AND evento = 'inicio_jornada' AND DATE(fecha_hora) = ?",
+              [licencia, fechaDia],
+              (err, results) => {
+                if (results[0].total === 0) {
+                  return res.status(400).json({ message: "⛔ No puedes iniciar un descanso sin iniciar jornada." });
+                } else {
+                  validarFinDescanso();
+                }
+              }
+            );
+          } else {
+            validarFinDescanso();
+          }
+        };
+  
+        const validarFinDescanso = () => {
+          if (accion === 'fin_descanso') {
+            db.query(
+              "SELECT COUNT(*) AS total FROM eventos WHERE licencia = ? AND evento = 'inicio_descanso' AND DATE(fecha_hora) = ?",
+              [licencia, fechaDia],
+              (err, results) => {
+                if (results[0].total === 0) {
+                  return res.status(400).json({ message: "⛔ No puedes finalizar un descanso sin haberlo iniciado." });
+                } else {
+                  validarFinJornada();
+                }
+              }
+            );
+          } else {
+            validarFinJornada();
+          }
+        };
+  
+        const validarFinJornada = () => {
+          if (accion === 'fin_jornada') {
+            db.query(
+              "SELECT COUNT(*) AS total FROM eventos WHERE licencia = ? AND evento = 'inicio_descanso' AND DATE(fecha_hora) = ?",
+              [licencia, fechaDia],
+              (err, results) => {
+                const huboInicioDescanso = results[0].total > 0;
+                if (huboInicioDescanso) {
+                  db.query(
+                    "SELECT COUNT(*) AS total FROM eventos WHERE licencia = ? AND evento = 'fin_descanso' AND DATE(fecha_hora) = ?",
+                    [licencia, fechaDia],
+                    (err, results) => {
+                      if (results[0].total === 0) {
+                        return res.status(400).json({
+                          message: "⛔ No puedes finalizar la jornada si no finalizaste el descanso iniciado."
+                        });
+                      } else {
+                        obtenerConductor();
+                      }
+                    }
+                  );
+                } else {
+                  obtenerConductor();
+                }
+              }
+            );
+          } else {
+            obtenerConductor();
+          }
+        };
+  
+        const obtenerConductor = () => {
+          db.query(
+            `SELECT c.nombre_apellidos AS nombre_conductor, c.dni, c.licencia, 
+                    l.marca_modelo AS vehiculo_modelo, l.matricula, 
+                    c.email, c.numero_seguridad_social AS num_seguridad_social, 
+                    l.nombre_apellidos AS empresa
+             FROM conductores c
+             JOIN licencias l ON c.licencia = l.licencia
+             WHERE c.licencia = ?`,
+            [licencia],
+            (err, results) => {
+              if (err || results.length === 0) {
+                return res.status(404).json({ message: 'Conductor no encontrado' });
+              }
+  
+              const conductor = results[0];
+  
+              db.query(
+                `INSERT INTO eventos 
+                 (nombre_conductor, dni, licencia, vehiculo_modelo, matricula, email, 
+                 num_seguridad_social, empresa, evento, fecha_hora)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                [
+                  conductor.nombre_conductor,
+                  conductor.dni,
+                  conductor.licencia,
+                  conductor.vehiculo_modelo,
+                  conductor.matricula,
+                  conductor.email,
+                  conductor.num_seguridad_social,
+                  conductor.empresa,
+                  accion,
+                  fechaStr
+                ],
+                (err) => {
+                  if (err) return res.status(500).json({ message: 'Error al guardar el evento' });
+  
+                  // Aquí enviamos el email
+                  const mailOptions = {
+                    from: 'controldeconductores@gmail.com',
+                    to: conductor.email,
+                    subject: 'Registro de evento',
+                    text: `Hola ${conductor.nombre_conductor},\n\nSe ha registrado la acción "${accion}" a las ${fechaStr}.\n\nSaludos.`
+                  };
+  
+                  transporter.sendMail(mailOptions, (error, info) => {
+                    if (error) {
+                      console.error('Error enviando correo:', error);
+                      // No bloqueamos el response aunque falle el correo
+                    } else {
+                      console.log('Correo enviado:', info.response);
+                    }
+                    return res.json({ message: `✅ Evento "${accion}" registrado a las ${fechaStr}` });
+                  });
+                }
+              );
+            }
+          );
+        };
+  
+        validarAccion();
       }
-  
-      // Validación: 'fin_descanso' requiere 'inicio_descanso' previo
-      if (accion === "fin_descanso") {
-        const [rows] = await db.promise().query(
-          "SELECT COUNT(*) AS total FROM eventos WHERE licencia = ? AND evento = 'inicio_descanso' AND DATE(fecha_hora) = ?",
-          [licencia, fechaDia]
-        );
-  
-        if (rows[0].total === 0) {
-          return res.status(400).json({
-            message: "⛔ No puedes finalizar un descanso sin haberlo iniciado."
-          });
-        }
-      }
-  
-      // Validación: 'fin_jornada' requiere 'fin_descanso' previo
-      if (accion === "fin_jornada") {
-        const [rows] = await db.promise().query(
-          "SELECT COUNT(*) AS total FROM eventos WHERE licencia = ? AND evento = 'fin_descanso' AND DATE(fecha_hora) = ?",
-          [licencia, fechaDia]
-        );
-  
-        if (rows[0].total === 0) {
-          return res.status(400).json({
-            message: "⛔ No puedes finalizar la jornada sin haber finalizado el descanso."
-          });
-        }
-      }
-  
-      // Buscar datos del conductor
-      const [conductores] = await db.promise().query(`
-        SELECT c.nombre_apellidos AS nombre_conductor, c.dni, c.licencia,
-               l.marca_modelo AS vehiculo_modelo, l.matricula,
-               c.email, c.numero_seguridad_social AS num_seguridad_social,
-               l.nombre_apellidos AS empresa
-        FROM conductores c
-        JOIN licencias l ON c.licencia = l.licencia
-        WHERE c.licencia = ?
-      `, [licencia]);
-  
-      if (conductores.length === 0) {
-        return res.status(404).json({ message: 'Conductor no encontrado' });
-      }
-  
-      const conductor = conductores[0];
-  
-      // Insertar evento
-      await db.promise().query(`
-        INSERT INTO eventos
-        (nombre_conductor, dni, licencia, vehiculo_modelo, matricula, email,
-         num_seguridad_social, empresa, evento, fecha_hora)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-      `, [
-        conductor.nombre_conductor,
-        conductor.dni,
-        conductor.licencia,
-        conductor.vehiculo_modelo,
-        conductor.matricula,
-        conductor.email,
-        conductor.num_seguridad_social,
-        conductor.empresa,
-        accion,
-        fechaStr
-      ]);
-  
-      console.log(`✅ Evento '${accion}' registrado con éxito.`);
-      return res.json({ message: `✅ Evento "${accion}" registrado a las ${fechaStr}` });
-  
-    } catch (e) {
-      console.error(`❌ Error en /api/registrar-fecha: ${e}`);
-      return res.status(500).json({ message: 'Error interno del servidor' });
-    }
+    );
   });
  // Enviar correo
 app.post('/api/send-email', async (req, res) => {
