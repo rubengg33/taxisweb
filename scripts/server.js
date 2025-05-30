@@ -781,7 +781,7 @@ app.post('/api/registrar-fecha', (req, res) => {
                 Te informamos que se ha registrado el siguiente evento en tu control horario:
                 
                 📌 Tipo de acción: ${accion.toUpperCase()}
-                🕒 Fecha y hora: ${fecha_str}
+                🕒 Fecha y hora: ${fechaStr}
                 🆔 Licencia: ${licencia}
                 🚗 Vehículo: ${conductor.vehiculo_modelo} - ${conductor.matricula}
                 🏢 Empresa: ${conductor.empresa}
