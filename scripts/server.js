@@ -122,11 +122,11 @@ app.post('/api/import', authenticateToken, validateApiKey, upload.single('file')
     try {
       await parseCSV();
       await query('SET SQL_SAFE_UPDATES = 0');
-      await query('DELETE FROM conductores_test');
+      await query('DELETE FROM conductores');
       for (const row of results) {
         const { licencia, nombre_apellidos, dni, direccion, codigo_postal, email, numero_seguridad_social } = row;
         await query(
-          `INSERT INTO conductores_test (nombre_apellidos, dni, direccion, codigo_postal, email, numero_seguridad_social, licencia)
+          `INSERT INTO conductores (nombre_apellidos, dni, direccion, codigo_postal, email, numero_seguridad_social, licencia)
            VALUES (?, ?, ?, ?, ?, ?, ?)`,
           [nombre_apellidos, dni, direccion, codigo_postal, email, numero_seguridad_social, licencia]
         );
