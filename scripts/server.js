@@ -123,6 +123,7 @@ app.post('/api/import', authenticateToken, validateApiKey, upload.single('file')
       await parseCSV();
       await query('SET SQL_SAFE_UPDATES = 0');
       await query('DELETE FROM conductores');
+      await query('ALTER TABLE conductores AUTO_INCREMENT = 1');
       for (const row of results) {
         const { licencia, nombre_apellidos, dni, direccion, codigo_postal, email, numero_seguridad_social } = row;
 
