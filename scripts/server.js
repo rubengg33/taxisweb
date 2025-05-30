@@ -775,19 +775,36 @@ app.post('/api/registrar-fecha', (req, res) => {
                   const mailOptions = {
                     from: 'controldeconductores@gmail.com',
                     to: conductor.email,
-                    subject: 'Registro de evento',
-                    text: `Hola ${conductor.nombre_conductor},\n\nSe ha registrado la acción "${accion}" a las ${fechaStr}.\n\nSaludos.`
+                    subject: `📋 Evento registrado: ${accion.replace('_', ' ').toUpperCase()}`,
+                    text: `Hola ${conductor.nombre_conductor},
+                
+                Te informamos que se ha registrado el siguiente evento en tu control horario:
+                
+                📌 Tipo de acción: ${accion.toUpperCase()}
+                🕒 Fecha y hora: ${fecha_str}
+                🆔 Licencia: ${licencia}
+                🚗 Vehículo: ${conductor.vehiculo_modelo} - ${conductor.matricula}
+                🏢 Empresa: ${conductor.empresa}
+                
+                Este registro quedará guardado como parte de tu jornada laboral.
+                Si detectas algún error o consideras que debe realizarse alguna modificación, por favor contacta con el administrador de la aplicación escribiendo a: controldeconductores@gmail.com con tu Nombre y tu número de licencia.
+                
+                En caso de no recibir ninguna notificación por tu parte, se entenderá que el registro es válido y real.
+                
+                Saludos cordiales,
+                Control de Conductores
+                www.controldeconductores.com`
                   };
-  
-                  transporter.sendMail(mailOptions, (error, info) => {
-                    if (error) {
-                      console.error('Error enviando correo:', error);
-                      // No bloqueamos el response aunque falle el correo
-                    } else {
-                      console.log('Correo enviado:', info.response);
-                    }
-                    return res.json({ message: `✅ Evento "${accion}" registrado a las ${fechaStr}` });
-                  });
+                  
+res.json({ message: `✅ Evento "${accion}" registrado a las ${fechaStr} 📋` });
+
+transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      console.error(`❌ Error al enviar correo: ${error}`);
+    } else {
+      console.log(`📧 Correo enviado con éxito: ${info.response}`);
+    }
+  });
                 }
               );
             }
