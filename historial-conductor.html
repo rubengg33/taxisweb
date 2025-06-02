@@ -182,17 +182,12 @@ function pantallaConductores() {
         });
 
         const lista = document.getElementById("listaEventos");
-        lista.innerHTML = "";
+      lista.innerHTML = "";
 
-        if (eventosMostrados.length > 0) {
-          eventosMostrados.forEach(ev => {
-            const li = document.createElement("li");
-            li.className = "px-4";
-            
-            // Formatear la fecha correctamente para la zona horaria de Madrid (Europe/Madrid)
-            const fechaHora = new Date(ev.fecha_hora);
-            const opciones = { 
-              timeZone: "UTC",
+      if (eventosMostrados.length > 0) {
+        eventosMostrados.forEach(ev => {
+          const fechaFormateada = new Date(ev.fecha_hora).toLocaleString("es-ES", {
+            timeZone: "UTC",
             hour12: false,
             year: "numeric",
             month: "2-digit",
@@ -200,20 +195,26 @@ function pantallaConductores() {
             hour: "2-digit",
             minute: "2-digit",
             second: "2-digit"
-            };
-            const fechaFormateada = fechaHora.toLocaleString('es-ES', opciones);
-            
-            li.innerHTML = `<span class="text-cyan-400 font-semibold">${ev.nombre_conductor}</span> — ${ev.evento} 🕒 <span class="text-gray-400">${fechaFormateada}</span>`;
-            lista.appendChild(li);
           });
-        } else {
-          lista.innerHTML = "<li class='px-4'>No hay eventos registrados</li>";
-        }
 
-      } catch (error) {
-        console.error("❌ Error al cargar eventos:", error);
+          const claseColor = `evento-${ev.evento}`;
+          const li = document.createElement("li");
+          li.className = "px-4";
+          li.innerHTML = `
+            <span class="text-cyan-400 font-semibold">${ev.nombre_conductor}</span> — 
+            <span class="${claseColor}">${ev.evento}</span> 🕒 
+            <span class="text-gray-400">${fechaFormateada}</span>
+          `;
+          lista.appendChild(li);
+        });
+      } else {
+        lista.innerHTML = "<li class='px-4'>No hay eventos registrados</li>";
       }
+
+    } catch (error) {
+      console.error("❌ Error al cargar eventos:", error);
     }
+  }
 
     function exportarCSV(eventos) {
       if (!eventos.length) {
