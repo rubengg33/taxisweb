@@ -632,6 +632,36 @@ app.post('/api/registrar-fecha', (req, res) => {
     const fechaStr = fechaLocal.toFormat('yyyy-MM-dd HH:mm:ss');
     const fechaDia = fechaLocal.toISODate();
   
+     // Validación nueva: Esperar X horas tras último fin_jornada antes de inicio_jornada
+  if (accion === 'inicio_jornada') {
+    const horasEspera = 2;
+    db.query(
+      `SELECT fecha_hora FROM eventos WHERE licencia = ? AND evento = 'fin_jornada' ORDER BY fecha_hora DESC LIMIT 1`,
+      [licencia],
+      (err, results) => {
+        if (err) return res.status(500).json({ message: 'Error al verificar último fin de jornada' });
+
+        if (results.length > 0) {
+          let ultimaFin = DateTime.fromJSDate(results[0].fecha_hora).setZone('Europe/Madrid');
+          const diffSegundos = fechaLocal.diff(ultimaFin, 'seconds').seconds;
+          if (diffSegundos < horasEspera * 3600) {
+            return res.status(400).json({
+              message: `⛔ Debes esperar al menos ${horasEspera} horas desde el último fin de jornada.`
+            });
+          }
+        }
+
+        // Si pasa esta validación, continua con la validación normal
+        validarFinJornadaExistente();
+      }
+    );
+  } else {
+    // Si no es inicio_jornada, ir directo a la validación de fin jornada existente
+    validarFinJornadaExistente();
+  }
+
+  // Función para validar que no exista fin_jornada ya registrado hoy
+  function validarFinJornadaExistente() {
     db.query(
       "SELECT COUNT(*) AS total FROM eventos WHERE licencia = ? AND evento = 'fin_jornada' AND DATE(fecha_hora) = ?",
       [licencia, fechaDia],
@@ -640,181 +670,184 @@ app.post('/api/registrar-fecha', (req, res) => {
         if (results[0].total > 0) {
           return res.status(400).json({ message: "⛔ Ya finalizaste tu jornada hoy." });
         }
-  
-        const accionesValidas = ['inicio_jornada', 'fin_jornada', 'inicio_descanso', 'fin_descanso'];
-        if (!accionesValidas.includes(accion)) {
-          return res.status(400).json({ message: 'Acción no válida' });
+        validarAccion();
+      }
+    );
+  }
+
+  const accionesValidas = ['inicio_jornada', 'fin_jornada', 'inicio_descanso', 'fin_descanso'];
+
+  function validarAccion() {
+    if (!accionesValidas.includes(accion)) {
+      return res.status(400).json({ message: 'Acción no válida' });
+    }
+
+    if (accion === 'inicio_jornada' || accion === 'fin_jornada') {
+      db.query(
+        "SELECT COUNT(*) AS total FROM eventos WHERE licencia = ? AND evento = ? AND DATE(fecha_hora) = ?",
+        [licencia, accion, fechaDia],
+        (err, results) => {
+          if (err) return res.status(500).json({ message: 'Error al validar acción' });
+
+          if (results[0].total > 0) {
+            return res.status(400).json({
+              message: `⚠️ Ya registraste '${accion.replace('_', ' ')}' hoy.`
+            });
+          }
+          seguirValidando();
         }
-  
-        // Validaciones encadenadas (igual que antes)
-        const validarAccion = () => {
-          if (accion === 'inicio_jornada' || accion === 'fin_jornada') {
+      );
+    } else {
+      seguirValidando();
+    }
+  }
+
+  function seguirValidando() {
+    if (accion === 'inicio_descanso') {
+      db.query(
+        "SELECT COUNT(*) AS total FROM eventos WHERE licencia = ? AND evento = 'inicio_jornada' AND DATE(fecha_hora) = ?",
+        [licencia, fechaDia],
+        (err, results) => {
+          if (err) return res.status(500).json({ message: 'Error en validación inicio descanso' });
+
+          if (results[0].total === 0) {
+            return res.status(400).json({ message: "⛔ No puedes iniciar un descanso sin iniciar jornada." });
+          }
+          validarFinDescanso();
+        }
+      );
+    } else {
+      validarFinDescanso();
+    }
+  }
+
+  function validarFinDescanso() {
+    if (accion === 'fin_descanso') {
+      db.query(
+        "SELECT COUNT(*) AS total FROM eventos WHERE licencia = ? AND evento = 'inicio_descanso' AND DATE(fecha_hora) = ?",
+        [licencia, fechaDia],
+        (err, results) => {
+          if (err) return res.status(500).json({ message: 'Error en validación fin descanso' });
+
+          if (results[0].total === 0) {
+            return res.status(400).json({ message: "⛔ No puedes finalizar un descanso sin haberlo iniciado." });
+          }
+          validarFinJornada();
+        }
+      );
+    } else {
+      validarFinJornada();
+    }
+  }
+
+  function validarFinJornada() {
+    if (accion === 'fin_jornada') {
+      db.query(
+        "SELECT COUNT(*) AS total FROM eventos WHERE licencia = ? AND evento = 'inicio_descanso' AND DATE(fecha_hora) = ?",
+        [licencia, fechaDia],
+        (err, results) => {
+          if (err) return res.status(500).json({ message: 'Error en validación fin jornada' });
+
+          const huboInicioDescanso = results[0].total > 0;
+          if (huboInicioDescanso) {
             db.query(
-              "SELECT COUNT(*) AS total FROM eventos WHERE licencia = ? AND evento = ? AND DATE(fecha_hora) = ?",
-              [licencia, accion, fechaDia],
+              "SELECT COUNT(*) AS total FROM eventos WHERE licencia = ? AND evento = 'fin_descanso' AND DATE(fecha_hora) = ?",
+              [licencia, fechaDia],
               (err, results) => {
-                if (results[0].total > 0) {
+                if (err) return res.status(500).json({ message: 'Error en validación fin descanso antes de fin jornada' });
+
+                if (results[0].total === 0) {
                   return res.status(400).json({
-                    message: `⚠️ Ya registraste '${accion.replace('_', ' ')}' hoy.`
+                    message: "⛔ No puedes finalizar la jornada si no finalizaste el descanso iniciado."
                   });
-                } else {
-                  seguirValidando();
                 }
-              }
-            );
-          } else {
-            seguirValidando();
-          }
-        };
-  
-        const seguirValidando = () => {
-          if (accion === 'inicio_descanso') {
-            db.query(
-              "SELECT COUNT(*) AS total FROM eventos WHERE licencia = ? AND evento = 'inicio_jornada' AND DATE(fecha_hora) = ?",
-              [licencia, fechaDia],
-              (err, results) => {
-                if (results[0].total === 0) {
-                  return res.status(400).json({ message: "⛔ No puedes iniciar un descanso sin iniciar jornada." });
-                } else {
-                  validarFinDescanso();
-                }
-              }
-            );
-          } else {
-            validarFinDescanso();
-          }
-        };
-  
-        const validarFinDescanso = () => {
-          if (accion === 'fin_descanso') {
-            db.query(
-              "SELECT COUNT(*) AS total FROM eventos WHERE licencia = ? AND evento = 'inicio_descanso' AND DATE(fecha_hora) = ?",
-              [licencia, fechaDia],
-              (err, results) => {
-                if (results[0].total === 0) {
-                  return res.status(400).json({ message: "⛔ No puedes finalizar un descanso sin haberlo iniciado." });
-                } else {
-                  validarFinJornada();
-                }
-              }
-            );
-          } else {
-            validarFinJornada();
-          }
-        };
-  
-        const validarFinJornada = () => {
-          if (accion === 'fin_jornada') {
-            db.query(
-              "SELECT COUNT(*) AS total FROM eventos WHERE licencia = ? AND evento = 'inicio_descanso' AND DATE(fecha_hora) = ?",
-              [licencia, fechaDia],
-              (err, results) => {
-                const huboInicioDescanso = results[0].total > 0;
-                if (huboInicioDescanso) {
-                  db.query(
-                    "SELECT COUNT(*) AS total FROM eventos WHERE licencia = ? AND evento = 'fin_descanso' AND DATE(fecha_hora) = ?",
-                    [licencia, fechaDia],
-                    (err, results) => {
-                      if (results[0].total === 0) {
-                        return res.status(400).json({
-                          message: "⛔ No puedes finalizar la jornada si no finalizaste el descanso iniciado."
-                        });
-                      } else {
-                        obtenerConductor();
-                      }
-                    }
-                  );
-                } else {
-                  obtenerConductor();
-                }
+                obtenerConductor();
               }
             );
           } else {
             obtenerConductor();
           }
-        };
-  
-        const obtenerConductor = () => {
-          db.query(
-            `SELECT c.nombre_apellidos AS nombre_conductor, c.dni, c.licencia, 
-                    l.marca_modelo AS vehiculo_modelo, l.matricula, 
-                    c.email, c.numero_seguridad_social AS num_seguridad_social, 
-                    l.nombre_apellidos AS empresa
-             FROM conductores c
-             JOIN licencias l ON c.licencia = l.licencia
-             WHERE c.licencia = ?`,
-            [licencia],
-            (err, results) => {
-              if (err || results.length === 0) {
-                return res.status(404).json({ message: 'Conductor no encontrado' });
-              }
-  
-              const conductor = results[0];
-  
-              db.query(
-                `INSERT INTO eventos 
-                 (nombre_conductor, dni, licencia, vehiculo_modelo, matricula, email, 
-                 num_seguridad_social, empresa, evento, fecha_hora)
-                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-                [
-                  conductor.nombre_conductor,
-                  conductor.dni,
-                  conductor.licencia,
-                  conductor.vehiculo_modelo,
-                  conductor.matricula,
-                  conductor.email,
-                  conductor.num_seguridad_social,
-                  conductor.empresa,
-                  accion,
-                  fechaStr
-                ],
-                (err) => {
-                  if (err) return res.status(500).json({ message: 'Error al guardar el evento' });
-  
-                  // Aquí enviamos el email
-                  const mailOptions = {
-                    from: 'controldeconductores@gmail.com',
-                    to: conductor.email,
-                    subject: `📋 Evento registrado: ${accion.replace('_', ' ').toUpperCase()}`,
-                    text: `Hola ${conductor.nombre_conductor},
-                
-                Te informamos que se ha registrado el siguiente evento en tu control horario:
-                
-                📌 Tipo de acción: ${accion.toUpperCase()}
-                🕒 Fecha y hora: ${fechaStr}
-                🆔 Licencia: ${licencia}
-                🚗 Vehículo: ${conductor.vehiculo_modelo} - ${conductor.matricula}
-                🏢 Empresa: ${conductor.empresa}
-                
-                Este registro quedará guardado como parte de tu jornada laboral.
-                Si detectas algún error o consideras que debe realizarse alguna modificación, por favor contacta con el administrador de la aplicación escribiendo a: controldeconductores@gmail.com con tu Nombre y tu número de licencia.
-                
-                En caso de no recibir ninguna notificación por tu parte, se entenderá que el registro es válido y real.
-                
-                Saludos cordiales,
-                Control de Conductores
-                www.controldeconductores.com`
-                  };
-                  
-res.json({ message: `✅ Evento "${accion}" registrado a las ${fechaStr} 📋` });
-
-transporter.sendMail(mailOptions, (error, info) => {
-    if (error) {
-      console.error(`❌ Error al enviar correo: ${error}`);
+        }
+      );
     } else {
-      console.log(`📧 Correo enviado con éxito: ${info.response}`);
+      obtenerConductor();
     }
-  });
-                }
-              );
-            }
-          );
-        };
-  
-        validarAccion();
+  }
+
+  function obtenerConductor() {
+    db.query(
+      `SELECT c.nombre_apellidos AS nombre_conductor, c.dni, c.licencia, 
+              l.marca_modelo AS vehiculo_modelo, l.matricula, 
+              c.email, c.numero_seguridad_social AS num_seguridad_social, 
+              l.nombre_apellidos AS empresa
+       FROM conductores c
+       JOIN licencias l ON c.licencia = l.licencia
+       WHERE c.licencia = ?`,
+      [licencia],
+      (err, results) => {
+        if (err || results.length === 0) {
+          return res.status(404).json({ message: 'Conductor no encontrado' });
+        }
+
+        const conductor = results[0];
+
+        db.query(
+          `INSERT INTO eventos 
+           (nombre_conductor, dni, licencia, vehiculo_modelo, matricula, email, 
+            num_seguridad_social, empresa, evento, fecha_hora)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          [
+            conductor.nombre_conductor,
+            conductor.dni,
+            conductor.licencia,
+            conductor.vehiculo_modelo,
+            conductor.matricula,
+            conductor.email,
+            conductor.num_seguridad_social,
+            conductor.empresa,
+            accion,
+            fechaStr
+          ],
+          (err) => {
+            if (err) return res.status(500).json({ message: 'Error al guardar el evento' });
+
+            // Aquí enviamos el email
+            const mailOptions = {
+              from: 'controldeconductores@gmail.com',
+              to: conductor.email,
+              subject: `📋 Evento registrado: ${accion.replace('_', ' ').toUpperCase()}`,
+              text: `Hola ${conductor.nombre_conductor},
+
+Te informamos que se ha registrado el siguiente evento en tu control horario:
+
+📌 Tipo de acción: ${accion.toUpperCase()}
+🕒 Fecha y hora: ${fechaStr}
+🆔 Licencia: ${licencia}
+🚗 Vehículo: ${conductor.vehiculo_modelo} - ${conductor.matricula}
+🏢 Empresa: ${conductor.empresa}
+
+Este registro quedará guardado como parte de tu jornada laboral.
+Si detectas algún error o consideras que debe realizarse alguna modificación, por favor contacta con el administrador de la aplicación escribiendo a: controldeconductores@gmail.com con tu Nombre y tu número de licencia.
+
+Enviado automáticamente desde la aplicación de control horario.
+
+Un saludo.`
+            };
+
+            transporter.sendMail(mailOptions, (error, info) => {
+              if (error) {
+                console.error(`❌ Error al enviar correo: ${error}`);
+              } else {
+                console.log(`📧 Correo enviado con éxito: ${info.response}`);
+              }
+              return res.status(200).json({ message: 'Evento registrado correctamente.' });
+            });
+          }
+        );
       }
     );
-  });
+  }
+});
  // Enviar correo
 app.post('/api/send-email', async (req, res) => {
     const { email, evento } = req.body;
