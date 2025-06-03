@@ -236,7 +236,7 @@
           text-white placeholder-gray-400 
           focus:outline-none focus:ring-2 focus:ring-cyan-500 transition" required>
       </div>
-        <button onclick="requestPasswordReset()" class="w-full py-2 text-white rounded-full 
+        <button id="resetPasswordbtn" class="w-full py-2 text-white rounded-full 
         bg-gradient-to-r from-cyan-400 to-cyan-600 
         shadow-inner hover:from-cyan-300 transition hover:cursor-pointer">
             Recuperar Correo Electrónico
@@ -286,7 +286,7 @@
                     document.getElementById('loginForm').classList.remove('hidden');
                 }
 
-  document.getElementById("resetEmailForm").addEventListener("submit", async function(e) {
+  document.getElementById("resetPasswordbtn").addEventListener("submit", async function(e) {
     e.preventDefault();
     const dni = document.getElementById("resetDNI").value.trim();
     const licencia = document.getElementById("resetLicencia").value.trim();
