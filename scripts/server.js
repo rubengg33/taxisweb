@@ -932,24 +932,29 @@ app.post("/api/reset-password", async (req, res) => {
 });
 app.post('/api/recuperar-correo', (req, res) => {
   const { dni, licencia } = req.body;
+  console.log('Petición /api/recuperar-correo recibida con:', { dni, licencia });
 
   if (!dni || !licencia) {
+    console.warn('Faltan dni o licencia');
     return res.status(400).json({ error: 'DNI y Licencia son requeridos.' });
   }
 
-  const sql = 'SELECT email FROM conductores WHERE DNI = ? AND licencia = ?';
-  pool.query(sql, [dni, licencia], (err, results) => {
+  const sql = 'SELECT email FROM conductores WHERE dni = ? AND licencia = ?';
+  db.query(sql, [dni.toUpperCase(), licencia.toUpperCase()], (err, results) => {
     if (err) {
-      console.error(err);
+      console.error('Error en consulta SQL:', err);
       return res.status(500).json({ error: 'Error en el servidor.' });
     }
+
+    console.log('Resultados de la consulta:', results);
 
     if (results.length === 0) {
       return res.status(404).json({ error: 'No se encontró ningún correo para esos datos.' });
     }
 
     const email = results[0].email;
-    res.json({ email });
+    console.log('Email encontrado:', email);
+    res.json({ email });  // respuesta con la propiedad 'email'
   });
 });
 
