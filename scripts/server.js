@@ -949,7 +949,7 @@ app.post('/api/recuperar-correo', (req, res) => {
     }
 
     const email = results[0].email;
-    res.json({ correo: email });
+    res.json({ email });
   });
 });
 
