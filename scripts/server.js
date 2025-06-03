@@ -934,28 +934,22 @@ app.post('/api/recuperar-correo', (req, res) => {
   const { dni, licencia } = req.body;
 
   if (!dni || !licencia) {
-    return res.send('<p style="color:red;">DNI y Licencia son requeridos.</p>');
+    return res.status(400).json({ error: 'DNI y Licencia son requeridos.' });
   }
 
   const sql = 'SELECT email FROM conductores WHERE DNI = ? AND licencia = ?';
   pool.query(sql, [dni, licencia], (err, results) => {
     if (err) {
       console.error(err);
-      return res.status(500).send('<p style="color:red;">Error en el servidor.</p>');
+      return res.status(500).json({ error: 'Error en el servidor.' });
     }
 
     if (results.length === 0) {
-      return res.send('<p style="color:red;">No se encontró ningún correo para esos datos.</p>');
+      return res.status(404).json({ error: 'No se encontró ningún correo para esos datos.' });
     }
 
     const email = results[0].email;
-
-    res.send(`
-      <div style="font-family:sans-serif; padding: 2rem;">
-        <h2 class="text-white">Correo asociado encontrado:</h2>
-        <p class="text-white"><strong>${email}</strong></p>
-      </div>
-    `);
+    res.json({ correo: email });
   });
 });
 
