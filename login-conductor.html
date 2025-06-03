@@ -214,12 +214,40 @@
             class="w-full bg-gradient-to-r from-cyan-400 to-cyan-600 text-white py-2 rounded-lg hover:from-cyan-300 transition duration-300">
             Ingresar
           </button>
-        </form>
+        
 
         <p class="text-center text-gray-400 text-sm">
-          ¿Olvidaste tu contraseña?
-          <a href="#" class="text-cyan-400 hover:underline">Recupérala aquí</a>
+          ¿Olvidaste tu Correo Electrónico?
+          <a href="#" class="text-cyan-400 hover:underline" onclick="showResetEmailForm()">Recupéralo aquí</a>
         </p>
+      </form>
+      <!-- Restablecimiento de correo electrónico -->
+      <div id="resetEmailForm" class="hidden space-y-4">
+        <h3 class="text-xl font-bold text-center mb-4 text-white">Recuperación de Correo Electrónico</h3>
+        <div>
+            <label for="resetDNI" class="block text-sm text-white mb-1">DNI</label>
+            <input type="password" id="resetDNI" placeholder="12345678X" class="w-full px-4 py-2 rounded-lg bg-gray-800 border border-gray-600 
+            text-white placeholder-gray-400 
+            focus:outline-none focus:ring-2 focus:ring-cyan-500 transition" required>
+        </div>
+        <div>
+          <label for="resetLicencia" class="block text-sm text-white mb-1">Número de Licencia</label>
+          <input type="password" id="resetLicencia" placeholder="001" class="w-full px-4 py-2 rounded-lg bg-gray-800 border border-gray-600 
+          text-white placeholder-gray-400 
+          focus:outline-none focus:ring-2 focus:ring-cyan-500 transition" required>
+      </div>
+        <button onclick="requestPasswordReset()" class="w-full py-2 text-white rounded-full 
+        bg-gradient-to-r from-cyan-400 to-cyan-600 
+        shadow-inner hover:from-cyan-300 transition hover:cursor-pointer">
+            Recuperar Correo Electrónico
+        </button>
+        <div class="text-center">
+            <a href="#" onclick="showLoginForm()" class="text-sm text-cyan-400 hover:underline">Volver al inicio
+                de sesión</a>
+        </div>
+        <p class="text-white text-center font-bold">Tu correo aparecerá aqui:</p>
+        <p id="resultado" class="text-white text-center font-bold"></p>
+    </div>
       </div>
     </div>
   </div>
@@ -248,6 +276,38 @@
   <script src="scripts/config.js"></script>
 
   <script>
+    function showResetEmailForm() {
+                    document.getElementById('loginForm').classList.add('hidden');
+                    document.getElementById('resetEmailForm').classList.remove('hidden');
+                }
+
+                function showLoginForm() {
+                    document.getElementById('resetEmailForm').classList.add('hidden');
+                    document.getElementById('loginForm').classList.remove('hidden');
+                }
+
+  document.getElementById("resetEmailForm").addEventListener("submit", async function(e) {
+    e.preventDefault();
+    const dni = document.getElementById("resetDNI").value.trim();
+    const licencia = document.getElementById("resetLicencia").value.trim();
+
+    const res = await fetch(`${API_URL}/recuperar-correo`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ dni, licencia })
+    });
+
+    const data = await res.json();
+
+    const resultado = document.getElementById("resultado");
+    if (res.ok && data.correo) {
+      resultado.textContent = `Tu correo es: ${data.correo}`;
+      resultado.style.color = "green";
+    } else {
+      resultado.textContent = "No se encontró ningún conductor con esos datos.";
+      resultado.style.color = "red";
+    }
+  });
     // Menú móvil
     const mobileMenuButton = document.querySelector('.mobile-menu-button');
     const mobileMenu = document.querySelector('.mobile-menu');

@@ -930,6 +930,35 @@ app.post("/api/reset-password", async (req, res) => {
         res.status(500).json({ message: "Error al actualizar la contraseña" });
     }
 });
+app.post('/api/recuperar-correo', (req, res) => {
+  const { dni, licencia } = req.body;
+
+  if (!dni || !licencia) {
+    return res.send('<p style="color:red;">DNI y Licencia son requeridos.</p>');
+  }
+
+  const sql = 'SELECT email FROM conductores WHERE DNI = ? AND licencia = ?';
+  pool.query(sql, [dni, licencia], (err, results) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).send('<p style="color:red;">Error en el servidor.</p>');
+    }
+
+    if (results.length === 0) {
+      return res.send('<p style="color:red;">No se encontró ningún correo para esos datos.</p>');
+    }
+
+    const email = results[0].email;
+
+    res.send(`
+      <div style="font-family:sans-serif; padding: 2rem;">
+        <h2 class="text-white">Correo asociado encontrado:</h2>
+        <p class="text-white"><strong>${email}</strong></p>
+      </div>
+    `);
+  });
+});
+
 // Obtener info del conductor por licencia
 app.get('/api/conductor/:licencia', (req, res) => {
     const { licencia } = req.params;
