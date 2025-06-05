@@ -163,7 +163,7 @@
         });
     </script>
     <!-- Estilos generales del modal y fondo -->
-<div id="cookieModal" class="bg-opacity-60 fixed inset-0 z-50 flex items-center justify-center bg-black backdrop-blur-sm">
+<div id="cookieModal" class="hidden bg-opacity-60 fixed inset-0 z-50 flex items-center justify-center bg-black backdrop-blur-sm">
     <div
       class="relative w-full max-w-md rounded-xl bg-white p-6 text-sm text-gray-900 shadow-xl dark:bg-gray-900 dark:text-white"
     >
@@ -290,13 +290,6 @@
       <div class="flex justify-center text-teal-600 sm:justify-start dark:text-teal-300">
         <img src="img/taxi.png" alt="Logo" class="h-17 w-37 rounded">
       </div>
-
-      <p
-        class=" max-w-md text-center leading-relaxed text-gray-400 sm:max-w-xs sm:text-left dark:text-gray-400"
-      >
-        Lorem ipsum dolor, sit amet consectetur adipisicing elit. Incidunt consequuntur amet culpa
-        cum itaque neque.
-      </p>
 
       <ul class="mt-8 flex justify-center gap-6 sm:justify-start md:gap-8">
         <li>
@@ -708,13 +701,17 @@
   
     // Mostrar o esconder modal según si hay preferencias guardadas
     window.addEventListener('DOMContentLoaded', () => {
-      const prefs = loadPreferences();
-      if (prefs) {
-        // Ocultar modal porque ya hay preferencias guardadas
-        document.getElementById('cookieModal').style.display = 'none';
-        applyPreferences(prefs);
-      }
-    });
+  const prefs = loadPreferences();
+  const modal = document.getElementById('cookieModal');
+
+  if (prefs) {
+    applyPreferences(prefs);
+    // El modal ya está oculto por la clase "hidden", no es necesario hacer nada
+  } else {
+    // Mostrar el modal solo si no hay preferencias
+    modal.classList.remove('hidden');
+  }
+});
   
     // Evento para botón Aceptar
     document.getElementById('acceptCookies').addEventListener('click', () => {

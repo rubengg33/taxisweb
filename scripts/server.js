@@ -753,7 +753,7 @@ app.post('/api/registrar-fecha', (req, res) => {
           conductor.email,
           conductor.num_seguridad_social,
           conductor.empresa,
-          accion,
+          accion, 
           fechaStr
         ]
       );
