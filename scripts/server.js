@@ -19,8 +19,8 @@ const transporter = nodemailer.createTransport({
     port: 587,
     secure: false,
     auth: {
-      user: 'controldeconductores@gmail.com',
-      pass: 'kcvfplzhswfpbsxn'
+      user: 'controldeconductores@wetaximadrid.com',
+      pass: 'lsqz yyta xlwo hpms'
     }
   });
   
@@ -760,7 +760,7 @@ app.post('/api/registrar-fecha', (req, res) => {
 
       // Email
       const mailOptions = {
-        from: 'controldeconductores@gmail.com',
+        from: 'controldeconductores@wetaximadrid.com',
         to: conductor.email,
         subject: `📋 Evento registrado: ${accion.replace('_', ' ').toUpperCase()}`,
         text: `Hola ${conductor.nombre_conductor},
@@ -774,7 +774,7 @@ Te informamos que se ha registrado el siguiente evento en tu control horario:
 🏢 Empresa: ${conductor.empresa}
 
 Este registro quedará guardado como parte de tu jornada laboral.
-Si detectas algún error o consideras que debe realizarse alguna modificación, por favor contacta con el administrador de la aplicación escribiendo a: controldeconductores@gmail.com con tu Nombre y tu número de licencia.
+Si detectas algún error o consideras que debe realizarse alguna modificación, por favor contacta con el administrador de la aplicación escribiendo a: controldeconductores@wetaximadrid.com con tu Nombre y tu número de licencia.
 En caso de no recibir ninguna notificación por tu parte, se entenderá que el registro es válido y real.
 
 Saludos cordiales,
