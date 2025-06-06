@@ -273,6 +273,7 @@
           class="mt-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition">Intentar otra vez</button>
       </div>
     </div>
+
     <script src="scripts/config.js"></script>
 
     <script>
@@ -315,7 +316,7 @@ try {
   const resultado = document.getElementById("resultado");
 
   if (res.ok && data.email) {
-    resultado.textContent = `Tu correo es: ${data.email}`;
+    resultado.textContent = `${data.email}`;
     resultado.style.color = "green";
   } else {
     resultado.textContent = "No se encontró ningún conductor con esos datos.";
