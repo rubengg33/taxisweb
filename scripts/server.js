@@ -12,6 +12,9 @@ const multer = require('multer');
 const csv = require('csv-parser');
 const fs = require('fs');
 const path = require('path');
+const { v4: uuidv4 } = require('uuid');
+const cookieParser = require('cookie-parser');
+const schedule = require('node-schedule');
 // Add the middleware functions
 // Configura tu transporter de nodemailer (SMTP o servicio)
 const transporter = nodemailer.createTransport({
@@ -64,6 +67,9 @@ const corsOptions = {
   app.use(cors(corsOptions));
 
 app.use(express.json());
+app.use(cookieParser());
+
+const conductorCache = {};
 
 const db = mysql.createConnection(process.env.DATABASE_URL);
 
@@ -168,7 +174,65 @@ app.post('/api/import', authenticateToken, validateApiKey, upload.single('file')
       res.status(500).send('Error al procesar importación');
     }
   });
+  //Registrar eventos
+  async function registrarEvento(conductor, accion, fecha_str, enviarCorreo = true) {
+    try {
+      const sql = `
+        INSERT INTO eventos
+        (nombre_conductor, dni, licencia, vehiculo_modelo, matricula, email,
+         num_seguridad_social, empresa, evento, fecha_hora)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `;
+      const params = [
+        conductor.nombre_conductor,
+        conductor.dni,
+        conductor.licencia,
+        conductor.vehiculo_modelo,
+        conductor.matricula,
+        conductor.email,
+        conductor.num_seguridad_social,
+        conductor.empresa,
+        accion,
+        fecha_str
+      ];
+      
+      await new Promise((resolve, reject) => {
+        db.query(sql, params, (err, result) => {
+          if (err) return reject(err);
+          resolve(result);
+        });
+      });
   
+      if (enviarCorreo) {
+        const mailOptions = {
+          from: 'controldeconductores@wetaximadrid.com',
+          to: conductor.email,
+          subject: `📋 Evento registrado: ${accion.replace(/_/g, ' ').toUpperCase()}`,
+          text: `Hola ${conductor.nombre_conductor},
+  
+  Te informamos que se ha registrado el siguiente evento en tu control horario:
+
+📌 Tipo de acción: ${accion.toUpperCase()}
+🕒 Fecha y hora: ${fecha_str}
+🆔 Licencia: ${licencia}
+🚗 Vehículo: ${conductor.vehiculo_modelo} - ${conductor.matricula}
+🏢 Empresa: ${conductor.empresa}
+
+Este registro quedará guardado como parte de tu jornada laboral.
+Si detectas algún error o consideras que debe realizarse alguna modificación, por favor contacta con el administrador de la aplicación escribiendo a: controldeconductores@wetaximadrid.com con tu Nombre y tu número de licencia.
+En caso de no recibir ninguna notificación por tu parte, se entenderá que el registro es válido y real.
+
+Saludos cordiales,
+Control de Conductores
+www.controldeconductores.com`
+        };
+  
+        await transporter.sendMail(mailOptions);
+      }
+    } catch (err) {
+      console.error('❌ Error al registrar evento:', err);
+    }
+  }
 // Obtener todos los titulares (licencias)
 app.get("/api/licencias", authenticateToken, validateApiKey, (req, res) => {
     db.query("SELECT * FROM licencias", (err, result) => {
@@ -558,247 +622,216 @@ app.post("/api/login-empresa", async (req, res) => {
     }
 });
 
-app.post('/api/login-conductor', async (req, res) => {
-    const { email, dni } = req.body;
-    if (!email || !dni) return res.status(400).json({ message: 'Faltan datos' });
+app.post('/api/login-conductor', (req, res) => {
+  const { email, dni } = req.body;
+  if (!email || !dni) return res.status(400).json({ message: 'Faltan datos' });
 
-    try {
-        // Primero consultamos si el conductor existe, sin filtrar por estado
-        db.query(`SELECT * FROM conductores WHERE email = ? AND dni = ?`, [email, dni], (err, results) => {
-            if (err) {
-                console.error('❌ Error en /login-conductor (verificación de existencia):', err);
-                return res.status(500).json({ message: 'Error interno del servidor' });
-            }
+  db.query(`SELECT * FROM conductores WHERE email = ? AND dni = ?`, [email, dni], (err, results) => {
+      if (err) {
+          console.error('❌ Error en /login-conductor (verificación de existencia):', err);
+          return res.status(500).json({ message: 'Error interno del servidor' });
+      }
 
-            if (results.length === 0) {
-                return res.status(401).json({ message: '❌ Usuario no encontrado' });
-            }
+      if (results.length === 0) {
+          return res.status(401).json({ message: '❌ Usuario no encontrado' });
+      }
 
-            const conductor = results[0];
+      const conductor = results[0];
 
-            if (conductor.estado !== 'activo') {
-                return res.status(403).json({ message: '❌ Usuario dado de baja, no puedes iniciar sesión' });
-            }
+      if (conductor.estado !== 'activo') {
+          return res.status(403).json({ message: '❌ Usuario dado de baja, no puedes iniciar sesión' });
+      }
 
-            // Ahora hacemos la consulta con JOIN porque ya sabemos que el usuario es válido y activo
-            db.query(`
-                SELECT c.nombre_apellidos AS nombre, c.licencia, c.dni, c.email, 
-                       c.numero_seguridad_social, l.marca_modelo AS vehiculo_modelo, 
-                       l.nombre_apellidos AS empresa, l.matricula
-                FROM conductores c
-                JOIN licencias l ON c.licencia = l.licencia
-                WHERE c.email = ? AND c.dni = ?`,
-                [email, dni],
-                (err, rows) => {
-                    if (err) {
-                        console.error('❌ Error en /login-conductor (datos completos):', err);
-                        return res.status(500).json({ message: 'Error interno del servidor' });
-                    }
+      // Consulta completa con JOIN para obtener datos extendidos
+      db.query(`
+          SELECT c.nombre_apellidos AS nombre, c.licencia, c.email, c.dni, c.numero_seguridad_social,
+                 l.marca_modelo AS vehiculo_modelo,
+                 l.nombre_apellidos AS empresa, l.matricula
+          FROM conductores c
+          JOIN licencias l ON c.licencia = l.licencia
+          WHERE c.email = ? AND c.dni = ?
+      `, [email, dni], (err, rows) => {
+          if (err) {
+              console.error('❌ Error en /login-conductor (datos completos):', err);
+              return res.status(500).json({ message: 'Error interno del servidor' });
+          }
 
-                    const token = jwt.sign(
-                        {
-                            email,
-                            isConductor: true,
-                            licencia: rows[0].licencia
-                        },
-                        process.env.JWT_SECRET,
-                        { expiresIn: '24h' }
-                    );
+          if (rows.length === 0) {
+              return res.status(401).json({ message: '❌ Usuario no encontrado' });
+          }
 
-                    rows[0].token = token;
-                    res.json(rows[0]);
-                }
-            );
-        });
-    } catch (e) {
-        console.error('❌ Error en /login-conductor:', e);
-        res.status(500).json({ message: 'Error interno del servidor' });
-    }
+          const usuario = rows[0];
+
+          // Generar tokens UUID para session y csrf (no JWT para session id aquí)
+          const sessionToken = uuidv4();
+          const csrfToken = uuidv4();
+
+          // Guardar en caché info relevante para eventos futuros
+          conductorCache[usuario.licencia] = {
+              nombre_conductor: usuario.nombre,
+              dni: usuario.dni,
+              licencia: usuario.licencia,
+              vehiculo_modelo: usuario.vehiculo_modelo,
+              matricula: usuario.matricula,
+              email: usuario.email,
+              num_seguridad_social: usuario.numero_seguridad_social,
+              empresa: usuario.empresa
+          };
+
+          // Construir usuario sanitizado para respuesta
+          const usuarioSanitizado = {
+              nombre: usuario.nombre,
+              licencia: usuario.licencia,
+              email: usuario.email,
+              vehiculo_modelo: usuario.vehiculo_modelo,
+              empresa: usuario.empresa,
+              matricula: usuario.matricula,
+              token: sessionToken // este token es tipo UUID como en Python, no JWT aquí
+          };
+
+          // Configurar cookies como en Python
+          const secureFlag = process.env.NODE_ENV === 'production';
+
+          res.cookie('session_id', sessionToken, {
+              httpOnly: true,
+              secure: secureFlag,
+              sameSite: 'Lax'
+          });
+          res.cookie('csrf_token', csrfToken, {
+              secure: secureFlag,
+              sameSite: 'Strict'
+          });
+          res.cookie('cookie_consent', 'true', {
+              maxAge: 31536000 * 1000, // 1 año en ms
+              httpOnly: false,
+              secure: secureFlag,
+              sameSite: 'Strict'
+          });
+
+          return res.status(200).json(usuarioSanitizado);
+      });
+  });
 });
 // Registrar evento
-app.post('/api/registrar-fecha', (req, res) => {
-  const { accion, licencia, fecha_hora } = req.body;
-  if (!accion || !licencia) {
+app.post('/api/registrar-fecha', async (req, res) => {
+  const data = req.body;
+  console.log('📥 Datos recibidos:', data);
+
+  const accion = data.accion;
+  const licencia = data.licencia;
+
+  if (!licencia || !accion) {
     return res.status(400).json({ message: 'Faltan datos (licencia o acción)' });
   }
 
-  let fechaLocal;
+  let fecha_utc;
   try {
-    fechaLocal = DateTime.fromISO(fecha_hora, { zone: 'utc' }).setZone('Europe/Madrid');
-  } catch (error) {
+    fecha_utc = DateTime.fromISO(data.fecha_hora, { zone: 'utc' });
+    if (!fecha_utc.isValid) throw new Error('Fecha inválida');
+  } catch {
     return res.status(400).json({ message: 'Formato de fecha inválido' });
   }
 
-  const fechaStr = fechaLocal.toFormat('yyyy-MM-dd HH:mm:ss');
-  const fechaDia = fechaLocal.toISODate();
-  const accionesValidas = ['inicio_jornada', 'fin_jornada', 'inicio_descanso', 'fin_descanso'];
+  // Convertir a zona Madrid
+  const zonaMadrid = 'Europe/Madrid';
+  const fecha_local = fecha_utc.setZone(zonaMadrid);
+  const fecha_str = fecha_local.toFormat('yyyy-MM-dd HH:mm:ss');
 
-  if (!accionesValidas.includes(accion)) {
-    return res.status(400).json({ message: 'Acción no válida' });
+  const conductor = conductorCache.get(licencia);
+  if (!conductor) {
+    return res.status(404).json({ message: 'Conductor no encontrado en caché' });
   }
 
-  const validar = async () => {
-    try {
-      if (accion === 'inicio_jornada') {
-        // Esperar 2 horas tras último fin_jornada
-        const [ultimaFin] = await db.promise().query(`
-          SELECT fecha_hora FROM eventos
-          WHERE licencia = ? AND evento = 'fin_jornada'
-          ORDER BY fecha_hora DESC LIMIT 1
-        `, [licencia]);
+  // Consultas a base de datos: convertimos consultas sincronas a async con Promises
+  function queryAsync(sql, params) {
+    return new Promise((resolve, reject) => {
+      db.query(sql, params, (err, results) => {
+        if (err) reject(err);
+        else resolve(results);
+      });
+    });
+  }
 
-        if (ultimaFin.length > 0) {
-          const ultimaFinDate = DateTime.fromJSDate(ultimaFin[0].fecha_hora).setZone('Europe/Madrid');
-          const diff = fechaLocal.diff(ultimaFinDate, 'hours').hours;
-          if (diff < 2) {
-            return res.status(400).json({ message: `⛔ Debes esperar al menos 2 horas desde el último fin de jornada.` });
-          }
-        }
+  try {
+    if (accion === 'inicio_jornada') {
+      const ultimoFin = await queryAsync(`
+        SELECT fecha_hora FROM eventos
+        WHERE licencia = ? AND evento = 'fin_jornada'
+        ORDER BY fecha_hora DESC
+        LIMIT 1
+      `, [licencia]);
 
-        // Solo un inicio_jornada por día
-        const [inicioHoy] = await db.promise().query(`
-          SELECT COUNT(*) AS total FROM eventos
-          WHERE licencia = ? AND evento = 'inicio_jornada' AND DATE(fecha_hora) = ?
-        `, [licencia, fechaDia]);
-        if (inicioHoy[0].total > 0) {
-          return res.status(400).json({ message: "⚠️ Ya registraste un inicio de jornada hoy." });
-        }
-      }
-
-      if (accion === 'fin_jornada') {
-        const [finHoy] = await db.promise().query(`
-          SELECT COUNT(*) AS total FROM eventos
-          WHERE licencia = ? AND evento = 'fin_jornada' AND DATE(fecha_hora) = ?
-        `, [licencia, fechaDia]);
-        if (finHoy[0].total > 0) {
-          return res.status(400).json({ message: "⚠️ Ya registraste un fin de jornada hoy." });
+      if (ultimoFin.length > 0) {
+        const ultimaFecha = DateTime.fromJSDate(ultimoFin[0].fecha_hora, { zone: 'utc' });
+        const diff = fecha_utc.diff(ultimaFecha, 'minutes').minutes;
+        if (diff < 2) {
+          return res.status(429).json({ message: 'Debes esperar al menos 2 minutos después de finalizar la jornada para iniciar una nueva.' });
         }
       }
+    }
 
-      // Evitar duplicados en el mismo segundo
-      const [dupes] = await db.promise().query(`
-        SELECT COUNT(*) AS total FROM eventos 
-        WHERE licencia = ? AND evento = ? AND ABS(TIMESTAMPDIFF(SECOND, fecha_hora, ?)) <= 1
-      `, [licencia, accion, fechaStr]);
-      if (dupes[0].total > 0) {
-        return res.status(400).json({ message: `⚠️ Ya registraste '${accion}' en este momento.` });
-      }
+    if (accion === 'inicio_descanso' || accion === 'fin_descanso') {
+      const ultimoEvento = await queryAsync(`
+        SELECT evento FROM eventos
+        WHERE licencia = ?
+        ORDER BY fecha_hora DESC
+        LIMIT 1
+      `, [licencia]);
 
       if (accion === 'inicio_descanso') {
-        const [hayJornada] = await db.promise().query(`
-          SELECT COUNT(*) AS total FROM eventos
-          WHERE licencia = ? AND evento = 'inicio_jornada' AND DATE(fecha_hora) = ?
-        `, [licencia, fechaDia]);
-        if (hayJornada[0].total === 0) {
-          return res.status(400).json({ message: "⛔ No puedes iniciar un descanso sin iniciar jornada." });
+        if (ultimoEvento.length > 0 && ultimoEvento[0].evento === 'inicio_descanso') {
+          return res.status(400).json({ message: 'No se puede registrar un nuevo inicio de descanso sin finalizar el anterior.' });
         }
       }
 
       if (accion === 'fin_descanso') {
-        const [hayInicio] = await db.promise().query(`
-          SELECT COUNT(*) AS total FROM eventos
-          WHERE licencia = ? AND evento = 'inicio_descanso' AND DATE(fecha_hora) = ?
-        `, [licencia, fechaDia]);
-        if (hayInicio[0].total === 0) {
-          return res.status(400).json({ message: "⛔ No puedes finalizar un descanso sin haberlo iniciado." });
+        if (ultimoEvento.length === 0 || ultimoEvento[0].evento !== 'inicio_descanso') {
+          return res.status(400).json({ message: 'No se puede finalizar el descanso sin haberlo iniciado.' });
         }
       }
-
-      if (accion === 'fin_jornada') {
-        const [inicioDesc] = await db.promise().query(`
-          SELECT COUNT(*) AS total FROM eventos
-          WHERE licencia = ? AND evento = 'inicio_descanso' AND DATE(fecha_hora) = ?
-        `, [licencia, fechaDia]);
-
-        if (inicioDesc[0].total > 0) {
-          const [finDesc] = await db.promise().query(`
-            SELECT COUNT(*) AS total FROM eventos
-            WHERE licencia = ? AND evento = 'fin_descanso' AND DATE(fecha_hora) = ?
-          `, [licencia, fechaDia]);
-
-          if (finDesc[0].total === 0) {
-            return res.status(400).json({ message: "⛔ No puedes finalizar la jornada si no finalizaste el descanso iniciado." });
-          }
-        }
-      }
-
-      // Obtener info del conductor
-      const [conductorRows] = await db.promise().query(`
-        SELECT c.nombre_apellidos AS nombre_conductor, c.dni, c.licencia, 
-               l.marca_modelo AS vehiculo_modelo, l.matricula, 
-               c.email, c.numero_seguridad_social AS num_seguridad_social, 
-               l.nombre_apellidos AS empresa
-        FROM conductores c
-        JOIN licencias l ON c.licencia = l.licencia
-        WHERE c.licencia = ?
-      `, [licencia]);
-
-      if (conductorRows.length === 0) {
-        return res.status(404).json({ message: 'Conductor no encontrado' });
-      }
-
-      const conductor = conductorRows[0];
-
-      // Insertar evento
-      await db.promise().query(`
-        INSERT INTO eventos 
-        (nombre_conductor, dni, licencia, vehiculo_modelo, matricula, email, 
-         num_seguridad_social, empresa, evento, fecha_hora)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-      `, [
-        conductor.nombre_conductor,
-        conductor.dni,
-        conductor.licencia,
-        conductor.vehiculo_modelo,
-        conductor.matricula,
-        conductor.email,
-        conductor.num_seguridad_social,
-        conductor.empresa,
-        accion,
-        fechaStr
-      ]);
-
-      // Email
-      const mailOptions = {
-        from: 'controldeconductores@wetaximadrid.com',
-        to: conductor.email,
-        subject: `📋 Evento registrado: ${accion.replace('_', ' ').toUpperCase()}`,
-        text: `Hola ${conductor.nombre_conductor},
-
-Te informamos que se ha registrado el siguiente evento en tu control horario:
-
-📌 Tipo de acción: ${accion.toUpperCase()}
-🕒 Fecha y hora: ${fechaStr}
-🆔 Licencia: ${licencia}
-🚗 Vehículo: ${conductor.vehiculo_modelo} - ${conductor.matricula}
-🏢 Empresa: ${conductor.empresa}
-
-Este registro quedará guardado como parte de tu jornada laboral.
-Si detectas algún error o consideras que debe realizarse alguna modificación, por favor contacta con el administrador de la aplicación escribiendo a: controldeconductores@wetaximadrid.com con tu Nombre y tu número de licencia.
-En caso de no recibir ninguna notificación por tu parte, se entenderá que el registro es válido y real.
-
-Saludos cordiales,
-Control de Conductores
-www.controldeconductores.com`
-      };
-
-      transporter.sendMail(mailOptions, (error, info) => {
-        if (error) {
-          console.error("❌ Error al enviar correo:", error);
-        } else {
-          console.log(`📧 Correo enviado con éxito al destinatario por '${accion}'`);
-        }
-      });
-
-      res.status(200).json({ message: `✅ Evento "${accion}" registrado a las ${fechaStr}` });
-
-    } catch (err) {
-      console.error("❌ Error en /api/registrar-fecha:", err);
-      res.status(500).json({ message: 'Error interno del servidor' });
     }
-  };
 
-  validar();
+    // Registrar evento en base de datos y enviar correo
+    await registrarEvento(conductor, accion, fecha_str);
+
+    // Si es inicio_jornada, programar eventos futuros
+    if (accion === 'inicio_jornada') {
+      const datosConductor = { ...conductor };
+
+      const tiempos = [
+        ["inicio_descanso", 120],
+        ["fin_descanso", 240],
+        ["inicio_descanso", 360],
+        ["fin_descanso", 480],
+        ["inicio_descanso", 600],
+        ["fin_descanso", 720],
+        ["fin_jornada", 840]
+      ];
+
+      // Fecha base en UTC
+      const fechaBase = fecha_utc;
+
+      tiempos.forEach(([nombreEvento, minutos]) => {
+        // Sumar minutos y convertir a zona Madrid
+        const fechaEvento = fechaBase.plus({ minutes: minutos }).setZone(zonaMadrid);
+        const fechaEventoStr = fechaEvento.toFormat('yyyy-MM-dd HH:mm:ss');
+
+        // Programar tarea con node-schedule para que se ejecute a la fecha exacta
+        schedule.scheduleJob(fechaEvento.toJSDate(), async () => {
+          console.log(`⏱ Ejecutando evento automático: ${nombreEvento} con fecha registrada: ${fechaEventoStr}`);
+          await registrarEvento(datosConductor, nombreEvento, fechaEventoStr, true);
+        });
+
+        console.log(`📅 Evento automático '${nombreEvento}' agendado para: ${fechaEvento.toISO()}`);
+      });
+    }
+
+    return res.json({ message: `✅ Evento "${accion}" registrado a las ${fecha_str}` });
+
+  } catch (e) {
+    console.error('❌ Error en /api/registrar-fecha:', e);
+    return res.status(500).json({ message: 'Error interno del servidor' });
+  }
 });
  // Enviar correo
 app.post('/api/send-email', async (req, res) => {
