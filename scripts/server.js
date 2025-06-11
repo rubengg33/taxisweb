@@ -736,11 +736,27 @@ app.post('/api/registrar-fecha', async (req, res) => {
   const fecha_local = fecha_utc.setZone(zonaMadrid);
   const fecha_str = fecha_local.toFormat('yyyy-MM-dd HH:mm:ss');
 
-  const conductor = conductorCache.get(licencia);
-  if (!conductor) {
-    return res.status(404).json({ message: 'Conductor no encontrado en caché' });
-  }
+  let conductor = conductorCache.get(licencia);
 
+  if (!conductor) {
+    // Si la acción es inicio_jornada, lo cargamos de la base de datos
+    if (accion === 'inicio_jornada') {
+      const resultado = await queryAsync(`
+        SELECT nombre_conductor, dni, licencia, vehiculo_modelo, matricula, email, num_seguridad_social, empresa
+        FROM conductores
+        WHERE licencia = ?
+      `, [licencia]);
+  
+      if (resultado.length === 0) {
+        return res.status(404).json({ message: 'Conductor no encontrado en la base de datos' });
+      }
+  
+      conductor = resultado[0];
+      conductorCache.set(licencia, conductor); // Ahora sí, lo guardamos en caché
+    } else {
+      return res.status(404).json({ message: 'Conductor no encontrado en caché. Debes iniciar jornada primero.' });
+    }
+  }
   // Consultas a base de datos: convertimos consultas sincronas a async con Promises
   function queryAsync(sql, params) {
     return new Promise((resolve, reject) => {
