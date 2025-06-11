@@ -14,7 +14,7 @@ async function sendPasswordResetEmail(email, resetToken) {
     const mailOptions = {
         from: process.env.EMAIL_USER,
         to: email,
-        subject: 'Restablecer contraseña - TaxiGest',
+        subject: 'Restablecer contraseña - www.controldeconductores.com',
         html: `
             <h1>Restablecer su contraseña</h1>
             <p>Ha solicitado restablecer su contraseña.</p>
