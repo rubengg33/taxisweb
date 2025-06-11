@@ -666,16 +666,16 @@ app.post('/api/login-conductor', (req, res) => {
           const csrfToken = uuidv4();
 
           // Guardar en caché info relevante para eventos futuros
-          conductorCache[usuario.licencia] = {
-              nombre_conductor: usuario.nombre,
-              dni: usuario.dni,
-              licencia: usuario.licencia,
-              vehiculo_modelo: usuario.vehiculo_modelo,
-              matricula: usuario.matricula,
-              email: usuario.email,
-              num_seguridad_social: usuario.numero_seguridad_social,
-              empresa: usuario.empresa
-          };
+          conductorCache.set(usuario.licencia, {
+            nombre_conductor: usuario.nombre,
+            dni: usuario.dni,
+            licencia: usuario.licencia,
+            vehiculo_modelo: usuario.vehiculo_modelo,
+            matricula: usuario.matricula,
+            email: usuario.email,
+            num_seguridad_social: usuario.numero_seguridad_social,
+            empresa: usuario.empresa
+          });
 
           // Construir usuario sanitizado para respuesta
           const usuarioSanitizado = {
