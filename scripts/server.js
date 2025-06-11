@@ -69,8 +69,7 @@ const corsOptions = {
 app.use(express.json());
 app.use(cookieParser());
 
-const conductorCache = {};
-
+const conductorCache = new Map();
 const db = mysql.createConnection(process.env.DATABASE_URL);
 
 db.connect(err => {
