@@ -213,7 +213,7 @@ app.post('/api/import', authenticateToken, validateApiKey, upload.single('file')
 
 📌 Tipo de acción: ${accion.toUpperCase()}
 🕒 Fecha y hora: ${fecha_str}
-🆔 Licencia: ${licencia}
+🆔 Licencia: ${conductor.licencia}
 🚗 Vehículo: ${conductor.vehiculo_modelo} - ${conductor.matricula}
 🏢 Empresa: ${conductor.empresa}
 
