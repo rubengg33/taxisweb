@@ -742,9 +742,18 @@ app.post('/api/registrar-fecha', async (req, res) => {
     // Si la acción es inicio_jornada, lo cargamos de la base de datos
     if (accion === 'inicio_jornada') {
       const resultado = await queryAsync(`
-        SELECT nombre_conductor, dni, licencia, vehiculo_modelo, matricula, email, num_seguridad_social, empresa
-        FROM conductores
-        WHERE licencia = ?
+        SELECT 
+          c.nombre_apellidos AS nombre_conductor,
+          c.dni,
+          c.licencia,
+          l.marca_modelo AS vehiculo_modelo,
+          l.matricula,
+          c.email,
+          c.numero_seguridad_social AS num_seguridad_social,
+          l.nombre_apellidos AS empresa
+        FROM conductores c
+        JOIN licencias l ON c.licencia = l.licencia
+        WHERE c.licencia = ?
       `, [licencia]);
   
       if (resultado.length === 0) {
