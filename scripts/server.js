@@ -23,7 +23,7 @@ const transporter = nodemailer.createTransport({
     secure: false,
     auth: {
       user: 'controldeconductores@wetaximadrid.com',
-      pass: 'lsqz yyta xlwo hpms'
+      pass: 'yeie ekyb lrto czhn'
     }
   });
   
