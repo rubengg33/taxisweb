@@ -791,7 +791,7 @@
                         });
 
                         if (response.status === 401) {
-                            // Token expired or invalid
+                            // Token expirado, redirigir al login
                             window.location.href = '/login.html';
                             return;
                         }
@@ -834,7 +834,7 @@
                     try {
                         const apiTipo = tipo === 'licencias' ? 'licencias' : 'conductores';
                         const response = await fetch(`${API_URL}/${apiTipo}/${id}`, {
-                            headers: getAuthHeaders() // Add authentication headers
+                            headers: getAuthHeaders()
                         });
 
                         if (!response.ok) {
@@ -858,7 +858,7 @@
                         const apiTipo = tipo === 'licencias' ? 'licencias' : 'conductores';
                         const response = await fetch(`${API_URL}/${apiTipo}/${id}`, {
                             method: "DELETE",
-                            headers: getAuthHeaders() // Add authentication headers
+                            headers: getAuthHeaders() 
                         });
 
                         if (!response.ok) {
