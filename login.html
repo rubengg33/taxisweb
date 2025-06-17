@@ -305,7 +305,7 @@
                     }
                 }
 
-                // Update your existing error handling to use SweetAlert
+                // boton y función de login
                 document.getElementById("loginForm").addEventListener("submit", async function (event) {
                     event.preventDefault();
                     const email = document.getElementById("email").value;
@@ -323,7 +323,7 @@
                         if (data.exists && data.admin) {
                             localStorage.setItem("userEmail", email);
                             localStorage.setItem("isAdmin", data.admin);
-                            // Store the JWT token
+                            // Almacena el JWT token
                             localStorage.setItem("token", data.token); // The server should return this token
 
                             await Swal.fire({
@@ -402,12 +402,13 @@
 </html>
 
 <script>
-    // Add these functions to your existing script
+    // Mostrar el formulario de restablecimiento de contraseña
     function showResetPasswordForm() {
         document.getElementById('loginForm').classList.add('hidden');
         document.getElementById('resetPasswordForm').classList.remove('hidden');
     }
 
+    // Mostrar el formulario de inicio de sesión
     function showLoginForm() {
         document.getElementById('resetPasswordForm').classList.add('hidden');
         document.getElementById('loginForm').classList.remove('hidden');

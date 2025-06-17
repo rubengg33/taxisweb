@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script>
-        // Check authentication immediately before anything else loads
+        // Comprobar autenticación inmediatamente antes de cargar el resto de la página
         if (localStorage.getItem("token") &&
             localStorage.getItem("empresaEmail") &&
             localStorage.getItem("isEmpresa") === "true") {
@@ -32,10 +32,10 @@
             }
             return false;
         }
-        // Check immediately when the script loads
+        // Comprobar autenticación inmediatamente al cargar la página
         checkAuthAndRedirect();
 
-        // Also check when the document is fully loaded
+        // Tambien comprobar cuando el contenido del documento se haya cargado
         document.addEventListener('DOMContentLoaded', function () {
             checkAuthAndRedirect();
         });
@@ -53,7 +53,7 @@
 
         @layer utilities {
 
-            /* Force white text for autofilled inputs */
+            /* Forzar texto blanco para el autocompletado de los campos */
             input:-webkit-autofill,
             input:-webkit-autofill:hover,
             input:-webkit-autofill:focus,
@@ -65,13 +65,12 @@
                 background-clip: content-box !important;
             }
 
-            /* Additional styles for Firefox and other browsers */
+            /*Estilos adicionales para el autocompletado de los campos */
             input.input-autofill {
                 background-color: black !important;
                 color: white !important;
             }
 
-            /* Remove menulist button appearance */
             input:-webkit-autofill {
                 -webkit-appearance: none;
                 appearance: none;
@@ -178,7 +177,7 @@
 <body>
 
     <body class="bg-[#0f172a] min-h-screen">
-        <!-- Add navbar -->
+        <!-- Navbar -->
         <nav class="fixed top-0 w-full z-50 bg-gradient-to-r from-gray-900 to-gray-800 shadow-lg">
             <div class="w-full">
                 <div class="flex justify-between items-center h-16 ml-8">
@@ -218,7 +217,7 @@
                 </div>
             </div>
         </nav>
-        <!-- Updated login container -->
+        <!-- Actualizado login container -->
         <div class="flex items-center justify-center min-h-[calc(100vh-4rem)]">
             <div class="w-[19rem] p-6 flex flex-col gap-4 rounded-2xl animated-border
             shadow-[0_0_20px_2px_rgba(34,211,238,0.3)]">
@@ -340,8 +339,7 @@
                 }
             }
 
-            // Add the login form handler
-            // First, add the showAlert function at the top of your script section
+            // Alerts Bonitos
             function showAlert(message, type = 'info') {
                 return Swal.fire({
                     text: message,
@@ -352,7 +350,7 @@
                 });
             }
 
-            // Then update the login handler
+            // boton y funcion de login
             document.getElementById('loginForm').addEventListener('submit', async function (e) {
                 e.preventDefault();
                 const email = document.getElementById('email').value;
@@ -375,7 +373,7 @@
                         return;
                     }
 
-                    // If not admin, try empresa login
+                    // Si no es admin, intenta iniciar sesión como empresa
                     const empresaResponse = await fetch(`${API_URL}/login-empresa`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },

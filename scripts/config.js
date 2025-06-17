@@ -1,16 +1,16 @@
 // Define la URL base
-let API_URL = "https://taxisweb.onrender.com/api";  // URL completa del backend
+let API_URL = "http://localhost:3000/api";  // URL completa del backend
 
-fetch(`${API_URL}/config`)
+fetch(`${API_URL}/config`, {
+    credentials: 'include'
+  })
   .then(res => res.json())
   .then(config => {
-    const backendAPIUrl = config.apiUrl; // Usamos una variable diferente para almacenar la URL
-    console.log("API URL cargada:", backendAPIUrl);
-    // Aquí puedes hacer lo que necesites con backendAPIUrl
+    console.log("API URL cargada:", config.apiUrl);
   })
   .catch(err => console.error("Error cargando API_URL:", err));
 
-// Helper function to add authentication headers
+// Funcion para obtener los headers de autenticacion
 function getAuthHeaders() {
     const token = localStorage.getItem('token');
     return {

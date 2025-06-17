@@ -3,7 +3,8 @@ const mysql = require("mysql2");
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken'); // Add this line
-require("dotenv").config();
+const path = require('path');
+require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 const cors = require("cors");
 const { DateTime } = require("luxon");
 const nodemailer = require('nodemailer');
@@ -11,11 +12,9 @@ const { sendPasswordResetEmail } = require('../utils/emailService');
 const multer = require('multer'); 
 const csv = require('csv-parser');
 const fs = require('fs');
-const path = require('path');
 const { v4: uuidv4 } = require('uuid');
 const cookieParser = require('cookie-parser');
 const schedule = require('node-schedule');
-// Add the middleware functions
 // Configura tu transporter de nodemailer (SMTP o servicio)
 const transporter = nodemailer.createTransport({
     host: 'smtp.gmail.com',
@@ -52,16 +51,17 @@ const validateApiKey = (req, res, next) => {
     next();
 };
 const app = express();
+app.use(express.static(path.join(__dirname, '..')));
 const upload = multer({ dest: path.join(__dirname, 'uploads/') });
 
 
 // Configuración de CORS
 const corsOptions = {
-    origin: process.env.FRONTEND_URL, // Esto usará 'https://controldeconductores.com'
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'x-api-key'],
-    credentials: true
-  };
+  origin: ['http://localhost:5500', 'http://127.0.0.1:5500'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'x-api-key'],
+  credentials: true
+};
   
   // Aplicar CORS como middleware
   app.use(cors(corsOptions));
@@ -70,7 +70,13 @@ app.use(express.json());
 app.use(cookieParser());
 
 const conductorCache = new Map();
-const db = mysql.createConnection(process.env.DATABASE_URL);
+const db = mysql.createConnection({
+  host: process.env.DB_HOST || 'localhost',
+  user: process.env.DB_USER || 'root',
+  password: process.env.DB_PASSWORD || '1234',
+  database: process.env.DB_NAME || 'taxislocal',
+  port: process.env.DB_PORT || 3306
+});
 
 db.connect(err => {
     if (err) {
@@ -83,10 +89,14 @@ db.connect(err => {
 app.get("/", (req, res) => {
     res.send("¡El servidor está funcionando correctamente!");
 });
-
+app.use((req, res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.url} desde: ${req.headers.origin || 'sin origin'}`);
+  next();
+});
 // Backend (Node.js)
 app.get("/api/config", (req, res) => {
-    res.json({ apiUrl: process.env.API_URL });
+  console.log("Se llamó /api/config desde:", req.headers.origin);
+  res.json({ apiUrl: process.env.API_URL });
 });
 
 app.post('/api/import', authenticateToken, validateApiKey, upload.single('file'), async (req, res) => {
@@ -317,7 +327,7 @@ app.get("/api/conductores", authenticateToken, validateApiKey, (req, res) => {
     });
 });
 
-// Add this new endpoint after your other licencias endpoints
+//Obtener la informacion de la empresa
 app.get("/api/licencias/empresa/:licencia", authenticateToken, validateApiKey, (req, res) => {
     const licencia = req.params.licencia;
     db.query("SELECT * FROM licencias WHERE licencia = ?", [licencia], (err, result) => {
@@ -332,7 +342,6 @@ app.get("/api/licencias/empresa/:licencia", authenticateToken, validateApiKey, (
     });
 });
 
-// Add this new endpoint for getting all conductors (protected with authentication)
 app.get('/api/conductores/all', authenticateToken, validateApiKey, async (req, res) => {
     try {
         const query = `
@@ -349,7 +358,7 @@ app.get('/api/conductores/all', authenticateToken, validateApiKey, async (req, r
     }
 });
 
-// Add this new endpoint for getting conductor by DNI (place it before the /api/conductores/:id endpoint)
+//Obtener conductor por DNI
 app.get("/api/conductores/dni/:dni", authenticateToken, async (req, res) => {
     try {
         const dni = req.params.dni;
@@ -381,8 +390,7 @@ app.get("/api/conductores/dni/:dni", authenticateToken, async (req, res) => {
         res.status(500).json({ message: "Error interno del servidor" });
     }
 });
-// Keep existing /api/conductores/:id endpoint as is
-// También proteger las demás rutas de conductores
+// Obtener conductor por id
 app.get("/api/conductores/:id", authenticateToken, validateApiKey, (req, res) => {
     const id = req.params.id;
     db.query("SELECT * FROM conductores WHERE id = ?", [id], (err, result) => {
@@ -459,7 +467,8 @@ app.delete("/api/conductores/:id", (req, res) => {
 app.post("/api/logout", (req, res) => {
     res.json({ message: "Sesión cerrada correctamente" });
 });
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 3000; // 5500 es el puerto por defecto si no hay variable de entorno
+
 app.listen(PORT, () => {
     console.log(`Servidor ejecutándose en http://localhost:${PORT} 🚀`);
 });
@@ -503,11 +512,11 @@ app.get("/api/conductores/buscar/:termino", authenticateToken, validateApiKey, (
 });
 
 
-// Modified login endpoint
+// endpoint de login
 app.post("/api/login", async (req, res) => {
     const { email, password } = req.body;
 
-    // Check if admin
+    // Comprobar si el usuario existe en la tabla admins
     const [admins] = await db.promise().query('SELECT * FROM admins WHERE email = ?', [email]);
     if (admins.length > 0) {
         const isValidPassword = await bcrypt.compare(password, admins[0].password);
@@ -518,7 +527,7 @@ app.post("/api/login", async (req, res) => {
     }
       return res.json({ exists: false });
 });
-// Update the eventos endpoint
+//Mirar los eventos de un conductor segun su licencia
 app.get('/api/eventos/:licencia?', authenticateToken, async (req, res) => {
     try {
         const licencia = req.params.licencia;
@@ -575,12 +584,12 @@ app.get('/api/eventos/detalles/:licencia', async (req, res) => {
     }
 });
 
-// Login endpoint for empresa
+// endpoint para login de empresas
 app.post("/api/login-empresa", async (req, res) => {
     const { email, dni } = req.body;
 
     try {
-        // Check if the email and DNI exist in licencias table
+        // Comprobar si el email y el DNI existen en la tabla licencias
         const query = "SELECT * FROM licencias WHERE EMAIL = ? AND DNI = ?";
         db.query(query, [email, dni], (err, result) => {
             if (err) {
@@ -589,7 +598,7 @@ app.post("/api/login-empresa", async (req, res) => {
             }
             
             if (result.length > 0) {
-                // Create JWT token for empresa
+                // Crear JWT para la empresa
                 const token = jwt.sign(
                     { 
                         email, 
@@ -620,7 +629,7 @@ app.post("/api/login-empresa", async (req, res) => {
         return res.status(500).json({ error: "Error en el servidor" });
     }
 });
-
+// endpoint para login de conductores
 app.post('/api/login-conductor', (req, res) => {
   const { email, dni } = req.body;
   if (!email || !dni) return res.status(400).json({ message: 'Faltan datos' });
@@ -881,7 +890,7 @@ app.post('/api/send-email', async (req, res) => {
       res.status(500).json({ message: 'Error al enviar correo' });
     }
   }); 
-// Password reset request endpoint
+// endpoint para Solicitar cambio de contraseña
 app.post("/api/request-password-reset", async (req, res) => {
     const { email } = req.body;
     
@@ -908,7 +917,7 @@ app.post("/api/request-password-reset", async (req, res) => {
     }
 });
 
-// Password reset endpoint
+// endpoint para restablecer contraseña
 app.post("/api/reset-password", async (req, res) => {
     const { email, token, newPassword } = req.body;
 
@@ -939,6 +948,7 @@ app.post("/api/reset-password", async (req, res) => {
         res.status(500).json({ message: "Error al actualizar la contraseña" });
     }
 });
+//endpoint para recuperar correo por si lo olvidaste
 app.post('/api/recuperar-correo', (req, res) => {
   const { dni, licencia } = req.body;
   console.log('Petición /api/recuperar-correo recibida con:', { dni, licencia });
@@ -992,7 +1002,7 @@ app.get('/api/conductor/:licencia', (req, res) => {
   });
   
   
-// Update the conductores by licencia endpoint
+// Actualizar los conductores por licencia
 app.get("/api/conductores/licencia/:licencia", authenticateToken, async (req, res) => {
     try {
         const licencia = req.params.licencia;
@@ -1022,7 +1032,7 @@ app.get("/api/conductores/licencia/:licencia", authenticateToken, async (req, re
     }
 });
 
-// Add this new endpoint to get a single conductor by DNI
+// Obtener info del conductor por DNI
 app.get("/api/conductores/:dni", authenticateToken, async (req, res) => {
     try {
         const dni = req.params.dni;

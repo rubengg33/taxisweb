@@ -252,7 +252,7 @@
           fecha_hora: ev.fecha_hora || '-'
         }));
 
-        // Apply filters
+        // Applicar filtros
         eventosMostrados = eventosMostrados.filter(ev => {
           const fechaEvento = new Date(ev.fecha_hora);
           const fechaDesde = document.getElementById("fechaInicio").value;
@@ -268,7 +268,7 @@
           return filtraTipo && filtraFecha;
         });
 
-        // Update display
+        // Actualizar la lista de eventos
         const lista = document.getElementById("listaEventos");
         lista.innerHTML = "";
 
@@ -297,7 +297,7 @@
       window.location.href = "empresa.html";
     }
 
-    // Update the exportarCSV function to match exact database field names
+    // Actualizar exportarCSV para coincidir con el formato de la base de datos
     function exportarCSV(eventos) {
       if (!eventos.length) {
         showAlert("No hay eventos para exportar.", "warning");
@@ -338,10 +338,10 @@
         columnas.map(col => {
           let value = ev[col];
 
-          // Format specific fields
+          // Formatear campos especificos
           if (col === 'fecha_hora' && value) {
             const date = new Date(value);
-            // Format date as DD/MM/YYYY HH:mm:ss
+            // formato de DD/MM/YYYY HH:mm:ss
             value = date.toLocaleString('es-ES', {
               day: '2-digit',
               month: '2-digit',
@@ -351,11 +351,11 @@
               second: '2-digit'
             });
           } else if (col === 'licencia' && value) {
-            // Pad licencia with leading zeros to maintain 5 digits
+            // Pad licencia con ceros a la izquierda para tener 5 dígitos
             value = value.padStart(5, '0');
           }
 
-          // Handle all fields
+          // Manejar todos los campos
           return `"${(value || '-').toString().replace(/"/g, '""')}"`;
         }).join(separador)
       );

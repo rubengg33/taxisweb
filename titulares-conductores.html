@@ -181,18 +181,16 @@
 </head>
 
 <body class="bg-gradient-to-br from-purple-600 via-indigo-500 to-sky-400 min-h-screen">
-    <!-- Add content-hidden class to the main content -->
     <div id="mainContent" class="content-hidden">
-        <!-- Your entire content (nav, tables, etc) goes here -->
+        <!-- Contenido Principal-->
     </div>
 
-    <!-- Add a loading state -->
+    <!-- Animación de carga -->
     <div id="loadingState" class="flex items-center justify-center min-h-screen">
         <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-white"></div>
     </div>
 
     <!-- Navbar con nuevos colores -->
-    <!-- Navbar structure update -->
     <nav class="fixed top-0 w-full z-50 bg-gradient-to-r from-gray-900 to-gray-800 shadow-lg">
         <div class="w-full">
             <div class="flex justify-between items-center h-16 ml-8">
@@ -479,7 +477,7 @@
                         forceWhiteColor(input);
                     });
                 }
-                // Add these helper functions at the beginning of your script
+                // Alerts Bonitos
                 function showAlert(message, type = 'info') {
                     return Swal.fire({
                         text: message,
@@ -562,7 +560,7 @@
                         buscar('conductores');
                     }
                 });
-                // Replace logout alert
+                // Cerrar Sesión
                 document.getElementById("logoutButton").addEventListener("click", async () => {
                     try {
                         const response = await fetch(`${API_URL}/logout`, {
@@ -742,7 +740,7 @@
                     try {
                         const response = await fetch(url, {
                             method: id ? "PUT" : "POST",
-                            headers: getAuthHeaders(), // Replace the existing headers with getAuthHeaders
+                            headers: getAuthHeaders(),
                             body: JSON.stringify(datos)
                         });
 
@@ -789,7 +787,7 @@
                     console.log("Cargando datos con URL:", url, "en la tabla:", tablaId);
                     try {
                         const response = await fetch(url, {
-                            headers: getAuthHeaders() // Add authentication headers
+                            headers: getAuthHeaders() // Headers de Autenticación
                         });
 
                         if (response.status === 401) {

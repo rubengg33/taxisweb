@@ -11,7 +11,7 @@
         const isEmpresa = localStorage.getItem("isEmpresa");
         const isAdmin = localStorage.getItem("isAdmin");
 
-        // Modified check to handle both admin and empresa cases
+        // Comprueba si el usuario es admin o es empresa
         if (!token || (!isAdmin && !isEmpresa)) {
             window.location.replace("login-empresa.html");
         }
@@ -79,7 +79,7 @@
 </head>
 
 <body class="bg-gradient-to-br from-purple-600 via-indigo-500 to-sky-400 min-h-screen">
-    <!-- Navbar stays at the top -->
+    <!-- Navbar Al inicio -->
     <nav class="fixed top-0 w-full z-50 bg-gradient-to-r from-gray-900 to-gray-800 shadow-lg">
         <div class="w-full">
             <div class="flex justify-between items-center h-16 ml-8">
@@ -120,11 +120,9 @@
         </div>
     </nav>
 
-    <!-- Main content wrapper -->
+    <!-- Div de Contenido Principal -->
     <div class="container mx-auto px-4 py-6">
-        <!-- Welcome section -->
-        <!-- Welcome section -->
-        <!-- Welcome section -->
+        <!-- Seccion de Bienvenida -->
         <div class="bg-gray-900 rounded-lg shadow-xl p-6 md:p-8 mb-8 welcome-section hidden">
             <div class="text-center">
                 <h1 id="bienvenidaTitulo" class="text-2xl md:text-3xl font-bold text-white mb-2">Bienvenido</h1>
@@ -145,7 +143,7 @@
                 <option value="">Seleccione una licencia...</option>
             </select>
         </div>
-        <!-- Conductor Selector Section -->
+        <!-- Seccion de Selección de Conductor -->
         <div class="bg-gray-900 rounded-lg shadow-xl p-6 md:p-8 mb-8">
             <div class="text-center mb-4">
                 <h3 class="text-xl text-white font-semibold">Seleccionar Conductor</h3>
@@ -155,7 +153,7 @@
                     class="w-full md:w-2/3 p-3 rounded-lg bg-gray-800 text-white border border-gray-700 focus:border-sky-400 focus:ring focus:ring-sky-400 focus:ring-opacity-50">
                     <option value="">Seleccione un conductor...</option>
                 </select>
-                <!-- Conductor Info Card -->
+                <!-- Card con información del conductor -->
                 <div id="conductorInfo"
                     class="hidden w-full md:w-2/3 bg-gray-800 rounded-lg p-4 border border-gray-700">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-gray-300">
@@ -187,7 +185,7 @@
                 }
 
                 try {
-                    // Get conductor data from the API
+                    // Consigue los datos del conductor por su DNI
                     const conductorResponse = await fetch(`${API_URL}/conductores/dni/${conductorSelect.value}`, {
                         headers: getAuthHeaders()
                     });
@@ -195,7 +193,7 @@
                     if (conductorResponse.ok) {
                         const conductor = await conductorResponse.json();
 
-                        // Store complete conductor data
+                        // Guardar los datos del conductor en localStorage
                         localStorage.setItem('selectedConductor', JSON.stringify({
                             nombre_apellidos: conductor.nombre_apellidos,
                             dni: conductor.dni,
@@ -263,15 +261,13 @@
             </div>
         </div>
     </div>
-
-    <!-- Loading state - Modified to be hidden by default -->
+    
     <div id="loadingState" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
         <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-white"></div>
     </div>
 
-    <!-- Update the script to properly handle loading state -->
     <script>
-        // Update the DOMContentLoaded event handler
+        
         document.addEventListener('DOMContentLoaded', async function () {
             const titulo = document.getElementById('bienvenidaTitulo');
             const isAdmin = localStorage.getItem("isAdmin") === "true";
@@ -330,8 +326,7 @@
 
         });
 
-        // Update loadConductores to only show names in dropdown
-        // Update loadConductores function
+        // Carga los conductores despues de haber seleccionado la licencia
         async function loadConductores(licenciaSeleccionada = null) {
             try {
                 const isAdmin = localStorage.getItem("isAdmin") === "true";
@@ -402,7 +397,7 @@
 </html>
 
 <script>
-    // Add these helper functions
+    // Funciones para mostrar alertas bonitas
     function showAlert(message, type = 'info') {
         return Swal.fire({
             text: message,
@@ -413,7 +408,7 @@
         });
     }
 
-    // Add logout handlers
+    // botones para cerrar sesion
     document.addEventListener('DOMContentLoaded', function () {
         const logoutButton = document.getElementById('logoutButton');
         const logoutButtonMobile = document.getElementById('logoutButtonMobile');
@@ -443,16 +438,15 @@
             });
         }
 
-        // Update the logout handler
+        // funcion para cerrar sesion
         async function handleLogout() {
             try {
                 const response = await fetch(`${API_URL}/logout`, {
                     method: "POST",
                     headers: getAuthHeaders()
-                    // Remove credentials: 'include'
                 });
 
-                // Even if the server request fails, we'll clear local storage
+                // Aunque la respuesta del servidor falle, limpiaremos el localStorage
                 localStorage.removeItem("empresaEmail");
                 localStorage.removeItem("isEmpresa");
                 localStorage.removeItem("token");
@@ -464,7 +458,7 @@
                 window.location.href = "login-empresa.html";
             } catch (error) {
                 console.error("Error al cerrar sesión:", error);
-                // Still clear localStorage and redirect even if there's an error
+                // Todavia limpiamos LocalStorage y redirigimos aunque haya error
                 localStorage.clear(); // Clear all localStorage items
                 window.location.href = "login-empresa.html";
             }
@@ -477,7 +471,7 @@
 <script>
 
 
-    // Update the conductor selection handler
+    // Seleccionar conductores
     document.getElementById('conductorSelect').addEventListener('change', async function (e) {
         const conductorInfo = document.getElementById('conductorInfo');
         const statsGrid = document.getElementById('statsGrid');
@@ -494,7 +488,7 @@
             const conductorId = e.target.value;
             let conductor;
 
-            // Fetch conductor details
+            // Obtener detalles del conductor por DNI
             const conductorResponse = await fetch(`${API_URL}/conductores/dni/${conductorId}`, {
                 headers: getAuthHeaders()
             });
@@ -508,7 +502,7 @@
             if (isAdmin && conductor) {
                 console.log('Conductor license:', conductor.licencia); // Debug conductor license
 
-                // Fetch empresa details using conductor's license
+                // Obtenemos los detalles de la empresa con la licencia del conductor
                 const empresaResponse = await fetch(`${API_URL}/licencias/${conductor.licencia}`, {
                     headers: getAuthHeaders()
                 });
@@ -519,14 +513,14 @@
                     const empresaData = await empresaResponse.json();
                     console.log('Empresa Data received:', empresaData);
 
-                    // Update empresa info in the welcome section with all available data
+                    // Actualizamos los datos de la empresa con los datos obtenidos
                     document.getElementById('empresaLicencia').textContent = conductor.licencia || 'N/A';
                     document.getElementById('empresaMatricula').textContent = empresaData.MATRICULA || 'N/A';
                     document.getElementById('empresaMarcaModelo').textContent = empresaData.MARCA_MODELO || 'N/A';
                     document.getElementById('empresaDNI').textContent = empresaData.DNI || 'N/A';
                     document.getElementById('empresaEmail').textContent = empresaData.EMAIL || 'N/A';
 
-                    // Debug the values being set
+                    // Depuracion 
                     console.log('Setting values:', {
                         licencia: conductor.licencia,
                         matricula: empresaData.MATRICULA,
@@ -540,11 +534,11 @@
                 }
             }
 
-            // Show conductor info
+            // Muestra la información del conductor
             conductorInfo.classList.remove('hidden');
             statsGrid.classList.remove('hidden');
 
-            // Update conductor info
+            // Actualiza la información del conductor
             document.getElementById('conductorNombre').textContent = conductor.nombre_apellidos || 'N/A';
             document.getElementById('conductorDNI').textContent = conductor.dni || 'N/A';
             document.getElementById('conductorEmail').textContent = conductor.email || 'N/A';
@@ -558,7 +552,7 @@
 
 
 
-    // Also in calculateHours function
+    // funcion para calcular horas trabajadas y horas descansadas
     async function calculateHours(conductorNombre) {
         try {
             const licencia = document.getElementById('empresaLicencia').textContent;
@@ -578,7 +572,7 @@
             const eventos = await response.json();
             console.log('Eventos del conductor:', eventos);
 
-            // Filter events by date range if dates are chosen
+            // Filtrar los eventos por fecha si se proporcionan
             const filteredEventos = (startDate && endDate)
                 ? eventos.filter(evento => {
                     const eventDate = evento.fecha_hora.split('T')[0];
@@ -586,13 +580,13 @@
                 })
                 : eventos;
 
-            // Reset sums
+            // Reiniciar sumas
             let sumInicioJornada = 0;
             let sumFinJornada = 0;
             let sumInicioDescanso = 0;
             let sumFinDescanso = 0;
 
-            // Calculate sums for filtered events
+            // Calcular sumas de horas
             filteredEventos.forEach(evento => {
                 const timestamp = new Date(evento.fecha_hora).getTime();
                 switch (evento.evento) {
@@ -611,7 +605,7 @@
                 }
             });
 
-            // Calculate totals and update display
+            // Calcular totales y mostrarlos
             const totalRest = sumFinDescanso - sumInicioDescanso;
             const totalWorking = (sumFinJornada - sumInicioJornada) - totalRest;
 
@@ -636,7 +630,7 @@
         }
     }
 
-    // Update the filter button event listener
+    // Filtrar los datos
     document.getElementById('filterButton').addEventListener('click', async function () {
         const conductorSelect = document.getElementById('conductorSelect');
         const selectedConductor = conductorSelect.options[conductorSelect.selectedIndex].text;
